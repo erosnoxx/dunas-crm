@@ -84,6 +84,14 @@ class LoginTest {
     }
 
     @Test
+    @DisplayName("toString dos parâmetros não traz a senha")
+    void paramsToStringDoesNotLeakThePassword() {
+        var text = params("joao@x.com").toString();
+
+        assertThat(text).doesNotContain(STRONG_PASSWORD).contains("joao@x.com");
+    }
+
+    @Test
     @DisplayName("devolve mustChangePassword da conta")
     void returnsMustChangePassword() {
         when(userRepository.findByEmail(Email.of("joao@x.com"))).thenReturn(Optional.of(userMustChangePassword()));

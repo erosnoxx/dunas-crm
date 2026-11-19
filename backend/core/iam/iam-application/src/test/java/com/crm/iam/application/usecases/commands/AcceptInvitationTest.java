@@ -107,6 +107,14 @@ class AcceptInvitationTest {
     }
 
     @Test
+    @DisplayName("toString dos parâmetros não traz o segredo do link nem a senha")
+    void paramsToStringDoesNotLeakSecrets() {
+        var text = params(STRONG_PASSWORD).toString();
+
+        assertThat(text).doesNotContain(secret.getValue()).doesNotContain(STRONG_PASSWORD).contains("Galaxy A54");
+    }
+
+    @Test
     @DisplayName("nunca salva o token depois do consume")
     void neverSavesTheToken() {
         pendingToken(TokenPurpose.INVITATION);

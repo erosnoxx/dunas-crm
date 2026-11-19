@@ -48,6 +48,11 @@ public class AcceptInvitation {
             String password,
             String device
     ) {
+        /** Sem o segredo do link nem a senha: o log e o {@code toString()} não podem vazá-los. */
+        @Override
+        public String toString() {
+            return "Params[device=" + device + "]";
+        }
     }
 
     public SessionResponse execute(Params params) {

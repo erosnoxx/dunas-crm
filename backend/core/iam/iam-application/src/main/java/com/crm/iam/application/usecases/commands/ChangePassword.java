@@ -53,18 +53,24 @@ public class ChangePassword {
             String currentPassword,
             String newPassword
     ) {
+        /** Sem as senhas: o log e o {@code toString()} não podem vazá-las. */
+        @Override
+        public String toString() {
+            return "Params[actor=" + actor + "]";
+        }
     }
 
     public void execute(Params params) {
         var now = Instant.now(clock);
         var actor = params.actor();
 
+        // a senha nova é validada antes do limite: uma senha nova fora da regra não gasta tentativa de login
+        var next = Password.of(params.newPassword());
+
         var user = userRepository.findById(actor.userId())
                 .orElseThrow(() -> new NotFoundException("user_not_found", "usuário não encontrado"));
 
         rateLimiter.consume(settings.loginPerEmail(), user.getEmail().getValue());
-
-        var next = Password.of(params.newPassword());
 
         var currentHash = user.getPasswordHash()
                 .orElseThrow(() -> new UnprocessableEntityException("user_not_active", "este usuário não está ativo"));

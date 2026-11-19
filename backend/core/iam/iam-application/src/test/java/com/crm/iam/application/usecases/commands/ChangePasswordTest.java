@@ -138,6 +138,24 @@ class ChangePasswordTest {
     }
 
     @Test
+    @DisplayName("toString dos parâmetros não traz a senha atual nem a nova")
+    void paramsToStringDoesNotLeakSecrets() {
+        var text = params().toString();
+
+        assertThat(text).doesNotContain(CURRENT_PASSWORD).doesNotContain(STRONG_PASSWORD);
+    }
+
+    @Test
+    @DisplayName("senha nova fora da regra é invalid_password sem gastar tentativa do limite de login")
+    void invalidNewPasswordDoesNotConsumeTheLimit() {
+        assertThatThrownBy(() -> changePassword.execute(new ChangePassword.Params(actor, CURRENT_PASSWORD, WEAK_PASSWORD)))
+                .satisfies(domainCode("invalid_password"));
+
+        verifyNoInteractions(rateLimiter, hasher, sessionRepository, publisher, cache);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("tira do cache a sessão atual, com a chave iam:session:<hash>, logo depois de salvar o usuário")
     void evictsTheCurrentSessionFromTheCache() {
         currentPasswordMatches(true);

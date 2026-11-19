@@ -20,6 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InOrder;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -32,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -202,6 +204,55 @@ class AuthenticateSessionTest {
         assertThat(stored.getLastUsedAt()).isEqualTo(NOW);
         assertThat(stored.getExpiresAt()).isEqualTo(NOW.plus(SETTINGS.sessionValidity()));
         verify(sessionRepository).save(stored);
+    }
+
+    @Test
+    @DisplayName("depois de gravar a renovação, tira a sessão do cache para não servir o último uso velho")
+    void evictsTheCacheAfterRenewing() {
+        var stored = storedSession(NOW.minus(Duration.ofMinutes(6)), null);
+        cacheHit(valid(NOW.minus(Duration.ofMinutes(6))));
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(stored));
+
+        authenticateSession.execute(secret.getValue());
+
+        InOrder order = inOrder(sessionRepository, cache);
+        order.verify(sessionRepository).save(stored);
+        order.verify(cache).evict(key);
+    }
+
+    @Test
+    @DisplayName("sem renovação devida não mexe no cache")
+    void doesNotEvictWhenNoRenewalIsDue() {
+        cacheHit(valid(NOW.minus(Duration.ofMinutes(4))));
+
+        authenticateSession.execute(secret.getValue());
+
+        verify(cache, never()).evict(any());
+    }
+
+    @Test
+    @DisplayName("renovação que já estava feita (banco sem escrita) não mexe no cache")
+    void doesNotEvictWhenNothingWasWritten() {
+        cacheHit(valid(NOW.minus(Duration.ofMinutes(6))));
+        when(sessionRepository.findById(sessionId))
+                .thenReturn(Optional.of(storedSession(NOW.minusSeconds(10), null)));
+
+        authenticateSession.execute(secret.getValue());
+
+        verify(cache, never()).evict(any());
+    }
+
+    @Test
+    @DisplayName("conflito ao gravar a renovação não tira do cache: quem renovou antes já o fez")
+    void doesNotEvictOnRenewalConflict() {
+        var stored = storedSession(NOW.minus(Duration.ofMinutes(6)), null);
+        cacheHit(valid(NOW.minus(Duration.ofMinutes(6))));
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(stored));
+        when(sessionRepository.save(stored)).thenThrow(new ConcurrentUpdateException());
+
+        authenticateSession.execute(secret.getValue());
+
+        verify(cache, never()).evict(any());
     }
 
     @Test

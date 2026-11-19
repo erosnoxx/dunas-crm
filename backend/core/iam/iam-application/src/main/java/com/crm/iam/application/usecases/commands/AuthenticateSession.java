@@ -98,6 +98,9 @@ public class AuthenticateSession {
 
         try {
             sessionRepository.save(session);
+
+            // o principal em cache guarda o último uso e a expiração de antes da renovação
+            cache.evict(CACHE_KEY_PREFIX + session.getTokenHash().getValue());
         }
         catch (ConcurrentUpdateException e) {
             // a renovação é de conveniência: se outra requisição renovou a mesma sessão primeiro,

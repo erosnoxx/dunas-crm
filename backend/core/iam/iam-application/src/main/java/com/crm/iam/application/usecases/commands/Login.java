@@ -76,6 +76,11 @@ public class Login {
             String device,
             String origin
     ) {
+        /** Sem a senha: o log e o {@code toString()} não podem vazá-la. */
+        @Override
+        public String toString() {
+            return "Params[email=" + email + ", device=" + device + ", origin=" + origin + "]";
+        }
     }
 
     public SessionResponse execute(Params params) {

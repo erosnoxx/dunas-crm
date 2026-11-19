@@ -43,6 +43,11 @@ public class ResetPassword {
             String token,
             String password
     ) {
+        /** Sem o segredo do link nem a senha: o log e o {@code toString()} não podem vazá-los. */
+        @Override
+        public String toString() {
+            return "Params[]";
+        }
     }
 
     public void execute(Params params) {
