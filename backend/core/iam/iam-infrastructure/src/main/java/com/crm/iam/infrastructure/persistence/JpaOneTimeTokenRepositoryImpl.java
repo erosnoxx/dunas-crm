@@ -47,7 +47,9 @@ public class JpaOneTimeTokenRepositoryImpl
 
     /**
      * A hora do uso é a que o aggregate já guarda: quem chama marca o token com
-     * {@code consume(now)} (e confere a validade) antes de gravar.
+     * {@code consume(now)} (e confere a validade) antes de gravar. Depois do consume, a instância
+     * não deve ser salva: a linha já está em uma versão mais nova e o save falharia por conflito
+     * de versão.
      */
     @Override
     public boolean consume(OneTimeToken token) {
