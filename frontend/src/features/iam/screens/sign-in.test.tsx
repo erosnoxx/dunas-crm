@@ -165,10 +165,11 @@ describe("SignIn", () => {
     expect(screen.getByLabelText("Senha")).toBeDisabled()
     expect(screen.getByRole("button", { name: "Mostrar" })).toBeDisabled()
     expect(screen.getByRole("button", { name: "Entrar" })).toBeDisabled()
-    expect(screen.getByRole("button", { name: "Entrar" })).toHaveClass(
-      "bg-line",
-      "text-text-muted",
-    )
+    // O jsdom não calcula a cascata: confere o conjunto efetivo de classes. O
+    // `disabled:opacity-50` do Button tem mais força que `opacity-100` e deixaria o botão pela metade.
+    const locked = screen.getByRole("button", { name: "Entrar" })
+    expect(locked).toHaveClass("bg-line", "text-text-muted", "disabled:opacity-100")
+    expect(locked).not.toHaveClass("disabled:opacity-50", "bg-brand", "text-on-brand")
     expect(screen.getByRole("link", { name: "Esqueci minha senha" })).toBeInTheDocument()
 
     await user.click(screen.getByRole("button", { name: "Entrar" }))
@@ -192,6 +193,17 @@ describe("SignIn", () => {
 
     expect(await screen.findByText("início")).toBeInTheDocument()
     expect(service.login).toHaveBeenCalledTimes(2)
+  })
+
+  it("erro sem mensagem mostra o texto genérico da API em vez de um aviso vazio", async () => {
+    vi.mocked(service.login).mockRejectedValue(new Error(""))
+    const user = renderSignIn()
+
+    await fillAndSubmit(user)
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Algo deu errado; tente de novo",
+    )
   })
 
   it("outro erro da API mostra a mensagem que ela mandou", async () => {

@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Link, useNavigate } from "react-router"
 
-import type { ApiError } from "@/shared/api/api-error"
+import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
 import { cn } from "@/shared/lib/cn"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
@@ -73,7 +73,9 @@ function SignIn() {
               <Alert tone="danger">
                 {error.code === "invalid_credentials"
                   ? INVALID_CREDENTIALS
-                  : sentence(messageFor(error.code, error.message ?? ""))}
+                  : sentence(
+                      messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE),
+                    )}
               </Alert>
             )
           )}
@@ -121,7 +123,8 @@ function SignIn() {
             disabled={locked}
             className={cn(
               "md:min-h-12 md:cut-sm",
-              locked && "bg-line text-text-muted opacity-100 hover:brightness-100",
+              locked &&
+                "bg-line text-text-muted disabled:opacity-100 hover:brightness-100",
             )}
           >
             Entrar
