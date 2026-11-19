@@ -12,7 +12,7 @@ import { Input } from "@/shared/ui/input"
 import { AuthShell } from "../components/auth-shell"
 import { PasswordField } from "../components/password-field"
 import { useLogin } from "../iam.hooks"
-import { messageFor } from "../iam.messages"
+import { messageFor, sentence } from "../iam.messages"
 import { signInSchema, type SignInValues } from "../iam.schemas"
 
 const INVALID_CREDENTIALS =
@@ -20,9 +20,6 @@ const INVALID_CREDENTIALS =
 const RATE_LIMITED_TITLE = "Muitas tentativas de entrada"
 const RATE_LIMITED_TEXT =
   "Por segurança, o acesso fica pausado por 15 minutos. Tente de novo depois desse prazo."
-
-/** As mensagens da API vêm em minúscula; no aviso a frase começa com maiúscula. */
-const sentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
 /**
  * Entrar (mockups "Entrar · web", "senha errada" e "bloqueado"). O `device` não vai no corpo:

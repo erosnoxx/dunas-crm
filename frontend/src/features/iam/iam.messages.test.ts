@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { LABELS, messageFor } from "./iam.messages"
+import { LABELS, messageFor, sentence } from "./iam.messages"
 
 // A tabela de erros de docs/system-design/01-iam/usecases.md.
 const TABLE: Record<string, string> = {
@@ -52,5 +52,15 @@ describe("LABELS", () => {
       INVITED: "Convite pendente",
       DEACTIVATED: "Desativado",
     })
+  })
+})
+
+describe("sentence", () => {
+  it("põe a inicial em maiúscula e mantém o resto", () => {
+    expect(sentence("a senha precisa ter um número")).toBe(
+      "A senha precisa ter um número",
+    )
+    expect(sentence("Já está")).toBe("Já está")
+    expect(sentence("")).toBe("")
   })
 })

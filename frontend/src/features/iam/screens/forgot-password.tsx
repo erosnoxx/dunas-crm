@@ -13,11 +13,8 @@ import { Panel } from "@/shared/ui/panel"
 
 import { AuthHeader, AuthShell } from "../components/auth-shell"
 import { useRequestPasswordReset } from "../iam.hooks"
-import { messageFor } from "../iam.messages"
+import { messageFor, sentence } from "../iam.messages"
 import { forgotPasswordSchema, type ForgotPasswordValues } from "../iam.schemas"
-
-/** As mensagens da API vêm em minúscula; no aviso a frase começa com maiúscula. */
-const sentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
 const TEXT_LINK =
   "inline-flex min-h-11 items-center self-start text-body-sm font-semibold"
