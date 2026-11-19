@@ -75,6 +75,23 @@ describe("createQueryClient: sessão que cai", () => {
     expect(onSessionInvalid).not.toHaveBeenCalled()
   })
 
+  it("trata session_invalid de um me que já tinha dado: a sessão caiu e o cache guardado não vale", async () => {
+    const onSessionInvalid = vi.fn()
+    const client = createQueryClient(onSessionInvalid)
+    client.setQueryData(["me"], { id: "1" })
+
+    await client
+      .fetchQuery({
+        queryKey: ["me"],
+        queryFn: () => Promise.reject(sessionInvalid),
+        meta: { handlesOwnSession: true },
+      })
+      .catch(() => undefined)
+
+    expect(onSessionInvalid).toHaveBeenCalledTimes(1)
+    expect(client.getQueryData(["me"])).toBeUndefined()
+  })
+
   it("volta a agir depois que a pessoa entra de novo", async () => {
     const onSessionInvalid = vi.fn()
     const client = createQueryClient(onSessionInvalid)

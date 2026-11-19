@@ -35,8 +35,9 @@ function isSessionInvalid(error: unknown): boolean {
  * Cliente de consulta do app. `session_invalid` de qualquer consulta ou mutation autenticada
  * (a sessão caiu no meio do uso) limpa o cache e chama `onSessionInvalid` **uma única vez**: as
  * demais consultas em voo falham com o mesmo erro e não repetem o aviso. A trava solta quando
- * algo dá certo de novo (a pessoa entrou). A consulta marcada `handlesOwnSession` fica de
- * fora: é ela que a tela pública de login faz sem sessão, e que o guarda lê.
+ * algo dá certo de novo (a pessoa entrou). A consulta marcada `handlesOwnSession` só fica
+ * de fora enquanto não tem dado: é ela que a tela pública de login faz sem sessão e que o
+ * guarda lê; com dado em cache, o 401 é queda de sessão como qualquer outro.
  */
 export function createQueryClient(onSessionInvalid: () => void): QueryClient {
   let handled = false
@@ -56,7 +57,10 @@ export function createQueryClient(onSessionInvalid: () => void): QueryClient {
     queryCache: new QueryCache({
       onSuccess,
       onError: (error, query) => {
-        if (!query.meta?.handlesOwnSession) onError(error)
+        // Sem dado e com `handlesOwnSession` é "ninguém entrou" (esperado). Com dado em cache,
+        // o 401 é sessão que caiu: o `me` guardado não vale mais e o guarda não o notaria.
+        if (!(query.meta?.handlesOwnSession && query.state.data === undefined))
+          onError(error)
       },
     }),
     mutationCache: new MutationCache({ onSuccess, onError }),
