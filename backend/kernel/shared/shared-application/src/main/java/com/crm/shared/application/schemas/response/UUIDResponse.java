@@ -1,4 +1,4 @@
-package com.crm.common.application.response;
+package com.crm.shared.application.schemas.response;
 
 import java.util.UUID;
 
