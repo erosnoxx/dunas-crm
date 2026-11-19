@@ -11,7 +11,7 @@ describe("AuthShell", () => {
       </AuthShell>,
     )
 
-    expect(screen.getByRole("img", { name: "DUNAS" })).toBeInTheDocument()
+    expect(screen.getByText("DUNAS")).toBeInTheDocument()
     expect(screen.getByRole("heading", { level: 1, name: "Entrar" })).toBeInTheDocument()
     expect(screen.getByText("Acesse o sistema.")).toBeInTheDocument()
     expect(screen.getByText("conteúdo")).toBeInTheDocument()
@@ -40,5 +40,54 @@ describe("AuthShell", () => {
     expect(screen.getByRole("region", { name: "Entrar" })).toHaveClass(
       "max-md:bg-transparent",
     )
+  })
+
+  it("o logo é decorativo, porque o nome DUNAS está escrito ao lado", () => {
+    const { container } = render(
+      <AuthShell title="Entrar" description="d">
+        <p>x</p>
+      </AuthShell>,
+    )
+
+    expect(screen.queryByRole("img", { name: "DUNAS" })).not.toBeInTheDocument()
+    expect(container.querySelector("img")).toHaveAttribute("alt", "")
+  })
+
+  it("mostra o rodapé quando é dado, fora do painel", () => {
+    render(
+      <AuthShell title="Entrar" description="d" footer="O acesso é por convite.">
+        <p>x</p>
+      </AuthShell>,
+    )
+
+    const footer = screen.getByText("O acesso é por convite.")
+    expect(footer).toBeInTheDocument()
+    expect(screen.getByRole("region", { name: "Entrar" })).not.toContainElement(footer)
+  })
+
+  it("compact aperta o celular (24 do cabeçalho ao conteúdo, 20 do título ao formulário)", () => {
+    const { container } = render(
+      <AuthShell title="Crie sua senha" description="d" compact>
+        <p>x</p>
+      </AuthShell>,
+    )
+
+    expect(container.firstElementChild).toHaveClass("gap-6", "md:gap-0")
+    expect(container.firstElementChild).not.toHaveClass("gap-8")
+    expect(screen.getByRole("region", { name: "Crie sua senha" })).toHaveClass(
+      "gap-5",
+      "md:gap-6",
+    )
+  })
+
+  it("sem compact mantém os espaços do Entrar (32 e 24)", () => {
+    const { container } = render(
+      <AuthShell title="Entrar" description="d">
+        <p>x</p>
+      </AuthShell>,
+    )
+
+    expect(container.firstElementChild).toHaveClass("gap-8")
+    expect(screen.getByRole("region", { name: "Entrar" })).toHaveClass("gap-6")
   })
 })

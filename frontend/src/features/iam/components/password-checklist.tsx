@@ -10,7 +10,7 @@ import { checkPassword } from "../password-rules"
  */
 function PasswordChecklist({ password }: { password: string }) {
   return (
-    <ul aria-label="Regras da senha" className="flex flex-col gap-2">
+    <ul role="list" aria-label="Regras da senha" className="flex flex-col gap-2">
       {checkPassword(password).map((rule) => (
         <li
           key={rule.id}

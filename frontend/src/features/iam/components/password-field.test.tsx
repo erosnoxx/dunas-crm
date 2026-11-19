@@ -76,4 +76,36 @@ describe("PasswordField", () => {
     rerender(<PasswordField id="senha" label="Senha" value="" onChange={() => {}} />)
     expect(screen.queryByText(/de 30/)).not.toBeInTheDocument()
   })
+
+  it("o limite de 30 não pode ser trocado por quem usa o campo", () => {
+    render(<PasswordField id="senha" label="Senha" maxLength={100} />)
+
+    expect(screen.getByLabelText("Senha")).toHaveAttribute("maxlength", "30")
+  })
+
+  it("junta o aria-describedby de quem usa com o do erro", () => {
+    render(
+      <>
+        <p id="dica">use a senha do convite</p>
+        <PasswordField
+          id="senha"
+          label="Senha"
+          aria-describedby="dica"
+          error="informe a senha"
+        />
+      </>,
+    )
+
+    expect(screen.getByLabelText("Senha")).toHaveAccessibleDescription(
+      "use a senha do convite informe a senha",
+    )
+  })
+
+  it("desligado, desliga também o botão de mostrar", () => {
+    render(<PasswordField id="senha" label="Senha" disabled />)
+
+    expect(screen.getByLabelText("Senha")).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Mostrar" })).toBeDisabled()
+    expect(screen.getByText("Senha")).toHaveClass("text-text-muted")
+  })
 })
