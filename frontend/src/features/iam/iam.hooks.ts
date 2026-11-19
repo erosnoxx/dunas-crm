@@ -4,6 +4,7 @@ import {
   useQueryClient,
   type QueryClient,
 } from "@tanstack/react-query"
+import { useNavigate } from "react-router"
 
 import * as service from "./iam.service"
 import type { Role } from "./iam.service"
@@ -25,6 +26,8 @@ export function useCurrentUser() {
     queryKey: keys.me,
     queryFn: service.getCurrentUser,
     staleTime: ONE_HOUR,
+    // A tela pública de login faz esta consulta sem sessão: o 401 é esperado, não é queda de sessão.
+    meta: { handlesOwnSession: true },
   })
 }
 
@@ -68,11 +71,22 @@ export function useAcceptInvitation() {
   })
 }
 
-/** Quem sai não deixa dado para o próximo usuário do aparelho: limpa o cache inteiro. */
+/**
+ * Quem sai não deixa dado para o próximo usuário do aparelho: limpa o cache inteiro e vai para
+ * o login. A navegação é daqui porque `clear()` não avisa a consulta `me` ainda montada, e o
+ * guarda não notaria a saída.
+ */
 export function useLogout() {
   const client = useQueryClient()
+  const navigate = useNavigate()
 
-  return useMutation({ mutationFn: service.logout, onSuccess: () => client.clear() })
+  return useMutation({
+    mutationFn: service.logout,
+    onSuccess: () => {
+      client.clear()
+      void navigate("/entrar", { replace: true })
+    },
+  })
 }
 
 export function useRequestPasswordReset() {

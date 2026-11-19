@@ -1,14 +1,16 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { QueryClientProvider } from "@tanstack/react-query"
 import { renderHook, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
+import { MemoryRouter, useLocation } from "react-router"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-import { queryClient as appQueryClient } from "@/shared/lib/query-client"
+import { createQueryClient } from "@/shared/lib/query-client"
 
 import {
   useChangeUserRole,
   useCurrentUser,
   useLogin,
+  useLogout,
   useRevokeSession,
 } from "./iam.hooks"
 import * as service from "./iam.service"
@@ -16,14 +18,16 @@ import * as service from "./iam.service"
 vi.mock("./iam.service")
 
 function setup() {
-  const client = new QueryClient({
-    defaultOptions: {
-      ...appQueryClient.getDefaultOptions(),
-      queries: { ...appQueryClient.getDefaultOptions().queries, retryDelay: 0 },
-    },
+  const client = createQueryClient(() => undefined)
+
+  client.setDefaultOptions({
+    ...client.getDefaultOptions(),
+    queries: { ...client.getDefaultOptions().queries, retryDelay: 0 },
   })
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    <MemoryRouter initialEntries={["/painel"]}>
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    </MemoryRouter>
   )
 
   return { client, wrapper }
@@ -98,5 +102,43 @@ describe("mutations", () => {
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ["sessions"] })
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ["users"] })
+  })
+})
+
+describe("useLogout", () => {
+  it("encerra a sessão, limpa o cache inteiro e vai para o login", async () => {
+    vi.mocked(service.logout).mockResolvedValue(undefined)
+    const { client, wrapper } = setup()
+    client.setQueryData(["me"], { id: "1" })
+    client.setQueryData(["users", { page: 0, size: 10 }], [])
+
+    const { result } = renderHook(
+      () => ({ logout: useLogout(), path: useLocation().pathname }),
+      {
+        wrapper,
+      },
+    )
+    await result.current.logout.mutateAsync()
+
+    expect(service.logout).toHaveBeenCalledTimes(1)
+    expect(client.getQueryCache().getAll()).toHaveLength(0)
+    await waitFor(() => expect(result.current.path).toBe("/entrar"))
+  })
+
+  it("se o logout falha, mantém o cache e fica onde está", async () => {
+    vi.mocked(service.logout).mockRejectedValue({ status: 0, message: "rede" })
+    const { client, wrapper } = setup()
+    client.setQueryData(["me"], { id: "1" })
+
+    const { result } = renderHook(
+      () => ({ logout: useLogout(), path: useLocation().pathname }),
+      {
+        wrapper,
+      },
+    )
+    await result.current.logout.mutateAsync().catch(() => undefined)
+
+    expect(client.getQueryData(["me"])).toEqual({ id: "1" })
+    expect(result.current.path).toBe("/painel")
   })
 })
