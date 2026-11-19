@@ -44,6 +44,15 @@ public final class TokenSecret extends StringValueObject {
     }
 
     /**
+     * Diz se {@link #of} aceitaria o texto, sem lançar; nulo é malformado. O {@code of} apara as
+     * pontas antes de validar, e aqui vale a mesma regra. Serve a quem recebe o segredo de fora (link,
+     * cookie) e precisa tratar lixo como segredo desconhecido.
+     */
+    public static boolean isWellFormed(String value) {
+        return value != null && FORMAT.matcher(value.trim()).matches();
+    }
+
+    /**
      * Hash que o banco guarda no lugar do segredo.
      */
     public TokenHash hash() {
