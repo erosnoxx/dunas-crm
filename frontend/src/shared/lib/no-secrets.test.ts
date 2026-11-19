@@ -7,8 +7,9 @@ const sources = import.meta.glob(["../../**/*.{ts,tsx}", "!../../**/*.test.{ts,t
   eager: true,
 }) as Record<string, string>
 
+// As chaves são relativas a este arquivo: só `shared/api/http-client.ts` é isento.
 // O cliente HTTP é o único lugar que pode falar de credencial (docs/rules/frontend.md §5).
-const isHttpClient = (path: string) => path.endsWith("/api/http-client.ts")
+const isHttpClient = (path: string) => path === "../api/http-client.ts"
 
 describe("código do app", () => {
   it("encontrou o código-fonte para varrer", () => {

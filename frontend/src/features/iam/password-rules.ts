@@ -18,8 +18,8 @@ export function checkPassword(password: string): PasswordRule[] {
       label: "De 8 a 30 caracteres",
       met: password.length >= PASSWORD_MIN && password.length <= PASSWORD_MAX,
     },
-    { id: "upper", label: "Uma letra maiúscula", met: /\p{Lu}/u.test(password) },
-    { id: "lower", label: "Uma letra minúscula", met: /\p{Ll}/u.test(password) },
+    { id: "upper", label: "Uma letra maiúscula", met: /\p{Uppercase}/u.test(password) },
+    { id: "lower", label: "Uma letra minúscula", met: /\p{Lowercase}/u.test(password) },
     { id: "digit", label: "Um número", met: /\p{Nd}/u.test(password) },
     {
       id: "special",

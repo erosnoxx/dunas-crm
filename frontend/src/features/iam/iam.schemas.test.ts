@@ -63,6 +63,19 @@ describe("senha nova", () => {
     expect(mismatch.error?.issues[0]?.path).toEqual(["repeat"])
   })
 
+  it("acceptInvitationSchema mostra o repeat diferente mesmo com a senha fora das regras", () => {
+    const result = acceptInvitationSchema.safeParse({
+      password: "dunas",
+      repeat: "outra",
+    })
+
+    expect(
+      result.error?.issues.some(
+        (i) => i.path[0] === "repeat" && i.message === "as senhas não são iguais",
+      ),
+    ).toBe(true)
+  })
+
   it("acceptInvitationSchema não apara: espaços nas pontas permanecem", () => {
     const password = " Dunas#2026 "
     const result = acceptInvitationSchema.safeParse({ password, repeat: password })

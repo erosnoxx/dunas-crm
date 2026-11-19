@@ -62,6 +62,11 @@ describe("checkPassword", () => {
     expect(failed(" Dunas#1 ".trim())).toEqual(["length"])
   })
 
+  it("segue Character.isUpperCase/isLowerCase do Java, inclusive Other_Uppercase/Other_Lowercase", () => {
+    expect(failed("Ⅰunas#2026")).toEqual([])
+    expect(failed("DUNAⓐ#2026")).toEqual([])
+  })
+
   it("não valida senha vazia", () => {
     expect(isPasswordValid("")).toBe(false)
   })
