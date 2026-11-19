@@ -59,10 +59,13 @@ function ChangePassword({ initialMandatory }: { initialMandatory: boolean }) {
       toast.success("Senha alterada")
       await navigate("/")
     } catch (e) {
-      if ((e as Partial<ApiError>).code === WRONG_CURRENT)
+      if ((e as Partial<ApiError>).code === WRONG_CURRENT) {
         form.setError("currentPassword", {
           message: messageFor(WRONG_CURRENT, UNKNOWN_ERROR_MESSAGE),
         })
+        // O botão enviado segura o foco; leva o teclado de volta ao campo com o erro.
+        form.setFocus("currentPassword")
+      }
       // Os demais erros chegam em `change.error` e a tela os mostra no alerta.
     }
   }
@@ -118,7 +121,7 @@ function ChangePassword({ initialMandatory }: { initialMandatory: boolean }) {
             type="button"
             disabled={logout.isPending}
             onClick={() => logout.mutate()}
-            className="min-h-11 text-body-sm font-semibold text-brand-text underline md:min-h-0"
+            className="min-h-11 text-body-sm font-semibold text-brand-text underline"
           >
             Sair
           </button>
