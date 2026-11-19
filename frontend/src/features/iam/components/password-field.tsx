@@ -40,7 +40,9 @@ function PasswordField({
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-baseline justify-between">
-        <Label htmlFor={id}>{label}</Label>
+        <Label htmlFor={id} className={cn(inputProps.disabled && "text-text-muted")}>
+          {label}
+        </Label>
         {showCount && (
           <span className="text-caption text-text-muted">
             {count} de {PASSWORD_MAX}

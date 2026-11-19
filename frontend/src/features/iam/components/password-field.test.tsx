@@ -106,5 +106,6 @@ describe("PasswordField", () => {
 
     expect(screen.getByLabelText("Senha")).toBeDisabled()
     expect(screen.getByRole("button", { name: "Mostrar" })).toBeDisabled()
+    expect(screen.getByText("Senha")).toHaveClass("text-text-muted")
   })
 })
