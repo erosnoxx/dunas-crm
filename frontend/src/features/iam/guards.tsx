@@ -7,7 +7,7 @@ import { useCurrentUser } from "./iam.hooks"
 import type { Role } from "./iam.service"
 
 const LOGIN_PATH = "/entrar"
-const CHANGE_PASSWORD_PATH = "/conta/trocar-senha"
+export const CHANGE_PASSWORD_PATH = "/conta/trocar-senha"
 
 /** Sem `me` válido (401) vai para o login. Carregando ou com falha de rede, não mostra nem decide nada. */
 export function RequireAuth({ children }: { children: ReactNode }) {
