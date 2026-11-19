@@ -1,20 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, useWatch } from "react-hook-form"
+import { useForm } from "react-hook-form"
 
 import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
-import { cn } from "@/shared/lib/cn"
 import { Alert } from "@/shared/ui/alert"
-import { Button } from "@/shared/ui/button"
-import { Form, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/form"
-import { Input } from "@/shared/ui/input"
+import { Form } from "@/shared/ui/form"
 
 import { messageFor, sentence } from "../iam.messages"
 import { acceptInvitationSchema, type AcceptInvitationValues } from "../iam.schemas"
-import { PASSWORD_MAX } from "../password-rules"
 import { LinkProblem } from "../screens/link-problem"
 import { AuthShell } from "./auth-shell"
-import { PasswordChecklist } from "./password-checklist"
-import { PasswordField } from "./password-field"
+import { NewPasswordFields, PasswordSubmitButton } from "./new-password-fields"
 
 type NewPasswordFormProps = {
   title: string
@@ -48,7 +43,6 @@ function NewPasswordForm({
     mode: "onChange",
     defaultValues: { password: "", repeat: "" },
   })
-  const password = useWatch({ control: form.control, name: "password" })
 
   const error = rawError as Partial<ApiError> | null
 
@@ -86,55 +80,12 @@ function NewPasswordForm({
           )}
 
           <div className="flex flex-col gap-4">
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <PasswordField
-                  {...field}
-                  id="password"
-                  label="Nova senha"
-                  autoComplete="new-password"
-                  showCount
-                  onChange={(event) => {
-                    field.onChange(event)
-                    // A repetição depende da senha: revalida para o erro não ficar velho.
-                    if (form.getValues("repeat")) void form.trigger("repeat")
-                  }}
-                />
-              )}
-            />
-            <PasswordChecklist password={password} />
-            <FormField
-              control={form.control}
-              name="repeat"
-              render={({ field }) => (
-                <FormItem className="gap-1.5">
-                  <FormLabel>Repita a senha</FormLabel>
-                  <Input
-                    {...field}
-                    type="password"
-                    autoComplete="new-password"
-                    maxLength={PASSWORD_MAX}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <NewPasswordFields name="password" />
           </div>
 
-          <Button
-            type="submit"
-            size="lg"
-            loading={isPending}
-            disabled={!ready}
-            className={cn(
-              "md:min-h-12 md:cut-sm",
-              !ready && "bg-line text-text-muted disabled:opacity-100",
-            )}
-          >
+          <PasswordSubmitButton ready={ready} loading={isPending}>
             {submitLabel}
-          </Button>
+          </PasswordSubmitButton>
         </form>
       </Form>
     </AuthShell>
