@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.crm</groupId>
+    <artifactId>crm</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>crm</name>
+    <description>CRM — pom pai</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <resilience4j.version>2.3.0</resilience4j.version>
+        <awssdk.version>2.46.7</awssdk.version>
+        <archunit.version>1.4.1</archunit.version>
+        <!-- O BOM do Spring Boot 3.4.5 traz Testcontainers 1.20.6, que fala com o Docker pela API
+             1.32. O Docker Engine 29 exige no mínimo a 1.40 e recusa ("client version 1.32 is too
+             old"): nenhum teste com contêiner sobe. A 1.21.4 negocia uma API aceita. -->
+        <testcontainers.version>1.21.4</testcontainers.version>
+        <!-- A 2.8.8 é a última compilada contra o Spring Boot 3.4.5; a 2.8.9 em diante já exige o
+             3.5. Subir o Spring Boot é subir esta junto. -->
+        <springdoc.version>2.8.8</springdoc.version>
+        <!-- Argon2 do hash de senha (iam-infrastructure); o BOM do Spring Boot não gerencia. -->
+        <bouncycastle.version>1.80</bouncycastle.version>
+    </properties>
+
+    <!-- Versão de dependência que não vem do spring-boot-starter-parent é fixada aqui; módulo folha
+         declara a dependência sem <version>. -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit-junit5</artifactId>
+                <version>${archunit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-bom</artifactId>
+                <version>${resilience4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${awssdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <!-- Falha cedo e com mensagem clara se o build rodar num JDK diferente do alvo. Buildar
+                 com JDK mais novo não quebra na compilação (release=21 cuida do bytecode): quebra
+                 nas ferramentas que instrumentam bytecode. Em JDK 25 o Lombok não gera nada e o
+                 Mockito não mocka classe concreta, ambos com erros que não apontam para a causa. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-build-environment</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[21,22)</version>
+                                    <message>Este projeto compila com JDK 21. Aponte o JAVA_HOME para um JDK 21 antes de buildar.</message>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>[3.9,)</version>
+                                    <message>Este projeto exige Maven 3.9 ou superior.</message>
+                                </requireMavenVersion>
+                                <banDuplicatePomDependencyVersions/>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- Desde o JDK 22 o javac não executa mais annotation processor só por
+                         encontrá-lo no classpath. Com annotationProcessorPaths declarado, SÓ os
+                         processors listados aqui rodam: ao adicionar outro (MapStruct, etc.),
+                         inclua-o nesta lista. -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <!-- Gera META-INF/spring-configuration-metadata.json dos
+                             @ConfigurationProperties: autocomplete e documentação das properties
+                             crm.* na IDE, a partir do javadoc dos records. Sem <version>: vem do
+                             BOM do Spring Boot (maven-compiler-plugin 3.12+). -->
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- mvn test -Dtest=BoundedContextRulesTest percorre o build inteiro, e o teste
+                         existe só em boot. Sem isto, todo módulo que não o contém falha. -->
+                    <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <modules>
+        <module>kernel</module>
+        <module>core</module>
+        <module>edge</module>
+    </modules>
+
+</project>
