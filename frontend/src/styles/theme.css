@@ -1,0 +1,176 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Tema DUNAS. Os valores de cor vêm de docs/design-system/tokens.json e são conferidos por
+ * theme.test.ts nos dois temas. O escuro é o padrão; o claro (campo) segue o aparelho.
+ */
+
+:root {
+  color-scheme: dark;
+  --ground: #0b1220;
+  --panel: #131c2e;
+  --nav: #0f1729;
+  --line: #26324a;
+  --line-strong: #34476b;
+  --text: #e8edf5;
+  --text-muted: #9aa7bd;
+  --brand: #ff7e00;
+  --on-brand: #0b1220;
+  --brand-text: #ff7e00;
+  --highlight: #ffc15a;
+  --on-highlight: #0b1220;
+  --chip-ok: #1b2a44;
+  --danger: #ff6b6b;
+  --danger-text: #ffa3a3;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --ground: #f4f6f9;
+    --panel: #ffffff;
+    --nav: #ffffff;
+    --line: #d5dce8;
+    --line-strong: #b9c4d6;
+    --text: #0b1220;
+    --text-muted: #566178;
+    --brand: #ff7e00;
+    --on-brand: #0b1220;
+    --brand-text: #b84a00;
+    --highlight: #ffc15a;
+    --on-highlight: #0b1220;
+    --chip-ok: #e3e9f2;
+    --danger: #c62828;
+    --danger-text: #b3261e;
+  }
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-panel: var(--panel);
+  --color-nav: var(--nav);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-brand: var(--brand);
+  --color-on-brand: var(--on-brand);
+  --color-brand-text: var(--brand-text);
+  --color-highlight: var(--highlight);
+  --color-on-highlight: var(--on-highlight);
+  --color-chip-ok: var(--chip-ok);
+  --color-danger: var(--danger);
+  --color-danger-text: var(--danger-text);
+
+  --font-display: "Chakra Petch", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+
+  /* variáveis semânticas do shadcn/ui apontando para os tokens */
+  --color-background: var(--ground);
+  --color-foreground: var(--text);
+  --color-card: var(--panel);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--panel);
+  --color-popover-foreground: var(--text);
+  --color-primary: var(--brand);
+  --color-primary-foreground: var(--on-brand);
+  --color-secondary: var(--chip-ok);
+  --color-secondary-foreground: var(--text);
+  --color-muted: var(--panel);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--chip-ok);
+  --color-accent-foreground: var(--text);
+  --color-destructive: var(--danger);
+  --color-border: var(--line);
+  --color-input: var(--line-strong);
+  --color-ring: var(--highlight);
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
+  }
+}
+
+/* O corte do D do logo vira o canto chanfrado (docs/design-system/README.md, princípio 2). */
+@utility cut-sm {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+}
+
+@utility cut-md {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+}
+
+@utility cut-lg {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+}
+
+/* Escala tipográfica do design system. */
+@utility text-display-xl {
+  font-family: var(--font-display);
+  font-size: 56px;
+  line-height: 60px;
+  font-weight: 700;
+}
+
+@utility text-display-lg {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 40px;
+  font-weight: 700;
+}
+
+@utility text-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 600;
+}
+
+@utility text-number {
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+@utility text-body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+
+@utility text-body-sm {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+@utility text-label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+}
+
+@utility text-caption {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+}
