@@ -11,7 +11,7 @@ describe("AuthShell", () => {
       </AuthShell>,
     )
 
-    expect(screen.getByRole("img", { name: "DUNAS" })).toBeInTheDocument()
+    expect(screen.getByText("DUNAS")).toBeInTheDocument()
     expect(screen.getByRole("heading", { level: 1, name: "Entrar" })).toBeInTheDocument()
     expect(screen.getByText("Acesse o sistema.")).toBeInTheDocument()
     expect(screen.getByText("conteúdo")).toBeInTheDocument()
@@ -40,5 +40,28 @@ describe("AuthShell", () => {
     expect(screen.getByRole("region", { name: "Entrar" })).toHaveClass(
       "max-md:bg-transparent",
     )
+  })
+
+  it("o logo é decorativo, porque o nome DUNAS está escrito ao lado", () => {
+    const { container } = render(
+      <AuthShell title="Entrar" description="d">
+        <p>x</p>
+      </AuthShell>,
+    )
+
+    expect(screen.queryByRole("img", { name: "DUNAS" })).not.toBeInTheDocument()
+    expect(container.querySelector("img")).toHaveAttribute("alt", "")
+  })
+
+  it("mostra o rodapé quando é dado, fora do painel", () => {
+    render(
+      <AuthShell title="Entrar" description="d" footer="O acesso é por convite.">
+        <p>x</p>
+      </AuthShell>,
+    )
+
+    const footer = screen.getByText("O acesso é por convite.")
+    expect(footer).toBeInTheDocument()
+    expect(screen.getByRole("region", { name: "Entrar" })).not.toContainElement(footer)
   })
 })

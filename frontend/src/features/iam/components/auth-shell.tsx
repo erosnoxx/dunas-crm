@@ -7,6 +7,8 @@ type AuthShellProps = {
   title: string
   description: string
   children: React.ReactNode
+  /** Nota sob o painel (no celular, no pé da tela), como "O acesso é por convite..." do Entrar. */
+  footer?: React.ReactNode
 }
 
 /**
@@ -14,13 +16,13 @@ type AuthShellProps = {
  * painel `cut-lg` de 440 px, centralizado (mockup "Entrar · web"). Sobre o painel os campos
  * usam `ground`, como no mockup.
  */
-function AuthShell({ title, description, children }: AuthShellProps) {
+function AuthShell({ title, description, children, footer }: AuthShellProps) {
   const titleId = React.useId()
 
   return (
     <div className="flex min-h-dvh flex-col gap-8 px-6 pt-8 pb-6 md:gap-0 md:p-0">
       <header className="flex items-center gap-3 md:px-8 md:py-6">
-        <Logo size={40} />
+        <Logo size={40} alt="" />
         <span className="font-display text-xl font-semibold tracking-[0.04em]">
           DUNAS
         </span>
@@ -39,6 +41,11 @@ function AuthShell({ title, description, children }: AuthShellProps) {
           {children}
         </Panel>
       </main>
+      {footer && (
+        <div className="text-label font-normal text-text-muted md:px-8 md:pb-6 md:text-center">
+          {footer}
+        </div>
+      )}
     </div>
   )
 }

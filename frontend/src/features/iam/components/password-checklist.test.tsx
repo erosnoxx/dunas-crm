@@ -29,6 +29,15 @@ describe("PasswordChecklist", () => {
     expect(items[3]).toHaveClass("text-text-muted")
   })
 
+  it("a lista declara o papel list, que o Safari perde com list-style none", () => {
+    render(<PasswordChecklist password="" />)
+
+    expect(screen.getByRole("list", { name: "Regras da senha" })).toHaveAttribute(
+      "role",
+      "list",
+    )
+  })
+
   it("o texto para leitor de tela fica fora da vista", () => {
     render(<PasswordChecklist password="" />)
 
