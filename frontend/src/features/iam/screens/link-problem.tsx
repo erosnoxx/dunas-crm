@@ -8,24 +8,48 @@ import { Panel } from "@/shared/ui/panel"
 import { AuthHeader } from "../components/auth-shell"
 
 const COPY = {
-  expired: {
-    title: "Este convite expirou",
-    text: "Por segurança, o link do convite deixa de valer depois de um tempo. Peça ao administrador para enviar um novo convite.",
+  invitation: {
+    expired: {
+      title: "Este convite expirou",
+      text: "Por segurança, o link do convite deixa de valer depois de um tempo. Peça ao administrador para enviar um novo convite.",
+    },
+    used: {
+      title: "Este convite já foi usado ou foi substituído",
+      text: "Peça ao administrador para enviar um novo convite.",
+    },
+    action: { label: "Ir para o login", to: "/entrar" },
   },
-  used: {
-    title: "Este convite já foi usado ou foi substituído",
-    text: "Peça ao administrador para enviar um novo convite.",
+  // Copy aprovada em telas-complementares.md: um texto só para os dois títulos.
+  reset: {
+    expired: {
+      title: "Este link expirou",
+      text: "Por segurança, o link deixa de valer depois de um tempo. Peça um novo na tela de login.",
+    },
+    used: {
+      title: "Este link já foi usado ou foi substituído",
+      text: "Por segurança, o link deixa de valer depois de um tempo. Peça um novo na tela de login.",
+    },
+    action: { label: "Pedir novo link", to: "/esqueci-senha" },
   },
 } as const
 
 /**
- * Link do convite que não vale mais (mockup "Convite · link expirado"; `used` reaproveita o
- * desenho com o texto de `link_used`). No celular o painel `cut-lg` fica acima do botão; a partir
- * de `md` ele é centralizado, como o painel do `AuthShell`.
+ * Link que não vale mais (mockup "Convite · link expirado"; `used` reaproveita o desenho com o
+ * texto de `link_used`, e `source="reset"` o texto de "link" da redefinição de senha). No
+ * celular o painel `cut-lg` fica acima do botão; a partir de `md` ele é centralizado, como o
+ * painel do `AuthShell`.
  */
-function LinkProblem({ kind }: { kind: keyof typeof COPY }) {
+function LinkProblem({
+  kind,
+  source = "invitation",
+}: {
+  kind: "expired" | "used"
+  source?: keyof typeof COPY
+}) {
   const titleId = React.useId()
-  const { title, text } = COPY[kind]
+  const copy = COPY[source]
+  const { title, text } = copy[kind]
+  const { action } = copy
 
   return (
     <div className="flex min-h-dvh flex-col gap-8 px-6 pt-8 pb-6 md:gap-0 md:p-0">
@@ -46,11 +70,11 @@ function LinkProblem({ kind }: { kind: keyof typeof COPY }) {
             variant="outline"
             size="lg"
             nativeButton={false}
-            render={<Link to="/entrar" />}
+            render={<Link to={action.to} />}
             role="link"
             className="w-full"
           >
-            Ir para o login
+            {action.label}
           </Button>
         </div>
       </main>

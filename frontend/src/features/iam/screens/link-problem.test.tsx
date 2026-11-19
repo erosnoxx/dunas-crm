@@ -5,10 +5,11 @@ import { describe, expect, it } from "vitest"
 
 import { LinkProblem } from "./link-problem"
 
-function renderProblem(kind: "expired" | "used") {
+function renderProblem(kind: "expired" | "used", source?: "reset") {
   const Stub = createRoutesStub([
-    { path: "/convite", Component: () => <LinkProblem kind={kind} /> },
+    { path: "/convite", Component: () => <LinkProblem kind={kind} source={source} /> },
     { path: "/entrar", Component: () => <p>tela de entrar</p> },
+    { path: "/esqueci-senha", Component: () => <p>tela de esqueci a senha</p> },
   ])
 
   render(<Stub initialEntries={["/convite"]} />)
@@ -61,4 +62,29 @@ describe("LinkProblem", () => {
 
     expect(await screen.findByText("tela de entrar")).toBeInTheDocument()
   })
+
+  it.each([
+    ["expired", "Este link expirou"],
+    ["used", "Este link já foi usado ou foi substituído"],
+  ] as const)(
+    "redefinição, %s: texto de link e o botão Pedir novo link",
+    async (kind, title) => {
+      renderProblem(kind, "reset")
+
+      expect(
+        await screen.findByRole("heading", { level: 1, name: title }),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          "Por segurança, o link deixa de valer depois de um tempo. Peça um novo na tela de login.",
+        ),
+      ).toBeInTheDocument()
+      expect(screen.queryByText(/convite/i)).not.toBeInTheDocument()
+      expect(screen.queryByRole("link", { name: "Ir para o login" })).toBeNull()
+
+      await userEvent.setup().click(screen.getByRole("link", { name: "Pedir novo link" }))
+
+      expect(await screen.findByText("tela de esqueci a senha")).toBeInTheDocument()
+    },
+  )
 })
