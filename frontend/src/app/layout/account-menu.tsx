@@ -36,6 +36,16 @@ function AccountMenu({ user }: { user: CurrentUser }) {
   const logout = useLogout()
   const close = () => setOpen(false)
 
+  // A folha some em `md` (`md:hidden`), mas o diálogo seguiria modal: fecha ao cruzar o breakpoint.
+  React.useEffect(() => {
+    const query = window.matchMedia("(min-width: 48rem)")
+    const onChange = (event: { matches: boolean }) => event.matches && setOpen(false)
+
+    query.addEventListener("change", onChange)
+
+    return () => query.removeEventListener("change", onChange)
+  }, [])
+
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger

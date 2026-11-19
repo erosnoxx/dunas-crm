@@ -17,7 +17,11 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/usuarios", label: "Usuários", roles: ["ADMINISTRATOR"] },
 ]
 
-/** Título da barra superior do celular, por rota; a troca de senha tem cabeçalho próprio. */
+/**
+ * Título da barra superior do celular, por rota exata; a troca de senha tem cabeçalho próprio.
+ * Contrato: a página é dona do h1 e o esconde com `max-md:sr-only` no celular; rota aninhada
+ * precisa de entrada aqui ou de casamento por prefixo.
+ */
 const TITLES: Record<string, string> = {
   "/": "Início",
   "/usuarios": "Usuários",
