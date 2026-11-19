@@ -30,6 +30,9 @@ import java.time.Instant;
  * <p>O hash fixo é calculado pelo próprio hasher na construção, e não escrito como constante, para
  * acompanhar os parâmetros de custo configurados em cada ambiente.
  *
+ * <p>Uma senha fora da regra de formato é credencial errada, não erro de validação: o hasher roda
+ * contra o hash fixo com uma senha válida de descarte, para o tempo ser o mesmo.
+ *
  * <p>Os limites de tentativa são consumidos antes de conferir a credencial e devolvidos só no acerto.
  */
 @UseCase
@@ -41,6 +44,7 @@ public class Login {
     private final RateLimiter rateLimiter;
     private final IamSettings settings;
     private final Clock clock;
+    private final Password dummyPassword = Password.of("Dummy#Password1");
     private final PasswordHash dummyHash;
 
     public Login(
@@ -57,7 +61,7 @@ public class Login {
         this.rateLimiter = rateLimiter;
         this.settings = settings;
         this.clock = clock;
-        this.dummyHash = hasher.hash(Password.of("Dummy#Password1"));
+        this.dummyHash = hasher.hash(dummyPassword);
     }
 
     /**
@@ -77,7 +81,6 @@ public class Login {
     public SessionResponse execute(Params params) {
         var now = Instant.now(clock);
         var email = Email.of(params.email());
-        var password = Password.of(params.password());
 
         rateLimiter.consume(settings.loginPerEmail(), email.getValue());
         rateLimiter.consume(settings.loginPerOrigin(), params.origin());
@@ -85,10 +88,14 @@ public class Login {
         var user = userRepository.findByEmail(email)
                 .filter(found -> found.getStatus() == UserStatus.ACTIVE);
 
-        var hash = user.flatMap(User::getPasswordHash).orElse(dummyHash);
+        // senha fora da regra nunca bate com um hash guardado: é credencial errada, e não 400, para
+        // não revelar a regra de senha a quem não tem conta; o hasher roda mesmo assim, com o hash fixo
+        var valid = Password.isValid(params.password());
+        var password = valid ? Password.of(params.password()) : dummyPassword;
+        var hash = user.flatMap(User::getPasswordHash).filter(stored -> valid).orElse(dummyHash);
         var matches = hasher.matches(password, hash);
 
-        if (user.isEmpty() || !matches)
+        if (user.isEmpty() || !valid || !matches)
             throw new UnauthorizedException("invalid_credentials", "e-mail ou senha incorretos");
 
         rateLimiter.refund(settings.loginPerEmail(), email.getValue());

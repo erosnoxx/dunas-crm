@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * Aceita o convite: define a senha, ativa a conta e já abre a sessão.
@@ -53,7 +54,9 @@ public class AcceptInvitation {
         var now = Instant.now(clock);
         var password = Password.of(params.password());
 
-        var token = tokenRepository.findByTokenHash(TokenSecret.of(params.token()).hash())
+        var token = Optional.ofNullable(params.token())
+                .filter(TokenSecret::isWellFormed)
+                .flatMap(raw -> tokenRepository.findByTokenHash(TokenSecret.of(raw).hash()))
                 .filter(found -> found.getPurpose() == TokenPurpose.INVITATION)
                 .orElseThrow(() -> new UnprocessableEntityException("link_used", "este link já foi usado ou foi substituído"));
 

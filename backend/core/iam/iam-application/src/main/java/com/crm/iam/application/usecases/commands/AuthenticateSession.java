@@ -2,6 +2,7 @@ package com.crm.iam.application.usecases.commands;
 
 import com.crm.common.application.annotations.UseCase;
 import com.crm.common.application.cache.Cache;
+import com.crm.common.application.exceptions.ConcurrentUpdateException;
 import com.crm.common.application.exceptions.UnauthorizedException;
 import com.crm.iam.application.Actor;
 import com.crm.iam.application.IamSettings;
@@ -24,9 +25,14 @@ import java.time.Instant;
  * invalidação principal é por evento (a chave é removida pelo listener de {@code SessionRevoked}).
  *
  * <p>Só carrega e grava a {@code Session} quando a renovação é devida; a decisão final é de
- * {@code Session.renewIfDue}.
+ * {@code Session.renewIfDue}. A renovação é de conveniência: conflito de versão ao gravá-la
+ * (outra requisição renovou antes) não derruba a autenticação. Por isso o use case não abre
+ * transação: o conflito marcaria a transação externa como só-rollback e o commit falharia mesmo
+ * com a exception capturada; a única escrita é atômica por si.
+ *
+ * <p>Token malformado (lixo no cookie ou no cabeçalho) é {@code session_invalid}, como o desconhecido.
  */
-@UseCase
+@UseCase(transactional = false)
 @RequiredArgsConstructor
 public class AuthenticateSession {
 
@@ -51,6 +57,10 @@ public class AuthenticateSession {
 
     public AuthenticatedSession execute(String token) {
         var now = Instant.now(clock);
+
+        if (!TokenSecret.isWellFormed(token))
+            throw sessionInvalid();
+
         var tokenHash = TokenSecret.of(token).hash();
 
         var principal = cache.getOrLoad(
@@ -83,8 +93,16 @@ public class AuthenticateSession {
         if (!session.isActiveAt(now))
             throw sessionInvalid();
 
-        if (session.renewIfDue(now, settings.sessionValidity(), settings.sessionRenewInterval()))
+        if (!session.renewIfDue(now, settings.sessionValidity(), settings.sessionRenewInterval()))
+            return;
+
+        try {
             sessionRepository.save(session);
+        }
+        catch (ConcurrentUpdateException e) {
+            // a renovação é de conveniência: se outra requisição renovou a mesma sessão primeiro,
+            // o resultado é o que se queria, e a autenticação desta não pode falhar por isso
+        }
     }
 
     private boolean isValid(

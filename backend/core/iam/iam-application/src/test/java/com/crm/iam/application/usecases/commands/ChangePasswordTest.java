@@ -1,5 +1,6 @@
 package com.crm.iam.application.usecases.commands;
 
+import com.crm.common.application.cache.Cache;
 import com.crm.common.application.events.EventPublisher;
 import com.crm.common.application.exceptions.RateLimitExceededException;
 import com.crm.common.application.exceptions.UnprocessableEntityException;
@@ -15,6 +16,9 @@ import com.crm.iam.domain.vos.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InOrder;
 
 import java.util.List;
@@ -43,6 +47,7 @@ class ChangePasswordTest {
     private PasswordHasher hasher;
     private RateLimiter rateLimiter;
     private EventPublisher publisher;
+    private Cache cache;
     private ChangePassword changePassword;
 
     private final User user = userMustChangePassword();
@@ -56,6 +61,7 @@ class ChangePasswordTest {
         hasher = mock(PasswordHasher.class);
         rateLimiter = mock(RateLimiter.class);
         publisher = mock(EventPublisher.class);
+        cache = mock(Cache.class);
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(hasher.hash(any(Password.class))).thenReturn(NEW_HASH);
@@ -66,6 +72,7 @@ class ChangePasswordTest {
                 hasher,
                 rateLimiter,
                 publisher,
+                cache,
                 SETTINGS,
                 CLOCK
         );
@@ -112,6 +119,37 @@ class ChangePasswordTest {
 
         assertThat(user.getPasswordHash()).contains(NEW_HASH);
         assertThat(user.isMustChangePassword()).isFalse();
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"", "fraca", "semespecial1A"})
+    @DisplayName("senha atual fora da regra é wrong_current_password, conta no limite e não troca nada")
+    void currentPasswordOutsideThePolicyIsWrong(String raw) {
+        assertThatThrownBy(() -> changePassword.execute(new ChangePassword.Params(actor, raw, STRONG_PASSWORD)))
+                .isInstanceOf(UnprocessableEntityException.class)
+                .hasMessage("a senha atual está incorreta")
+                .satisfies(applicationCode("wrong_current_password"));
+
+        verify(rateLimiter).consume(LOGIN_PER_EMAIL, "joao@x.com");
+        verify(rateLimiter, never()).refund(any(), any());
+        verify(userRepository, never()).save(any());
+        verifyNoInteractions(sessionRepository, publisher, cache);
+    }
+
+    @Test
+    @DisplayName("tira do cache a sessão atual, com a chave iam:session:<hash>, logo depois de salvar o usuário")
+    void evictsTheCurrentSessionFromTheCache() {
+        currentPasswordMatches(true);
+        var other = session(user.getId());
+        when(sessionRepository.findActiveByUserId(user.getId(), NOW)).thenReturn(List.of(other, current));
+
+        changePassword.execute(params());
+
+        InOrder order = inOrder(userRepository, cache);
+        order.verify(userRepository).save(user);
+        order.verify(cache).evict("iam:session:" + current.getTokenHash().getValue());
+        verify(cache, never()).evict("iam:session:" + other.getTokenHash().getValue());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.crm.iam.application.usecases.commands;
 
 import com.crm.common.application.cache.Cache;
+import com.crm.common.application.exceptions.ConcurrentUpdateException;
 import com.crm.common.application.exceptions.UnauthorizedException;
 import com.crm.iam.application.Actor;
 import com.crm.iam.application.contracts.readers.SessionReader;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -199,6 +202,33 @@ class AuthenticateSessionTest {
         assertThat(stored.getLastUsedAt()).isEqualTo(NOW);
         assertThat(stored.getExpiresAt()).isEqualTo(NOW.plus(SETTINGS.sessionValidity()));
         verify(sessionRepository).save(stored);
+    }
+
+    @Test
+    @DisplayName("conflito ao gravar a renovação (outra requisição renovou antes) não derruba a autenticação")
+    void renewalConflictDoesNotBreakAuthentication() {
+        var stored = storedSession(NOW.minus(Duration.ofMinutes(6)), null);
+        cacheHit(valid(NOW.minus(Duration.ofMinutes(6))));
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(stored));
+        when(sessionRepository.save(stored)).thenThrow(new ConcurrentUpdateException());
+
+        var result = authenticateSession.execute(secret.getValue());
+
+        assertThat(result.actor()).isEqualTo(new Actor(userId, Role.ADMINISTRATOR, sessionId));
+        verify(sessionRepository).save(stored);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"", "curto", "+++++++++++++++++++++++++++++++++++++++++++"})
+    @DisplayName("token malformado é session_invalid e nem chega ao cache nem ao banco")
+    void malformedToken(String token) {
+        assertThatThrownBy(() -> authenticateSession.execute(token))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("sua sessão não vale mais; entre de novo")
+                .satisfies(applicationCode("session_invalid"));
+
+        verifyNoInteractions(cache, sessionReader, sessionRepository);
     }
 
     @Test

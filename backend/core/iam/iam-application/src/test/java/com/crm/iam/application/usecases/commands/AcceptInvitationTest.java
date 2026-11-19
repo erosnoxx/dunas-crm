@@ -16,6 +16,9 @@ import com.crm.iam.domain.vos.UserStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
@@ -123,6 +126,19 @@ class AcceptInvitationTest {
                 .satisfies(applicationCode("link_used"));
 
         verify(tokenRepository, never()).consume(any());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"", "curto", "+++++++++++++++++++++++++++++++++++++++++++"})
+    @DisplayName("token malformado é link_used, como o desconhecido, e nem consulta o repository")
+    void malformedTokenIsLinkUsed(String token) {
+        assertThatThrownBy(() -> acceptInvitation.execute(new AcceptInvitation.Params(token, STRONG_PASSWORD, "Galaxy A54")))
+                .isInstanceOf(UnprocessableEntityException.class)
+                .hasMessage("este link já foi usado ou foi substituído")
+                .satisfies(applicationCode("link_used"));
+
+        verifyNoInteractions(tokenRepository, sessionRepository);
     }
 
     @Test

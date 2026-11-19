@@ -15,6 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InOrder;
 
 import java.util.Optional;
@@ -117,6 +120,29 @@ class LoginTest {
                 .hasMessage("e-mail ou senha incorretos")
                 .satisfies(applicationCode("invalid_credentials"));
 
+        verify(rateLimiter, never()).refund(any(), any());
+        verify(sessionRepository, never()).save(any());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"", "fraca", "semespecial1A", "SEMMINUSCULA#1"})
+    @DisplayName("senha fora da regra é credencial errada: consome os limites, roda o hasher contra o hash fixo e não devolve nada")
+    void passwordOutsideThePolicyIsAFailedCredential(String raw) {
+        when(userRepository.findByEmail(Email.of("joao@x.com"))).thenReturn(Optional.of(user(UserStatus.ACTIVE)));
+        when(hasher.matches(any(Password.class), any())).thenReturn(true);
+
+        assertThatThrownBy(() -> login.execute(new Login.Params("joao@x.com", raw, "Galaxy A54", ORIGIN)))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("e-mail ou senha incorretos")
+                .satisfies(applicationCode("invalid_credentials"));
+
+        InOrder order = inOrder(rateLimiter, hasher);
+        order.verify(rateLimiter).consume(LOGIN_PER_EMAIL, "joao@x.com");
+        order.verify(rateLimiter).consume(LOGIN_PER_ORIGIN, ORIGIN);
+        order.verify(hasher).matches(any(Password.class), eq(DUMMY_HASH));
+
+        verify(hasher, never()).matches(any(Password.class), eq(USER_HASH));
         verify(rateLimiter, never()).refund(any(), any());
         verify(sessionRepository, never()).save(any());
     }
