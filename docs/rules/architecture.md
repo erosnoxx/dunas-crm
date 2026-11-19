@@ -426,7 +426,6 @@ Critério de aceite de toda mudança no backend: `mvn test` verde (o `BoundedCon
 Decisões ainda não tomadas ou peças ainda não escritas. Item resolvido sai daqui.
 
 - **Segurança:** a cadeia de segurança (regra em §4.1) é escrita junto da feature `01-iam`, que ainda não tem código. Enquanto ela não existir, vale o padrão do Spring Security: **toda rota exige autenticação**.
-- **Seeder:** o mecanismo atual (`DatabaseSeeder`) roda no boot e lê JSON do classpath. Falta torná-lo idempotente, transacional e seguro para rodar em produção; o desenho está pendente de aprovação.
 - **Stack Docker de desenvolvimento** (`infra/`): ainda por escrever; o app espera Postgres, Redis e RabbitMQ.
 - **Perfil `prod`:** `application-prod.properties` ainda não existe.
 - **Heartbeat de jobs agendados** (outbox, e os que vierem): depende de onde ficará o monitor.
