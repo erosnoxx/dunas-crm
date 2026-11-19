@@ -64,4 +64,30 @@ describe("AuthShell", () => {
     expect(footer).toBeInTheDocument()
     expect(screen.getByRole("region", { name: "Entrar" })).not.toContainElement(footer)
   })
+
+  it("compact aperta o celular (24 do cabeçalho ao conteúdo, 20 do título ao formulário)", () => {
+    const { container } = render(
+      <AuthShell title="Crie sua senha" description="d" compact>
+        <p>x</p>
+      </AuthShell>,
+    )
+
+    expect(container.firstElementChild).toHaveClass("gap-6", "md:gap-0")
+    expect(container.firstElementChild).not.toHaveClass("gap-8")
+    expect(screen.getByRole("region", { name: "Crie sua senha" })).toHaveClass(
+      "gap-5",
+      "md:gap-6",
+    )
+  })
+
+  it("sem compact mantém os espaços do Entrar (32 e 24)", () => {
+    const { container } = render(
+      <AuthShell title="Entrar" description="d">
+        <p>x</p>
+      </AuthShell>,
+    )
+
+    expect(container.firstElementChild).toHaveClass("gap-8")
+    expect(screen.getByRole("region", { name: "Entrar" })).toHaveClass("gap-6")
+  })
 })
