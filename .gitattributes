@@ -1,0 +1,9 @@
+# O repositório guarda texto em LF, e o checkout também grava LF, em qualquer sistema.
+# Sem isto, core.autocrlf=true grava CRLF no Windows, e o Prettier (que exige LF) acusa
+# todo arquivo que o checkout tocou, mesmo com o conteúdo commitado limpo.
+* text=auto eol=lf
+
+# Exceção: script do cmd.exe precisa de CRLF. Com LF, rótulos e blocos multilinha do cmd
+# quebram de forma intermitente.
+*.cmd text eol=crlf
+*.bat text eol=crlf

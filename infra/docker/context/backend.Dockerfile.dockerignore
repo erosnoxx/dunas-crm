@@ -1,0 +1,7 @@
+# Aplicado ao contexto backend/ so por estar ao lado de backend.Dockerfile (BuildKit).
+**/target/
+**/.idea/
+**/*.iml
+**/*.log
+**/.env
+**/.env.*
