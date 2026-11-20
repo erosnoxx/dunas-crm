@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -105,7 +106,7 @@ public class JpaUserReaderImpl implements UserReader {
 
         if (filter.text() != null && !filter.text().isBlank()) {
             conditions.add("(lower(u.name) like :text escape '\\' or lower(u.email) like :text escape '\\')");
-            parameters.put("text", "%" + escapeLike(filter.text().trim().toLowerCase()) + "%");
+            parameters.put("text", "%" + escapeLike(filter.text().trim().toLowerCase(Locale.ROOT)) + "%");
         }
 
         if (conditions.isEmpty())
