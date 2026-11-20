@@ -7,7 +7,7 @@ import { Form } from "@/shared/ui/form"
 
 import { errorMessage } from "../iam.messages"
 import { acceptInvitationSchema, type AcceptInvitationValues } from "../iam.schemas"
-import { LinkProblem } from "../screens/link-problem"
+import { LinkProblem } from "./link-problem"
 import { AuthShell } from "./auth-shell"
 import { NewPasswordFields, PasswordSubmitButton } from "./new-password-fields"
 

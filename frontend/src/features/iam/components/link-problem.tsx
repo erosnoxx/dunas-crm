@@ -5,7 +5,7 @@ import { Link } from "react-router"
 import { Button } from "@/shared/ui/button"
 import { Panel } from "@/shared/ui/panel"
 
-import { AuthHeader } from "../components/auth-shell"
+import { AuthHeader } from "./auth-shell"
 
 const COPY = {
   invitation: {
