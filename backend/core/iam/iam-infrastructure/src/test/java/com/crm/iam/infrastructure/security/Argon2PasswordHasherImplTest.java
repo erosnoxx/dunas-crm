@@ -108,6 +108,25 @@ class Argon2PasswordHasherImplTest {
                 .hasMessageNotContaining(RAW);
     }
 
+    @Test
+    @DisplayName("cada parâmetro do construtor chega ao lugar certo no hash PHC")
+    void constructorParametersReachTheRightPlaceInThePhcHash() {
+        var distinct = new Argon2PasswordHasherImpl(
+                1024,
+                2,
+                3,
+                16,
+                32
+        );
+
+        var phc = distinct.hash(Password.of(RAW)).getValue().split("\\$");
+
+        // ["", "argon2id", "v=19", "m=...,t=...,p=...", sal, hash], os dois últimos em base64 sem preenchimento
+        assertThat(phc[3]).isEqualTo("m=1024,t=2,p=3");
+        assertThat(phc[4]).hasSize(22);
+        assertThat(phc[5]).hasSize(43);
+    }
+
     private static long elapsedNanos(Runnable action) {
         var start = System.nanoTime();
 
