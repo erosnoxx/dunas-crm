@@ -162,6 +162,7 @@ class IamEndToEndTest {
 
     // --- cenários --------------------------------------------------------------------------------
 
+    /** Roda primeiro (@Order(1)): usa a senha inicial do Administrador, que ele troca aqui. */
     @Test
     @Order(1)
     @DisplayName("fluxo completo: troca obrigatória, convite, sessões, revogação, desativação e reativação")
@@ -462,6 +463,26 @@ class IamEndToEndTest {
 
         assertThat(forbidden.status()).isEqualTo(403);
         assertThat(forbidden.code()).isEqualTo("forbidden");
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("promover o papel vale na requisição seguinte: o listener tira a sessão do cache")
+    void roleChangeTakesEffectAtOnce() {
+        var admin = adminBrowser();
+        var email = "promovido@dunas.test";
+        var userId = activeUser(admin, email, "Tecnico Promovido");
+        var technician = browser("promovido");
+
+        technician.get("/auth/me");
+        technician.post("/auth/login", Map.of("email", email, "password", USER_PASSWORD));
+
+        assertThat(technician.get("/users").status()).isEqualTo(403);
+
+        var promoted = admin.put("/users/" + userId + "/role", Map.of("role", "ADMINISTRATOR"));
+
+        assertThat(promoted.status()).isEqualTo(204);
+        assertThat(technician.get("/users").status()).isEqualTo(200);
     }
 
     // --- apoio ---------------------------------------------------------------------------------
