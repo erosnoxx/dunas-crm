@@ -42,7 +42,7 @@ test/      setup global de teste
 - **`features/<dominio>/`** só existe se a feature existe em `docs/system-design/`: nunca especulativa. **Uma feature não importa outra**: o que as duas precisam sobe para `shared/`. Arquivos por feature: `<dominio>.service.ts` (chamadas à API), `<dominio>.hooks.ts` (TanStack Query), `<dominio>.schemas.ts` (Zod), componentes e telas.
 - **`shared/ui/`** não tem domínio.
 - **`shared/api/`**: `http-client.ts` é a única instância de axios; nenhum outro lugar importa `axios`.
-- A estrutura de `features/iam/` é fixada pelo plano da feature, e a skill `crm-frontend-add-feature` nasce dela, como as skills de backend nasceram do primeiro BC.
+- **Referência viva: `features/iam/`** (com as rotas em `app/routes/`); o passo a passo de uma feature nova está na skill `crm-frontend-add-feature`.
 
 ## 4. Tema e identidade
 
@@ -72,6 +72,7 @@ Fonte de verdade: [`docs/design-system/tokens.json`](../design-system/tokens.jso
 - **Mobile-first é responsividade real**: o componente parte do layout de celular e se adapta de propósito em cada ponto de quebra. Alvo de toque mínimo de 44 px.
 - **Identificadores em inglês; texto de interface e comentário em pt-BR.** Voz da interface: [`design-system/README`](../design-system/README.md) ("Voz e conteúdo").
 - **Campo de formulário respeita o limite do domínio** (ex. senha de 8 a 30, nome de 2 a 80: `usecases.md`/`domain-model.md` da feature) e mostra o estado de toda consulta assíncrona.
+- **Campo de senha nunca é aparado (`trim()`) nem vai para log**, nem no schema nem no envio.
 - **Ícone** é SVG de traço (`lucide-react`), nunca emoji.
 - **Acessibilidade:** controle é `button`/`a`/`input` de verdade, rótulo associado, contraste ≥ 4,5:1 (os pares do design system já cumprem), foco visível.
 - **Backend e frontend de uma feature são planejados juntos**: a spec cobre os dois, e o plano tem uma parte por lado (`docs/plans/<data>-<feature>-backend.md` e `-frontend.md`).

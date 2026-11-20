@@ -34,7 +34,7 @@ const OWN_HEADER = [CHANGE_PASSWORD_PATH, "/conta/sessoes"]
 const USER_SCREENS = "/usuarios/"
 
 const ACCOUNT_LINK =
-  "flex min-h-11 items-center px-2 text-body-sm text-text-muted hover:text-text aria-[current=page]:text-text"
+  "flex min-h-11 items-center px-2 text-body-sm text-text-muted hover:text-text aria-[current=page]:font-semibold aria-[current=page]:text-text"
 
 /**
  * Casca das rotas autenticadas. A partir de `md` é a barra lateral de 232 px (mockups "Usuários ·

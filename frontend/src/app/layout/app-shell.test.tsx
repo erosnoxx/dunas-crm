@@ -97,6 +97,11 @@ describe("barra lateral", () => {
       "aria-current",
       "page",
     )
+    // Mockup "Minhas sessões · web": o item atual da conta é texto claro e seminegrito.
+    expect(within(nav).getByRole("link", { name: "Minhas sessões" })).toHaveClass(
+      "aria-[current=page]:text-text",
+      "aria-[current=page]:font-semibold",
+    )
     expect(within(nav).getByRole("link", { name: "Trocar senha" })).toHaveAttribute(
       "href",
       "/conta/trocar-senha",

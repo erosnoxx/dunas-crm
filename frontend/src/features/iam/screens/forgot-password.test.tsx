@@ -174,3 +174,16 @@ describe("ForgotPassword", () => {
     expect(await screen.findByText(SENT)).toBeInTheDocument()
   })
 })
+
+describe("teclado", () => {
+  it("percorre os controles pelo Tab na ordem da tela", async () => {
+    const user = renderScreen()
+
+    await user.tab()
+    expect(screen.getByLabelText("E-mail")).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole("button", { name: "Enviar link" })).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole("link", { name: "Voltar para o login" })).toHaveFocus()
+  })
+})

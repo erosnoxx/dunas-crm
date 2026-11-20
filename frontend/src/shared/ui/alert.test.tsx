@@ -10,6 +10,8 @@ describe("Alert", () => {
     const alert = screen.getByRole("alert")
 
     expect(alert).toHaveClass("border-danger", "text-danger-text")
+    // Mockup "Entrar · celular, senha errada": 12 px em cima e embaixo, 14 nas laterais.
+    expect(alert).toHaveClass("px-3.5", "py-3")
     expect(alert).toHaveTextContent("e-mail ou senha incorretos")
   })
 

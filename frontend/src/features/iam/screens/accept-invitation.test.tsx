@@ -274,3 +274,21 @@ describe("AcceptInvitationScreen", () => {
     expect(repeatInput()).toHaveClass("h-13")
   })
 })
+
+describe("teclado", () => {
+  it("percorre os controles pelo Tab na ordem da tela", async () => {
+    const { user } = renderScreen()
+
+    await user.tab()
+    expect(passwordInput()).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole("button", { name: "Mostrar" })).toHaveFocus()
+    await user.tab()
+    expect(screen.getByLabelText("Repita a senha")).toHaveFocus()
+    // O botão só entra na ordem quando as regras e a repetição estão atendidas.
+    await user.type(passwordInput(), "Dunas#2026")
+    await user.type(screen.getByLabelText("Repita a senha"), "Dunas#2026")
+    await user.tab()
+    expect(screen.getByRole("button", { name: "Criar senha e entrar" })).toHaveFocus()
+  })
+})

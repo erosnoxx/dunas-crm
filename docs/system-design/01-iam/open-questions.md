@@ -6,12 +6,6 @@ Estão marcados como *proposta* em [`usecases.md`](usecases.md): convite válido
 
 **Fecha com:** o usuário confirmar ou trocar os números.
 
-## Tela de reativar usuário
-
-O ADR-10 cria a reativação, e os mockups aprovados não têm o botão nem o estado de usuário desativado. Dois artboards novos (web e celular) foram acrescentados ao canvas e aguardam aprovação.
-
-**Fecha com:** o usuário aprovar os dois artboards.
-
 ## Como o rótulo do aparelho é obtido
 
 O mockup mostra "Galaxy A54, app DUNAS" e "Chrome, Windows". O backend usa o cabeçalho `X-Device-Name` quando ele vem (o app, ou o frontend se mandar um nome legível) e, sem ele, o `User-Agent` cru; os dois são cortados em 80 caracteres, e sem nenhum o rótulo é "Aparelho desconhecido". Nenhuma biblioteca lê o `User-Agent`, então a tela de sessões mostra o texto cru do navegador, e não "Chrome, Windows". O rótulo é só informativo.
