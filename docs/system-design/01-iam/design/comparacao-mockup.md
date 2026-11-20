@@ -2,7 +2,7 @@
 
 Etapa de comparação da regra 7 ([`docs/CLAUDE.md`](../../../CLAUDE.md)): cada tela do IAM, em 390 px (celular) e 1280 px (web), contra os artboards aprovados do canvas ([`README.md`](README.md) e [`telas-complementares.md`](telas-complementares.md)). Feita em 2026-11-20, com o frontend servido por `npm run dev` e ligado ao backend real (Postgres, Redis e um coletor de e-mail locais).
 
-Nada aqui é aceito em silêncio: o que diverge e não foi corrigido está nas seções 3 a 6, **para o usuário decidir**.
+Nada aqui é aceito em silêncio: o que diverge e não foi corrigido está nas seções 3 a 7, **para o usuário decidir**.
 
 ## 1. Como foi comparado
 
@@ -222,6 +222,7 @@ Comportamentos e débitos da execução, sem divergência visual de mockup; regi
 | Detalhe do usuário, celular | carregando e erro não têm `h1` (só o "Voltar") |
 | Detalhe do usuário | ação iniciada num usuário perde o aviso de sucesso ou de erro se o Administrador abrir outro antes de terminar; encerramentos seguidos perdem o erro de cada chamada |
 | Minhas sessões | dois cliques rápidos em "Encerrar esta sessão" perdem o carregando do primeiro; um aviso de erro antigo fica depois de um "Encerrar todas as outras" bem-sucedido; os botões "Encerrar esta sessão" têm o mesmo nome acessível |
+| Diálogo de convite | cruzar o ponto de quebra com o convite aberto troca o diálogo pela tela cheia e remonta os campos; o que foi digitado **continua** (o estado do formulário fica acima do ramo), coberto por teste em `invite-user.test.tsx`. Não é pendência: fica aqui porque um registro da execução dizia que o digitado se perdia |
 | Diálogo de convite | `clip-path` com `overflow-y-auto` pode cortar a barra de rolagem no chanfro |
 | Sessão | `403 password_change_required` não é tratado (a guarda impede chegar lá); a trava do `session_invalid` volta a armar com qualquer sucesso |
 | Testes | sem teste direto de `last-use`, `useMediaQuery`, `useInfiniteUsers` e da remoção do ouvinte de `matchMedia`; sem teste de `aria-current` em `/usuarios/:id`, do alvo `md:min-h-12` do Entrar, de `invalid_credentials` seguido de `rate_limited`, das classes `md:` do link inválido, do "Senha alterada" na troca obrigatória e do toast renderizado (o `sonner` é simulado) |
