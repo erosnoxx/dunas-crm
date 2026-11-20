@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.mock.env.MockEnvironment;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -141,5 +143,43 @@ class DatabaseSeederTest {
                 .hasMessage("falha ao semear");
 
         assertThat(second.received).isEmpty();
+    }
+
+    @ParameterizedTest(name = "valor [{0}]")
+    @ValueSource(strings = {"Senha\"Forte1!", "Senha\\Forte1!", "Senha\\nForte1!", "Senha\nForte1!", "Sen\\\"ha{1}"})
+    @DisplayName("o valor da variável chega ao seeder byte a byte, mesmo com aspas, barra e quebra de linha")
+    void variableValueRoundTripsByteForByte(String value) throws Exception {
+        environment.setProperty("CRM_ADMIN_EMAIL", value);
+        var seeder = new FakeSeeder("seed/admin.json", false, false, transaction);
+
+        seederOf(seeder).run(null);
+
+        assertThat(seeder.received).containsExactly(new Item(value));
+    }
+
+    @Test
+    @DisplayName("JSON malformado falha com a exception do sistema, sem o valor da variável nem a causa")
+    void malformedJsonFailsWithoutLeakingTheSecret() {
+        environment.setProperty("CRM_ADMIN_EMAIL", "hunter2secret");
+        var seeder = new FakeSeeder("seed/malformed.json", false, false, transaction);
+
+        assertThatThrownBy(() -> seederOf(seeder).run(null))
+                .isInstanceOf(InternalServerErrorException.class)
+                .hasMessage("seed: JSON inválido em seed/malformed.json")
+                .hasNoCause();
+
+        assertThat(seeder.received).isEmpty();
+    }
+
+    @Test
+    @DisplayName("JSON com formato diferente do registro falha sem o valor da variável nem a causa")
+    void wrongShapeFailsWithoutLeakingTheSecret() {
+        environment.setProperty("CRM_ADMIN_EMAIL", "hunter2secret");
+        var seeder = new FakeSeeder("seed/wrong-shape.json", false, false, transaction);
+
+        assertThatThrownBy(() -> seederOf(seeder).run(null))
+                .isInstanceOf(InternalServerErrorException.class)
+                .hasMessage("seed: JSON inválido em seed/wrong-shape.json")
+                .hasNoCause();
     }
 }
