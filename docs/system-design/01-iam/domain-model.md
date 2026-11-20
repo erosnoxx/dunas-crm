@@ -40,7 +40,7 @@ Três aggregates, todos do BC `iam`. Entre si se referenciam por `UUID` (mesmo B
 | `acceptInvitation(passwordHash)` | `INVITED` → `ACTIVE` | `user_not_invited` |
 | `changePassword(newHash)` | troca o hash; zera `mustChangePassword` | `user_not_active` |
 | `resetPassword(newHash)` | troca o hash de quem esqueceu | `user_not_active` |
-| `changeRole(actorId, newRole)` | muda o papel | `cannot_change_own_role`, `user_not_active` |
+| `changeRole(actorId, newRole, now)` | muda o papel; registra `UserRoleChanged` com `now` | `cannot_change_own_role`, `user_not_active` |
 | `deactivate(actorId, now)` | `INVITED` ou `ACTIVE` → `DEACTIVATED` | `cannot_deactivate_self`, `user_deactivated` |
 | `reactivate()` | `DEACTIVATED` → `ACTIVE` (se tem senha) ou `INVITED` (se nunca definiu) | `user_not_deactivated` |
 | `markPasswordChangeRequired()` | só usado pelo seeder do primeiro Administrador | — |

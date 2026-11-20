@@ -45,7 +45,13 @@ public record VisitCanceled(UUID aggregateId, Instant occurredOn) implements Dom
 - **Atraso é normal** (segundos, dominado por `crm.outbox.poll-delay`): a tela trata como carregamento.
 - Para **ler fato alheio**, o consumidor mantém uma **projeção local** (tabela dele, só leitura, atualizada só pelo listener), nunca consulta o outro BC (§5.3). Decisão que precisa estar certa agora não é fato a copiar: é comando via `orchestration`.
 
-> Ainda não há listener nem integration event de referência no repositório. O primeiro caso real fixa o desenho; combine com o usuário e registre-o aqui.
+**Listener de domain event: referências vivas** em `core/iam/iam-infrastructure/.../listeners/`. O listener é uma classe sem anotação de componente, instanciada com `new` na `<Bc>Beans`; o `@EventListener` (e o `@Async`) funcionam igual no bean criado assim.
+
+- `OneTimeTokenIssuedListener`: efeito lento (e-mail) fora da thread do request, com `@Async(AsyncConfig.SIDE_EFFECT_EXECUTOR)` junto do `@EventListener`. Captura a falha e loga sem o segredo: o convite já commitou e não pode virar erro.
+- `SessionRevokedListener`: invalidação de cache pelo evento, síncrona e curta.
+- `UserDeactivatedListener`: listener que **grava**. O evento chega no `afterCommit` da transação que o publicou, e ela ainda está ligada à thread: um use case que abra transação comum entra nela, já encerrada, e **a escrita nunca é gravada**, sem erro nenhum. Por isso a chamada roda num `TransactionTemplate` com `PROPAGATION_REQUIRES_NEW`, montado na `<Bc>Beans`. Todo listener síncrono que escreve no banco segue esse desenho; o `IamEndToEndTest` (`edge/boot`) prova que a revogação é gravada.
+
+> Ainda não há integration event de referência no repositório. O primeiro caso real fixa o desenho; combine com o usuário e registre-o aqui.
 
 ## Falha
 

@@ -14,7 +14,7 @@ Precisa ser verdade para o objeto existir válido?        → dentro da entidade
 É uma condição sim/não, reutilizável ou combinável?      → Specification
 A decisão muda conforme o contexto (variantes)?          → Policy
 Liga aggregates do mesmo BC e não tem dono natural?      → Domain Service
-É o ciclo de vida (status e transições) de um aggregate? → State machine
+É o ciclo de vida (status e transições) de um aggregate? → enum com guardas (ciclo simples) ou State machine
 ```
 
 Na dúvida entre entidade e as demais: comece na entidade. Só extraia quando a regra aparecer em **dois** lugares ou precisar de dado que a entidade não tem.
@@ -43,11 +43,33 @@ Regra que liga aggregates do **mesmo** BC e não pertence a nenhum.
 - **Nunca cruza BC**: isso é orquestração (§5.4), não domínio.
 - Sem anotação (`@DomainService` não existe). Instanciado com `new` na `<Bc>Beans`.
 
+## Ciclo simples: enum com guardas
+
+Padrão do ADR-9 da feature [`01-iam`](../../../docs/system-design/01-iam/decisions.md): poucos estados e poucas transições, sem regra própria por transição, ficam num **enum** de status no aggregate, mudado só pelos métodos de domínio, cada um com a sua guarda. Referência viva: `User` (`UserStatus`: `INVITED`, `ACTIVE`, `DEACTIVATED`) em `core/iam/iam-domain`.
+
+```java
+public void deactivate(UUID actorId, Instant now) {
+    if (getId().equals(actorId))
+        throw new DomainException("cannot_deactivate_self", "você não pode desativar a sua própria conta");
+
+    if (status == UserStatus.DEACTIVATED)
+        throw new DomainException("user_deactivated", "este usuário já está desativado");
+
+    this.status = UserStatus.DEACTIVATED;
+
+    registerEvent(new UserDeactivated(getId(), now));
+}
+```
+
+- Transição inválida é `DomainException` com código estável (o da tabela de erros do `usecases.md`).
+- Guarda repetida vira método privado (`requireActive()`).
+- Só a transição que alguém escuta registra domain event.
+
 ## State machine
 
-`StateMachine<V extends Enum<V>>` (`common-domain`) é só a base: guarda o estado atual (`value`) e o evento da última transição (`event`). **Nenhum BC a usa ainda**, então o padrão de estados e transições não está fixado.
+`StateMachine<V extends Enum<V>>` (`common-domain`) é só a base: guarda o estado atual (`value`) e o evento da última transição (`event`). É para ciclos com muitas transições, regra por transição ou um evento por transição (ADR-9). **Nenhum BC a usa ainda**, então o padrão não está fixado.
 
-- A **primeira feature com ciclo de vida** (proposta, visita) define o padrão, e esta seção passa a descrevê-lo, a partir do código que passou nos testes.
+- A **primeira feature com ciclo complexo** (proposta, visita) define o padrão, e esta seção passa a descrevê-lo, a partir do código que passou nos testes.
 - Antes disso, **não invente**: proponha o desenho ao usuário. Transição inválida é `DomainException` com código estável, e cada transição registra o domain event.
 
 ## Teste

@@ -41,6 +41,6 @@ Brainstorming com o usuário em 2026-11-19 (decisões em `decisions.md`, ADR-1 a
 
 ## Critério de aceite
 
-- [ ] `mvn test` passa, a partir de `backend/` (inclui os testes de arquitetura)
+- [x] `mvn test` passa, a partir de `backend/` (inclui os testes de arquitetura e o `IamEndToEndTest`, com Docker; backend fechado em 2026-11-20)
 - [ ] Artefato visual em `design/` gerado e aprovado antes de fechar `domain-model.md`/`usecases.md` (telas de entrar, convite, sessões e usuários)
 - [ ] Plano de implementação em `docs/plans/` e executado
