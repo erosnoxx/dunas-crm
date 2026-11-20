@@ -232,6 +232,14 @@ describe("troca de senha", () => {
     expect(screen.queryByRole("button", { name: /Minha conta/ })).not.toBeInTheDocument()
   })
 
+  it("Minhas sessões fica na casca, sem a barra superior: o cabeçalho próprio tem o Voltar", async () => {
+    renderAt("/conta/sessoes", me("COMMERCIAL"))
+
+    await findSidebar()
+
+    expect(screen.queryByRole("button", { name: /Minha conta/ })).not.toBeInTheDocument()
+  })
+
   it("a voluntária fica na casca, sem a barra superior que dobraria o cabeçalho dela", async () => {
     renderAt("/conta/trocar-senha", me("COMMERCIAL"))
 

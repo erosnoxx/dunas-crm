@@ -23,8 +23,8 @@ function lastUse(iso: string, now: Date): string {
   return relative.format(-Math.floor(elapsed / DAY), "day")
 }
 
-// shortcut: a API só manda o rótulo livre do aparelho, sem tipo; troca por um campo `kind` se o backend passar a mandar.
-const PHONE = /iphone|ipad|android|galaxy|\bapp\b/i
+// shortcut: a API só manda o rótulo livre do aparelho, sem tipo; tablets (iPad) e rótulos fora da lista são aproximação, troca por um campo `kind` se o backend passar a mandar.
+const PHONE = /iphone|ipad|\bios\b|android|galaxy|\bapp\b/i
 
 type SessionItemProps = {
   session: SessionSummary
@@ -58,7 +58,7 @@ function SessionItem({ session, now, pending, onRevoke }: SessionItemProps) {
           variant="outline"
           loading={pending}
           onClick={() => onRevoke(session.id)}
-          className="text-sm [&>span]:bg-panel"
+          className="text-sm md:[&>span]:px-4 [&>span]:bg-panel"
         >
           Encerrar esta sessão
         </Button>

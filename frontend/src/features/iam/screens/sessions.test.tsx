@@ -110,9 +110,14 @@ describe("lista", () => {
   it("o título da página e o texto fixo da duração da sessão", async () => {
     renderScreen()
 
-    expect(
-      await screen.findByRole("heading", { level: 1, name: "Minhas sessões" }),
-    ).toHaveClass("max-md:sr-only")
+    const heading = await screen.findByRole("heading", {
+      level: 1,
+      name: "Minhas sessões",
+    })
+
+    // Visível no celular (cabeçalho próprio, 24 px) e 36 px na web: nunca `sr-only`.
+    expect(heading).toHaveClass("text-title", "md:text-display-lg")
+    expect(heading).not.toHaveClass("max-md:sr-only")
     expect(screen.getByText("A sessão dura 30 dias e renova a cada uso.")).toBeVisible()
     expect(
       screen.getByText(
@@ -142,6 +147,39 @@ describe("lista", () => {
     expect(endButton("Chrome, Windows")).toBeInTheDocument()
     expect(item("iPhone, Safari").querySelector("svg.lucide-smartphone")).not.toBeNull()
     expect(item("Chrome, Windows").querySelector("svg.lucide-monitor")).not.toBeNull()
+  })
+
+  it("rótulo de iOS também é celular", async () => {
+    vi.mocked(service.listSessions).mockResolvedValue([
+      CURRENT,
+      { ...IPHONE, id: "s4", device: "Safari, iOS" },
+    ])
+    renderScreen()
+    await screen.findByText("Safari, iOS")
+
+    expect(item("Safari, iOS").querySelector("svg.lucide-smartphone")).not.toBeNull()
+  })
+})
+
+describe("cabeçalho e geometria", () => {
+  it("no celular o cabeçalho próprio tem Voltar para o início; na web ele some", async () => {
+    renderScreen()
+
+    const back = await screen.findByRole("link", { name: "Voltar" })
+
+    expect(back).toHaveAttribute("href", "/")
+    expect(back).toHaveClass("size-12", "md:hidden")
+  })
+
+  it("na web os botões têm o corte e o respiro do mockup", async () => {
+    renderScreen()
+    await screen.findByText("Galaxy A54, app DUNAS")
+
+    const all = screen.getByRole("button", { name: "Encerrar todas as outras" })
+    const end = endButton("iPhone, Safari")!
+
+    expect(all).toHaveClass("md:cut-sm", "md:[&>span]:cut-sm", "md:min-h-12")
+    expect(end).toHaveClass("md:[&>span]:px-4")
   })
 })
 
@@ -264,5 +302,34 @@ describe("estados", () => {
     await user.click(endButton("iPhone, Safari")!)
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Sessão não encontrada")
+  })
+
+  it("sessão que já terminou em outro lugar sai da lista ao recarregar", async () => {
+    vi.mocked(service.revokeSession).mockRejectedValue({
+      status: 404,
+      code: "session_not_found",
+      message: "texto da API",
+    })
+    const user = renderScreen()
+    await screen.findByText("Galaxy A54, app DUNAS")
+    vi.mocked(service.listSessions).mockResolvedValue([CURRENT, CHROME])
+
+    await user.click(endButton("iPhone, Safari")!)
+
+    await waitFor(() =>
+      expect(screen.queryByText("iPhone, Safari")).not.toBeInTheDocument(),
+    )
+    expect(screen.getAllByRole("listitem")).toHaveLength(2)
+  })
+
+  it("outro erro ao encerrar não recarrega a lista", async () => {
+    vi.mocked(service.revokeSession).mockRejectedValue({ status: 500, message: "falhou" })
+    const user = renderScreen()
+    await screen.findByText("Galaxy A54, app DUNAS")
+
+    await user.click(endButton("iPhone, Safari")!)
+    await screen.findByRole("alert")
+
+    expect(service.listSessions).toHaveBeenCalledTimes(1)
   })
 })

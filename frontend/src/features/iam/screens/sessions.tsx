@@ -1,4 +1,5 @@
-import { Loader2Icon } from "lucide-react"
+import { ChevronLeftIcon, Loader2Icon } from "lucide-react"
+import { Link } from "react-router"
 
 import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
 import { Alert } from "@/shared/ui/alert"
@@ -17,7 +18,8 @@ import { messageFor, sentence } from "../iam.messages"
 /**
  * Minhas sessões (mockups "Minhas sessões, celular" e "Minhas sessões, web"). Encerrar uma
  * sessão não pede confirmação (ADR-11); a lista é a do servidor, e o refetch dos hooks tira a
- * que acabou de sair. O h1 some no celular porque o título já está na barra superior da casca.
+ * que acabou de sair. No celular a página tem o cabeçalho próprio do mockup (com "Voltar"), e a
+ * casca não põe a barra superior nesta rota.
  */
 function SessionsScreen() {
   const { data: me } = useCurrentUser()
@@ -40,66 +42,78 @@ function Sessions({ userId }: { userId: string }) {
   const now = new Date()
 
   return (
-    <main className="flex flex-col gap-4 px-4 pt-5 pb-6 md:gap-6 md:px-10 md:py-8">
-      <h1 className="text-display-lg max-md:sr-only">Minhas sessões</h1>
-      <p className="text-body-sm text-text-muted md:max-w-140">
-        Aparelhos conectados à sua conta. Encerre os que você não reconhece.
-      </p>
-      {/* No celular é o rodapé (sem fixar no fim da tela); na web continua o parágrafo acima (a margem negativa cancela o gap). */}
-      <p className="text-caption text-text-muted max-md:order-last md:-mt-6 md:text-body-sm md:max-w-140">
-        A sessão dura 30 dias e renova a cada uso.
-      </p>
+    <div className="flex flex-col">
+      {/* Celular: cabeçalho próprio com Voltar (a casca não põe barra superior aqui). Web: só o h1. */}
+      <header className="flex h-16 items-center gap-1 border-b border-line bg-nav px-2 md:h-auto md:border-0 md:bg-transparent md:px-10 md:pt-8">
+        <Link
+          to="/"
+          aria-label="Voltar"
+          className="flex size-12 items-center justify-center md:hidden"
+        >
+          <ChevronLeftIcon aria-hidden="true" className="size-6" />
+        </Link>
+        <h1 className="text-title md:text-display-lg">Minhas sessões</h1>
+      </header>
+      <main className="flex flex-col gap-4 px-4 pt-5 pb-6 md:gap-6 md:px-10 md:pt-6 md:pb-8">
+        <p className="text-body-sm text-text-muted md:max-w-140">
+          Aparelhos conectados à sua conta. Encerre os que você não reconhece.
+        </p>
+        {/* No celular é o rodapé (sem fixar no fim da tela); na web continua o parágrafo acima (a margem negativa cancela o gap). */}
+        <p className="text-caption text-text-muted max-md:order-last md:-mt-6 md:text-body-sm md:max-w-140">
+          A sessão dura 30 dias e renova a cada uso.
+        </p>
 
-      {error && (
-        <Alert tone="danger" className="md:max-w-160">
-          {sentence(messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE))}
-        </Alert>
-      )}
+        {error && (
+          <Alert tone="danger" className="md:max-w-160">
+            {sentence(messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE))}
+          </Alert>
+        )}
 
-      {sessions.isPending && (
-        <div role="status" aria-busy="true" className="flex justify-center py-6">
-          <Loader2Icon
-            aria-hidden="true"
-            className="size-6 animate-spin text-text-muted"
-          />
-        </div>
-      )}
-
-      {list && list.length > 0 && (
-        <ul className="flex flex-col gap-3 md:max-w-160">
-          {list.map((session) => (
-            <SessionItem
-              key={session.id}
-              session={session}
-              now={now}
-              pending={revokeOne.isPending && revokeOne.variables === session.id}
-              onRevoke={revokeOne.mutate}
+        {sessions.isPending && (
+          <div role="status" aria-busy="true" className="flex justify-center py-6">
+            <Loader2Icon
+              aria-hidden="true"
+              className="size-6 animate-spin text-text-muted"
             />
-          ))}
-        </ul>
-      )}
+          </div>
+        )}
 
-      <div className="mt-1 flex flex-col gap-3 md:mt-0">
-        <Button
-          variant="outline"
-          size="lg"
-          disabled={!hasOthers}
-          loading={revokeOthers.isPending}
-          onClick={() => revokeOthers.mutate(userId)}
-          className="text-danger-text md:min-h-12 md:self-start"
-        >
-          Encerrar todas as outras
-        </Button>
-        <Button
-          size="lg"
-          disabled={logout.isPending}
-          onClick={() => logout.mutate()}
-          className="md:hidden"
-        >
-          Sair deste aparelho
-        </Button>
-      </div>
-    </main>
+        {list && list.length > 0 && (
+          <ul className="flex flex-col gap-3 md:max-w-160">
+            {list.map((session) => (
+              <SessionItem
+                key={session.id}
+                session={session}
+                now={now}
+                pending={revokeOne.isPending && revokeOne.variables === session.id}
+                onRevoke={revokeOne.mutate}
+              />
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-1 flex flex-col gap-3 md:mt-0">
+          <Button
+            variant="outline"
+            size="lg"
+            disabled={!hasOthers}
+            loading={revokeOthers.isPending}
+            onClick={() => revokeOthers.mutate(userId)}
+            className="text-danger-text md:min-h-12 md:cut-sm md:[&>span]:cut-sm md:self-start"
+          >
+            Encerrar todas as outras
+          </Button>
+          <Button
+            size="lg"
+            disabled={logout.isPending}
+            onClick={() => logout.mutate()}
+            className="md:hidden"
+          >
+            Sair deste aparelho
+          </Button>
+        </div>
+      </main>
+    </div>
   )
 }
 

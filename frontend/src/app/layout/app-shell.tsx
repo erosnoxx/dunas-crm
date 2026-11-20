@@ -18,15 +18,17 @@ const NAV_ITEMS: NavItem[] = [
 ]
 
 /**
- * Título da barra superior do celular, por rota exata; a troca de senha tem cabeçalho próprio.
- * Contrato: a página é dona do h1 e o esconde com `max-md:sr-only` no celular; rota aninhada
- * precisa de entrada aqui ou de casamento por prefixo.
+ * Título da barra superior do celular, por rota exata. Contrato: a página é dona do h1 e o
+ * esconde com `max-md:sr-only` no celular; rota aninhada precisa de entrada aqui ou de casamento
+ * por prefixo. As rotas de `OWN_HEADER` não passam por aqui: a página desenha o cabeçalho.
  */
 const TITLES: Record<string, string> = {
   "/": "Início",
   "/usuarios": "Usuários",
-  "/conta/sessoes": "Minhas sessões",
 }
+
+/** Rotas com cabeçalho próprio no celular (com "Voltar"): a casca não põe a barra superior. */
+const OWN_HEADER = [CHANGE_PASSWORD_PATH, "/conta/sessoes"]
 
 const ACCOUNT_LINK =
   "flex min-h-11 items-center px-2 text-body-sm text-text-muted hover:text-text aria-[current=page]:text-text"
@@ -35,8 +37,8 @@ const ACCOUNT_LINK =
  * Casca das rotas autenticadas. A partir de `md` é a barra lateral de 232 px (mockups "Usuários ·
  * web" e "Navegação, web"); no celular, a barra superior de 64 px com o avatar que abre o menu da
  * conta (mockup "Usuários · celular"). A troca de senha obrigatória não ganha casca: é tela cheia
- * só com "Sair". A voluntária fica na casca, mas no celular sem a barra superior, porque o
- * cabeçalho próprio dela (com "Voltar") já ocupa o topo.
+ * só com "Sair". A voluntária e Minhas sessões ficam na casca, mas no celular sem a barra
+ * superior, porque o cabeçalho próprio delas (com "Voltar") já ocupa o topo.
  */
 function AppShell({ children }: { children: ReactNode }) {
   const { data: me } = useCurrentUser()
@@ -45,7 +47,7 @@ function AppShell({ children }: { children: ReactNode }) {
 
   if (!me || me.mustChangePassword) return children
 
-  const topBar = pathname !== CHANGE_PASSWORD_PATH
+  const topBar = !OWN_HEADER.includes(pathname)
 
   return (
     <div className="flex min-h-dvh flex-col md:flex-row">
