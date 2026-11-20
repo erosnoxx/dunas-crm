@@ -1,6 +1,6 @@
 import { Loader2Icon } from "lucide-react"
 import * as React from "react"
-import { Link, Outlet, useParams } from "react-router"
+import { Link, Outlet, useMatch, useParams } from "react-router"
 
 import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
 import { cn } from "@/shared/lib/cn"
@@ -168,7 +168,9 @@ function UsersScreen() {
   const { data: me } = useCurrentUser()
   const { id } = useParams()
   const isDesktop = useMediaQuery("(min-width: 48rem)")
-  const selected = id !== undefined
+  // `/usuarios/convidar` é rota irmã de `:id` (sem `id`): no celular também troca a lista pela tela.
+  const inviting = useMatch("/usuarios/convidar") !== null
+  const selected = id !== undefined || inviting
 
   if (!me) return null
 
@@ -217,7 +219,13 @@ function UsersScreen() {
         </section>
 
         {selected && (
-          <div className="min-w-0 flex-[1_1_21.25rem] max-md:w-full md:max-w-100">
+          // O convite é um diálogo na web (fora do fluxo): sem região reservada ao lado da lista.
+          <div
+            className={cn(
+              "min-w-0 flex-[1_1_21.25rem] max-md:w-full md:max-w-100",
+              inviting && "md:hidden",
+            )}
+          >
             <Outlet />
           </div>
         )}

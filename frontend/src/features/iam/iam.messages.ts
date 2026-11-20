@@ -39,5 +39,12 @@ export const LABELS: { role: Record<Role, string>; status: Record<UserStatus, st
     status: { ACTIVE: "Ativo", INVITED: "Convite pendente", DEACTIVATED: "Desativado" },
   }
 
+/** Os papéis na ordem em que as telas os listam. */
+export const ROLES = Object.keys(LABELS.role) as Role[]
+
 /** As mensagens da API vêm em minúscula; no aviso a frase começa com maiúscula. */
 export const sentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
+
+/** O nome na tela: o do próprio usuário leva "(você)". */
+export const displayName = (name: string, isMe: boolean) =>
+  isMe ? `${name} (você)` : name

@@ -2,7 +2,7 @@ import { NavLink } from "react-router"
 
 import { StatusChip } from "@/shared/ui/status-chip"
 
-import { LABELS } from "../iam.messages"
+import { displayName, LABELS } from "../iam.messages"
 import type { UserStatus, UserSummary } from "../iam.service"
 import { lastUse } from "../last-use"
 
@@ -27,7 +27,7 @@ function UserRow({ user, isMe, now }: UserRowProps) {
         <span className="grid min-h-11 grid-cols-[1fr_auto] items-center gap-x-3 gap-y-0.5 px-4 py-3.5 group-aria-[current=page]:bg-line max-md:cut-lg max-md:bg-panel md:min-h-16 md:grid-cols-[2.2fr_1.1fr_1.6fr_1fr] md:gap-4 md:border-b md:border-line md:px-5 md:py-0">
           <span className="flex min-w-0 flex-col gap-0.5">
             <span className="text-body font-semibold md:text-body-sm">
-              {isMe ? `${user.name} (você)` : user.name}
+              {displayName(user.name, isMe)}
             </span>
             <span className="truncate text-label font-normal text-text-muted max-md:hidden">
               {user.email}

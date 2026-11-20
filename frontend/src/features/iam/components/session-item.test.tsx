@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
+import userEvent from "@testing-library/user-event"
+import { describe, expect, it, vi } from "vitest"
 
 import type { SessionSummary } from "../iam.service"
 import { SessionItem } from "./session-item"
@@ -48,5 +49,55 @@ describe("SessionItem: último uso relativo", () => {
     lastUse(10_000)
 
     expect(screen.getByText("Entrou em 05/01")).toBeInTheDocument()
+  })
+})
+
+describe("SessionItem: disposição no painel do usuário", () => {
+  const base: SessionSummary = {
+    id: "s",
+    device: "Galaxy A54, app DUNAS",
+    startedAt: new Date(2026, 0, 5, 9).toISOString(),
+    lastUsedAt: new Date(NOW.getTime() - 2 * MINUTE).toISOString(),
+    current: false,
+  }
+  const renderItem = (
+    layout: "card" | "stacked" | "inline",
+    onRevoke = () => undefined,
+  ) =>
+    render(
+      <ul>
+        <SessionItem
+          session={base}
+          now={NOW}
+          pending={false}
+          onRevoke={onRevoke}
+          layout={layout}
+        />
+      </ul>,
+    )
+
+  it("inline: Encerrar ao lado do aparelho, sem a data de entrada", async () => {
+    const onRevoke = vi.fn()
+    renderItem("inline", onRevoke)
+
+    await userEvent.click(screen.getByRole("button", { name: "Encerrar" }))
+
+    expect(onRevoke).toHaveBeenCalledWith("s")
+    expect(screen.getByText("Último uso: há 2 min")).toBeVisible()
+    expect(screen.queryByText(/Entrou em/)).not.toBeInTheDocument()
+  })
+
+  it("stacked: sem cartão, com a linha de baixo, e o botão do próprio usuário", () => {
+    renderItem("stacked")
+
+    expect(screen.getByRole("listitem")).toHaveClass("border-b")
+    expect(screen.getByRole("listitem")).not.toHaveClass("bg-panel")
+    expect(screen.getByRole("button", { name: "Encerrar esta sessão" })).toBeVisible()
+  })
+
+  it("card é o padrão da tela Minhas sessões", () => {
+    renderItem("card")
+
+    expect(screen.getByRole("listitem")).toHaveClass("cut-lg", "bg-panel")
   })
 })

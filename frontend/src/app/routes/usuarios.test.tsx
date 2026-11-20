@@ -10,6 +10,7 @@ import { createQueryClient } from "@/shared/lib/query-client"
 import Authenticated from "./authenticated"
 import Home from "./home"
 import Usuarios from "./usuarios"
+import UsuariosConvidar from "./usuarios.convidar"
 import UsuariosId from "./usuarios.$id"
 
 vi.mock("@/features/iam/iam.service")
@@ -53,7 +54,10 @@ function renderAt(path: string, role: Role) {
         {
           path: "/usuarios",
           Component: Usuarios,
-          children: [{ path: ":id", Component: UsuariosId }],
+          children: [
+            { path: "convidar", Component: UsuariosConvidar },
+            { path: ":id", Component: UsuariosId },
+          ],
         },
       ],
     },
@@ -96,13 +100,49 @@ describe("rota /usuarios", () => {
   })
 })
 
-describe("rota /usuarios/:id", () => {
-  it("mostra a lista e a região de detalhe (o encaixe do painel) sem barra superior no celular", async () => {
-    renderAt("/usuarios/7", "ADMINISTRATOR")
+const PAULA_ID = "77777777-7777-4777-8777-777777777777"
 
-    expect(await screen.findByText("Paula Lima")).toBeInTheDocument()
-    expect(screen.getByRole("region", { name: "Detalhe do usuário" })).toBeInTheDocument()
+describe("rota /usuarios/:id", () => {
+  it("mostra a lista e o detalhe do usuário, sem barra superior no celular", async () => {
+    vi.mocked(service.getUser).mockResolvedValue({
+      user: {
+        id: PAULA_ID,
+        name: "Paula Lima",
+        email: "paula@dunas.com",
+        role: "COMMERCIAL",
+        status: "ACTIVE",
+        lastUsedAt: null,
+      },
+      sessions: [],
+    })
+    renderAt(`/usuarios/${PAULA_ID}`, "ADMINISTRATOR")
+
+    expect(
+      await screen.findByRole("button", { name: "Desativar usuário" }),
+    ).toBeInTheDocument()
+    expect(service.getUser).toHaveBeenCalledWith(PAULA_ID)
+    expect(screen.getByRole("region", { name: "Lista de usuários" })).toBeInTheDocument()
     // O celular tem cabeçalho próprio no detalhe: a casca não põe a barra superior.
-    expect(screen.queryByRole("banner")).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: /Minha conta/ })).not.toBeInTheDocument()
+  })
+})
+
+describe("rota /usuarios/convidar", () => {
+  it("é a rota do convite, não um detalhe: não consulta usuário e a casca não põe a barra superior no celular", async () => {
+    renderAt("/usuarios/convidar", "ADMINISTRATOR")
+
+    expect(await screen.findByLabelText("Nome completo")).toBeInTheDocument()
+    expect(service.getUser).not.toHaveBeenCalled()
+    expect(screen.queryByRole("button", { name: /Minha conta/ })).not.toBeInTheDocument()
+    // No celular a lista dá lugar à tela do convite.
+    expect(screen.getByRole("region", { name: "Lista de usuários" })).toHaveClass(
+      "max-md:hidden",
+    )
+  })
+
+  it("só o Administrador chega", async () => {
+    renderAt("/usuarios/convidar", "TECHNICIAN")
+
+    expect(await screen.findByText("Em construção")).toBeInTheDocument()
   })
 })

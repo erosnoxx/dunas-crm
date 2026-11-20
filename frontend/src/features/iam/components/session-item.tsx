@@ -1,5 +1,6 @@
 import { MonitorIcon, SmartphoneIcon } from "lucide-react"
 
+import { cn } from "@/shared/lib/cn"
 import { Button } from "@/shared/ui/button"
 import { StatusChip } from "@/shared/ui/status-chip"
 
@@ -11,21 +12,64 @@ const shortDate = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-d
 // shortcut: a API só manda o rótulo livre do aparelho, sem tipo; tablets (iPad) e rótulos fora da lista são aproximação, troca por um campo `kind` se o backend passar a mandar.
 const PHONE = /iphone|ipad|\bios\b|android|galaxy|\bapp\b/i
 
+/**
+ * `card`: cartão próprio (Minhas sessões). `stacked`: dentro do painel, com a marca e o botão
+ * abaixo (a lista do próprio usuário). `inline`: dentro do painel, com "Encerrar" ao lado (a
+ * lista de outro usuário).
+ */
+type Layout = "card" | "stacked" | "inline"
+
 type SessionItemProps = {
   session: SessionSummary
   now: Date
   pending: boolean
   onRevoke: (id: string) => void
+  layout?: Layout
 }
 
-/** Uma sessão ativa (mockups "Minhas sessões"). A do aparelho é marcada e não tem "Encerrar". */
-function SessionItem({ session, now, pending, onRevoke }: SessionItemProps) {
+/** Uma sessão ativa (mockups "Minhas sessões" e do painel do usuário). A do aparelho é marcada e não tem "Encerrar". */
+function SessionItem({
+  session,
+  now,
+  pending,
+  onRevoke,
+  layout = "card",
+}: SessionItemProps) {
   const DeviceIcon = PHONE.test(session.device) ? SmartphoneIcon : MonitorIcon
+  const icon = (
+    <DeviceIcon aria-hidden="true" className="mt-0.5 size-6 shrink-0 text-text-muted" />
+  )
+
+  if (layout === "inline")
+    return (
+      <li className="flex items-center gap-3 border-b border-line pb-3">
+        {icon}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <span className="text-body-sm font-semibold">{session.device}</span>
+          <span className="text-label font-normal text-text-muted">
+            {`Último uso: ${lastUse(session.lastUsedAt, now)}`}
+          </span>
+        </div>
+        <Button
+          variant="outline"
+          loading={pending}
+          onClick={() => !pending && onRevoke(session.id)}
+          className="text-sm [&>span]:bg-panel [&>span]:px-4"
+        >
+          Encerrar
+        </Button>
+      </li>
+    )
 
   return (
-    <li className="cut-lg flex flex-col items-start gap-3 bg-panel p-4">
+    <li
+      className={cn(
+        "flex flex-col items-start gap-3",
+        layout === "card" ? "cut-lg bg-panel p-4" : "border-b border-line pb-3",
+      )}
+    >
       <div className="flex items-start gap-3">
-        <DeviceIcon aria-hidden="true" className="mt-0.5 size-6 text-text-muted" />
+        {icon}
         <div className="flex flex-col gap-0.5">
           <span className="text-body font-semibold">{session.device}</span>
           <span className="text-body-sm text-text-muted">
@@ -42,7 +86,7 @@ function SessionItem({ session, now, pending, onRevoke }: SessionItemProps) {
         <Button
           variant="outline"
           loading={pending}
-          onClick={() => onRevoke(session.id)}
+          onClick={() => !pending && onRevoke(session.id)}
           className="text-sm md:[&>span]:px-4 [&>span]:bg-panel"
         >
           Encerrar esta sessão
