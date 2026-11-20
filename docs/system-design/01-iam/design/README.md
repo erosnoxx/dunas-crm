@@ -8,7 +8,7 @@ Artefatos visuais de validação de UX/UI desta feature.
 
 ## Artefatos
 
-Canvas com 12 telas na identidade DUNAS (tema escuro, [`tokens.json`](../../../design-system/tokens.json)): <https://claude.ai/artifact/CvVeA26TCvv9dBdXWwZ4eU>. **Status:** telas 1 a 10 aprovadas pelo usuário em 2026-11-19; telas 11 e 12 propostas (ADR-10).
+Canvas com 12 telas na identidade DUNAS (tema escuro, [`tokens.json`](../../../design-system/tokens.json)): <https://claude.ai/artifact/CvVeA26TCvv9dBdXWwZ4eU>. **Status:** telas 1 a 12 aprovadas pelo usuário em 2026-11-19 (as telas 11 e 12, de usuário desativado, vêm do ADR-10).
 
 | # | Tela | O que valida | Status |
 |---|---|---|---|
