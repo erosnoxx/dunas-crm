@@ -65,7 +65,16 @@ public class User extends AggregateRoot {
             Role role,
             Instant now
     ) {
-        return new User(UUID.randomUUID(), null, name, email, role, UserStatus.INVITED, null, false);
+        return new User(
+                UUID.randomUUID(),
+                null,
+                name,
+                email,
+                role,
+                UserStatus.INVITED,
+                null,
+                false
+        );
     }
 
     public static User reconstitute(
@@ -84,7 +93,16 @@ public class User extends AggregateRoot {
         if (status == UserStatus.INVITED && passwordHash != null)
             throw new DomainException("conta convidada não pode ter senha");
 
-        return new User(id, version, name, email, role, status, passwordHash, mustChangePassword);
+        return new User(
+                id,
+                version,
+                name,
+                email,
+                role,
+                status,
+                passwordHash,
+                mustChangePassword
+        );
     }
 
     /** Ausente enquanto a conta está convidada. */

@@ -117,6 +117,10 @@ public class Login {
 
         sessionRepository.save(session);
 
-        return new SessionResponse(secret.getValue(), session.getExpiresAt(), user.get().isMustChangePassword());
+        return new SessionResponse(
+                secret.getValue(),
+                session.getExpiresAt(),
+                user.get().isMustChangePassword()
+        );
     }
 }

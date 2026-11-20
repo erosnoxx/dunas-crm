@@ -60,7 +60,12 @@ public class InviteUser {
         if (userRepository.findByEmail(email).isPresent())
             throw new ConflictException("email_already_registered", "já existe um usuário com este e-mail");
 
-        var user = User.invite(UserName.of(params.name()), email, role, now);
+        var user = User.invite(
+                UserName.of(params.name()),
+                email,
+                role,
+                now
+        );
 
         userRepository.save(user);
 

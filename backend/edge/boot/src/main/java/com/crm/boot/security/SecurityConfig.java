@@ -3,11 +3,13 @@ package com.crm.boot.security;
 import com.crm.iam.application.usecases.commands.AuthenticateSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,6 +23,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +43,8 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
  * antes da primeira escrita. A proteção BREACH (valor mascarado) não se aplica a este formato:
  * o token só viaja em cookie e cabeçalho, nunca em corpo de página.
  *
- * <p>O formato do aplicativo ({@code Authorization: Bearer}) ainda não existe. Erro de segurança
- * sai em {@code ProblemDetail} como o resto da API.
+ * <p>O formato do aplicativo ({@code Authorization: Bearer}) é do plano do Capacitor
+ * (architecture.md §14). Erro de segurança sai em {@code ProblemDetail} como o resto da API.
  */
 @Configuration
 public class SecurityConfig {
@@ -92,20 +95,21 @@ public class SecurityConfig {
                                 "session_invalid",
                                 "sua sessão não vale mais; entre de novo"
                         ))
-                        .accessDeniedHandler((request, response, exception) -> problems.write(
+                        .accessDeniedHandler((request, response, exception) -> writeAccessDenied(
+                                problems,
                                 response,
-                                HttpStatus.FORBIDDEN,
-                                exception instanceof CsrfException ? "csrf_invalid" : "forbidden",
-                                exception instanceof CsrfException
-                                        ? "requisição recusada; recarregue a página e tente de novo"
-                                        : "você não tem permissão para isto"
+                                exception
                         )))
                 .authorizeHttpRequests(requests -> requests
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(publicRoutes).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(
-                        new SessionAuthenticationFilter(authenticateSession, publicRoutes, problems),
+                        new SessionAuthenticationFilter(
+                                authenticateSession,
+                                publicRoutes,
+                                problems
+                        ),
                         AnonymousAuthenticationFilter.class
                 );
 
@@ -121,6 +125,30 @@ public class SecurityConfig {
         return authentication -> {
             throw new ProviderNotFoundException("a autenticação é pela sessão, não por usuário e senha");
         };
+    }
+
+    private static void writeAccessDenied(
+            ProblemJsonWriter problems,
+            HttpServletResponse response,
+            AccessDeniedException exception
+    ) throws IOException {
+        if (exception instanceof CsrfException) {
+            problems.write(
+                    response,
+                    HttpStatus.FORBIDDEN,
+                    "csrf_invalid",
+                    "requisição recusada; recarregue a página e tente de novo"
+            );
+
+            return;
+        }
+
+        problems.write(
+                response,
+                HttpStatus.FORBIDDEN,
+                "forbidden",
+                "você não tem permissão para isto"
+        );
     }
 
     private static CookieCsrfTokenRepository csrfTokenRepository() {

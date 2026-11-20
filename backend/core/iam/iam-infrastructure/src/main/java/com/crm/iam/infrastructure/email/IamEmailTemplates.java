@@ -96,7 +96,12 @@ public class IamEmailTemplates {
                 + "<p>Se o link não abrir, copie este endereço no navegador:<br>" + escape(link) + "</p>\n"
                 + "<p>" + escape(validityText) + " " + escape(closing) + "</p>\n";
 
-        return new EmailMessage(to, subject, html, text);
+        return new EmailMessage(
+                to,
+                subject,
+                html,
+                text
+        );
     }
 
     /** O segredo é base64 url-safe, que já é seguro em URL; codifica mesmo assim, por não depender disso. */

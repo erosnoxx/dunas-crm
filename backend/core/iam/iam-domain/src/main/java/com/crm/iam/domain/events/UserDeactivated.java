@@ -8,5 +8,8 @@ import java.util.UUID;
 /**
  * Uma conta foi desativada. O listener revoga as sessões do usuário.
  */
-public record UserDeactivated(UUID aggregateId, Instant occurredOn) implements DomainEvent {
+public record UserDeactivated(
+        UUID aggregateId,
+        Instant occurredOn
+) implements DomainEvent {
 }

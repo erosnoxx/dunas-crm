@@ -38,6 +38,10 @@ public class ListSessions {
         if (!params.userId().equals(actor.userId()))
             actor.requireAdministrator();
 
-        return sessionReader.findActiveByUser(params.userId(), actor.sessionId(), Instant.now(clock));
+        return sessionReader.findActiveByUser(
+                params.userId(),
+                actor.sessionId(),
+                Instant.now(clock)
+        );
     }
 }

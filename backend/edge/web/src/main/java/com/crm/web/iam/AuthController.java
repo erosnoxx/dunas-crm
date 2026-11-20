@@ -34,8 +34,9 @@ import java.util.Optional;
  * quem sou eu.
  *
  * <p>O token da sessão sai só no cookie {@code HttpOnly} (architecture.md §14); o corpo leva
- * {@link SessionView}. O formato do aplicativo (token no corpo) não existe ainda. Nenhuma
- * exception é capturada aqui: o aspect de {@code @UseCase} e o {@code RestExceptionHandler} traduzem.
+ * {@link SessionView}. O formato do aplicativo (token no corpo) é do plano do Capacitor
+ * (architecture.md §14). Nenhuma exception é capturada aqui: o aspect de {@code @UseCase} e o
+ * {@code RestExceptionHandler} traduzem.
  */
 @RestController
 @RequestMapping("/auth")
@@ -115,7 +116,11 @@ public class AuthController {
             Actor actor,
             @Valid @RequestBody ChangePasswordRequest body
     ) {
-        changePassword.execute(new ChangePassword.Params(actor, body.currentPassword(), body.newPassword()));
+        changePassword.execute(new ChangePassword.Params(
+                actor,
+                body.currentPassword(),
+                body.newPassword()
+        ));
 
         return ResponseEntity.noContent().build();
     }

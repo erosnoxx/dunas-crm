@@ -65,7 +65,12 @@ public class UsersController {
             Actor actor,
             @Valid @RequestBody InviteUserRequest body
     ) {
-        var created = inviteUser.execute(new InviteUser.Params(actor, body.name(), body.email(), body.role()));
+        var created = inviteUser.execute(new InviteUser.Params(
+                actor,
+                body.name(),
+                body.email(),
+                body.role()
+        ));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -79,7 +84,12 @@ public class UsersController {
     ) {
         var pageable = Pageable.of(Math.max(page, 0), Math.min(Math.max(size, 1), MAX_PAGE_SIZE));
 
-        return listUsers.execute(new ListUsers.Params(actor, filter, pageable));
+        return listUsers.execute(new ListUsers.Params(
+                actor,
+                filter,
+                pageable
+        ));
+
     }
 
     @GetMapping("/{id}")
@@ -106,7 +116,11 @@ public class UsersController {
             @PathVariable UUID id,
             @Valid @RequestBody ChangeRoleRequest body
     ) {
-        changeUserRole.execute(new ChangeUserRole.Params(actor, id, body.role()));
+        changeUserRole.execute(new ChangeUserRole.Params(
+                actor,
+                id,
+                body.role()
+        ));
 
         return ResponseEntity.noContent().build();
     }
@@ -145,7 +159,11 @@ public class UsersController {
             @PathVariable UUID id,
             @RequestParam(defaultValue = "false") boolean keepCurrent
     ) {
-        revokeAllSessions.execute(new RevokeAllSessions.Params(actor, id, keepCurrent));
+        revokeAllSessions.execute(new RevokeAllSessions.Params(
+                actor,
+                id,
+                keepCurrent
+        ));
 
         return ResponseEntity.noContent().build();
     }

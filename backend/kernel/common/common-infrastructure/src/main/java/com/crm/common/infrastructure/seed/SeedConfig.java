@@ -19,6 +19,11 @@ public class SeedConfig {
             Environment environment,
             TransactionTemplate useCaseTransactionTemplate
     ) {
-        return new DatabaseSeeder(seeders, objectMapper, environment, useCaseTransactionTemplate);
+        return new DatabaseSeeder(
+                seeders,
+                objectMapper,
+                environment,
+                useCaseTransactionTemplate
+        );
     }
 }

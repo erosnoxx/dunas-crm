@@ -34,7 +34,11 @@ public class UserDeactivatedListener {
                     revokeUserSessions.execute(new RevokeUserSessions.Params(event.aggregateId(), null)));
         }
         catch (RuntimeException e) {
-            log.error("falha ao revogar as sessões do usuário desativado {}", event.aggregateId(), e);
+            log.error(
+                    "falha ao revogar as sessões do usuário desativado {}",
+                    event.aggregateId(),
+                    e
+            );
         }
     }
 }

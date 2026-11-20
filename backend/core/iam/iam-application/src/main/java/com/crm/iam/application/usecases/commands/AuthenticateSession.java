@@ -77,7 +77,11 @@ public class AuthenticateSession {
             renew(principal, now);
 
         return new AuthenticatedSession(
-                new Actor(principal.userId(), principal.role(), principal.sessionId()),
+                new Actor(
+                        principal.userId(),
+                        principal.role(),
+                        principal.sessionId()
+                ),
                 principal.mustChangePassword()
         );
     }
@@ -93,7 +97,13 @@ public class AuthenticateSession {
         if (!session.isActiveAt(now))
             throw sessionInvalid();
 
-        if (!session.renewIfDue(now, settings.sessionValidity(), settings.sessionRenewInterval()))
+        var renewed = session.renewIfDue(
+                now,
+                settings.sessionValidity(),
+                settings.sessionRenewInterval()
+        );
+
+        if (!renewed)
             return;
 
         try {

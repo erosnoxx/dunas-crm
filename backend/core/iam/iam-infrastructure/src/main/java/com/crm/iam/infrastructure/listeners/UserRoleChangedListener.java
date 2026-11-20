@@ -38,7 +38,11 @@ public class UserRoleChangedListener {
                 cache.evict(AuthenticateSession.CACHE_KEY_PREFIX + session.getTokenHash().getValue());
         }
         catch (RuntimeException e) {
-            log.error("falha ao invalidar as sessões do usuário que mudou de papel {}", event.aggregateId(), e);
+            log.error(
+                    "falha ao invalidar as sessões do usuário que mudou de papel {}",
+                    event.aggregateId(),
+                    e
+            );
         }
     }
 }

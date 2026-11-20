@@ -20,7 +20,12 @@ public class JpaSessionRepositoryImpl
             EntityManager em,
             SessionMapper mapper
     ) {
-        super(jpaRepository, em, mapper, SessionEntity.class);
+        super(
+                jpaRepository,
+                em,
+                mapper,
+                SessionEntity.class
+        );
     }
 
     @Override

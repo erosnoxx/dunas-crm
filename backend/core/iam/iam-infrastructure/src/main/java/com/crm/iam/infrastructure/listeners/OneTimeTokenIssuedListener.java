@@ -35,11 +35,21 @@ public class OneTimeTokenIssuedListener {
             var user = userRepository.findById(event.userId()).orElse(null);
 
             if (user == null) {
-                log.warn("e-mail de {} não enviado: usuário {} não existe mais", event.purpose(), event.userId());
+                log.warn(
+                        "e-mail de {} não enviado: usuário {} não existe mais",
+                        event.purpose(),
+                        event.userId()
+                );
                 return;
             }
 
-            emailSender.send(templates.build(user, event.purpose(), event.secret()));
+            var message = templates.build(
+                    user,
+                    event.purpose(),
+                    event.secret()
+            );
+
+            emailSender.send(message);
         }
         catch (RuntimeException e) {
             log.error(
