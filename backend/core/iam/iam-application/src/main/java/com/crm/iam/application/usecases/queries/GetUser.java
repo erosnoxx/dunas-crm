@@ -39,7 +39,11 @@ public class GetUser {
         var summary = userReader.findSummary(params.userId())
                 .orElseThrow(() -> new NotFoundException("user_not_found", "usuário não encontrado"));
 
-        var sessions = sessionReader.findActiveByUser(params.userId(), actor.sessionId(), Instant.now(clock));
+        var sessions = sessionReader.findActiveByUser(
+                params.userId(),
+                actor.sessionId(),
+                Instant.now(clock)
+        );
 
         return new UserDetail(summary, sessions);
     }

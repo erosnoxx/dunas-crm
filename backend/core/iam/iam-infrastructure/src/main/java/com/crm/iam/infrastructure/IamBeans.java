@@ -122,7 +122,11 @@ public class IamBeans {
             EntityManager em,
             UserMapper mapper
     ) {
-        return new JpaUserRepositoryImpl(jpaRepository, em, mapper);
+        return new JpaUserRepositoryImpl(
+                jpaRepository,
+                em,
+                mapper
+        );
     }
 
     @Bean
@@ -131,7 +135,11 @@ public class IamBeans {
             EntityManager em,
             SessionMapper mapper
     ) {
-        return new JpaSessionRepositoryImpl(jpaRepository, em, mapper);
+        return new JpaSessionRepositoryImpl(
+                jpaRepository,
+                em,
+                mapper
+        );
     }
 
     @Bean
@@ -140,7 +148,11 @@ public class IamBeans {
             EntityManager em,
             OneTimeTokenMapper mapper
     ) {
-        return new JpaOneTimeTokenRepositoryImpl(jpaRepository, em, mapper);
+        return new JpaOneTimeTokenRepositoryImpl(
+                jpaRepository,
+                em,
+                mapper
+        );
     }
 
     @Bean
@@ -164,7 +176,14 @@ public class IamBeans {
             IamSettings settings,
             Clock clock
     ) {
-        return new Login(userRepository, sessionRepository, hasher, rateLimiter, settings, clock);
+        return new Login(
+                userRepository,
+                sessionRepository,
+                hasher,
+                rateLimiter,
+                settings,
+                clock
+        );
     }
 
     /** Sem transação própria: a cadeia de segurança o chama a cada requisição (ver o use case). */
@@ -176,7 +195,13 @@ public class IamBeans {
             IamSettings settings,
             Clock clock
     ) {
-        return new AuthenticateSession(sessionReader, sessionRepository, cache, settings, clock);
+        return new AuthenticateSession(
+                sessionReader,
+                sessionRepository,
+                cache,
+                settings,
+                clock
+        );
     }
 
     @Bean
@@ -185,7 +210,11 @@ public class IamBeans {
             EventPublisher publisher,
             Clock clock
     ) {
-        return new Logout(sessionRepository, publisher, clock);
+        return new Logout(
+                sessionRepository,
+                publisher,
+                clock
+        );
     }
 
     @Bean
@@ -196,7 +225,13 @@ public class IamBeans {
             IamSettings settings,
             Clock clock
     ) {
-        return new InviteUser(userRepository, tokenRepository, publisher, settings, clock);
+        return new InviteUser(
+                userRepository,
+                tokenRepository,
+                publisher,
+                settings,
+                clock
+        );
     }
 
     @Bean
@@ -207,7 +242,13 @@ public class IamBeans {
             IamSettings settings,
             Clock clock
     ) {
-        return new ResendInvitation(userRepository, tokenRepository, publisher, settings, clock);
+        return new ResendInvitation(
+                userRepository,
+                tokenRepository,
+                publisher,
+                settings,
+                clock
+        );
     }
 
     @Bean
@@ -219,7 +260,14 @@ public class IamBeans {
             IamSettings settings,
             Clock clock
     ) {
-        return new AcceptInvitation(tokenRepository, userRepository, sessionRepository, hasher, settings, clock);
+        return new AcceptInvitation(
+                tokenRepository,
+                userRepository,
+                sessionRepository,
+                hasher,
+                settings,
+                clock
+        );
     }
 
     @Bean
@@ -231,7 +279,14 @@ public class IamBeans {
             IamSettings settings,
             Clock clock
     ) {
-        return new RequestPasswordReset(userRepository, tokenRepository, rateLimiter, publisher, settings, clock);
+        return new RequestPasswordReset(
+                userRepository,
+                tokenRepository,
+                rateLimiter,
+                publisher,
+                settings,
+                clock
+        );
     }
 
     @Bean
@@ -243,7 +298,14 @@ public class IamBeans {
             EventPublisher publisher,
             Clock clock
     ) {
-        return new ResetPassword(tokenRepository, userRepository, sessionRepository, hasher, publisher, clock);
+        return new ResetPassword(
+                tokenRepository,
+                userRepository,
+                sessionRepository,
+                hasher,
+                publisher,
+                clock
+        );
     }
 
     @Bean
@@ -275,7 +337,11 @@ public class IamBeans {
             EventPublisher publisher,
             Clock clock
     ) {
-        return new ChangeUserRole(userRepository, publisher, clock);
+        return new ChangeUserRole(
+                userRepository,
+                publisher,
+                clock
+        );
     }
 
     @Bean
@@ -284,7 +350,11 @@ public class IamBeans {
             EventPublisher publisher,
             Clock clock
     ) {
-        return new DeactivateUser(userRepository, publisher, clock);
+        return new DeactivateUser(
+                userRepository,
+                publisher,
+                clock
+        );
     }
 
     @Bean
@@ -298,7 +368,11 @@ public class IamBeans {
             EventPublisher publisher,
             Clock clock
     ) {
-        return new RevokeSession(sessionRepository, publisher, clock);
+        return new RevokeSession(
+                sessionRepository,
+                publisher,
+                clock
+        );
     }
 
     @Bean
@@ -307,7 +381,11 @@ public class IamBeans {
             EventPublisher publisher,
             Clock clock
     ) {
-        return new RevokeAllSessions(sessionRepository, publisher, clock);
+        return new RevokeAllSessions(
+                sessionRepository,
+                publisher,
+                clock
+        );
     }
 
     @Bean
@@ -316,7 +394,11 @@ public class IamBeans {
             EventPublisher publisher,
             Clock clock
     ) {
-        return new RevokeUserSessions(sessionRepository, publisher, clock);
+        return new RevokeUserSessions(
+                sessionRepository,
+                publisher,
+                clock
+        );
     }
 
     // --- queries ------------------------------------------------------------------------------
@@ -332,7 +414,11 @@ public class IamBeans {
             SessionReader sessionReader,
             Clock clock
     ) {
-        return new GetUser(userReader, sessionReader, clock);
+        return new GetUser(
+                userReader,
+                sessionReader,
+                clock
+        );
     }
 
     @Bean
@@ -356,7 +442,11 @@ public class IamBeans {
             EmailSenderService emailSender,
             IamEmailTemplates templates
     ) {
-        return new OneTimeTokenIssuedListener(userRepository, emailSender, templates);
+        return new OneTimeTokenIssuedListener(
+                userRepository,
+                emailSender,
+                templates
+        );
     }
 
     @Bean
@@ -385,7 +475,11 @@ public class IamBeans {
             Cache cache,
             Clock clock
     ) {
-        return new UserRoleChangedListener(sessionRepository, cache, clock);
+        return new UserRoleChangedListener(
+                sessionRepository,
+                cache,
+                clock
+        );
     }
 
     // --- seed ---------------------------------------------------------------------------------
@@ -396,6 +490,10 @@ public class IamBeans {
             PasswordHasher hasher,
             Clock clock
     ) {
-        return new AdminSeeder(userRepository, hasher, clock);
+        return new AdminSeeder(
+                userRepository,
+                hasher,
+                clock
+        );
     }
 }

@@ -76,7 +76,13 @@ public class OneTimeToken extends AggregateRoot {
                 null
         );
 
-        token.registerEvent(new OneTimeTokenIssued(token.getId(), now, userId, purpose, secret));
+        token.registerEvent(new OneTimeTokenIssued(
+                token.getId(),
+                now,
+                userId,
+                purpose,
+                secret
+        ));
 
         return token;
     }
@@ -91,7 +97,16 @@ public class OneTimeToken extends AggregateRoot {
             Instant usedAt,
             Instant invalidatedAt
     ) {
-        return new OneTimeToken(id, version, userId, purpose, tokenHash, expiresAt, usedAt, invalidatedAt);
+        return new OneTimeToken(
+                id,
+                version,
+                userId,
+                purpose,
+                tokenHash,
+                expiresAt,
+                usedAt,
+                invalidatedAt
+        );
     }
 
     /** Vazio enquanto o link não foi usado. */

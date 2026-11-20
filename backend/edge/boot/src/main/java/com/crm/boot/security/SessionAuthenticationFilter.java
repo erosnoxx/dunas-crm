@@ -98,12 +98,23 @@ class SessionAuthenticationFilter extends OncePerRequestFilter {
 
             var context = SecurityContextHolder.createEmptyContext();
 
-            context.setAuthentication(UsernamePasswordAuthenticationToken.authenticated(session.actor(), null, List.of()));
+            var authentication = UsernamePasswordAuthenticationToken.authenticated(
+                    session.actor(),
+                    null,
+                    List.of()
+            );
+
+            context.setAuthentication(authentication);
 
             SecurityContextHolder.setContext(context);
         }
         catch (UnauthorizedException e) {
-            problems.write(response, HttpStatus.UNAUTHORIZED, "session_invalid", e.getMessage());
+            problems.write(
+                    response,
+                    HttpStatus.UNAUTHORIZED,
+                    "session_invalid",
+                    e.getMessage()
+            );
 
             return;
         }

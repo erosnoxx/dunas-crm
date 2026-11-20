@@ -26,7 +26,12 @@ public class JpaOneTimeTokenRepositoryImpl
             EntityManager em,
             OneTimeTokenMapper mapper
     ) {
-        super(jpaRepository, em, mapper, OneTimeTokenEntity.class);
+        super(
+                jpaRepository,
+                em,
+                mapper,
+                OneTimeTokenEntity.class
+        );
     }
 
     @Override

@@ -128,7 +128,7 @@ Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `querie
 
 ### `AuthenticateSession`
 
-Chamado pela cadeia de segurança do `boot` a cada requisição ([`architecture.md`](../../rules/architecture.md) §13).
+Chamado pela cadeia de segurança do `boot` a cada requisição ([`architecture.md`](../../rules/architecture.md) §4.1).
 
 - **Entrada:** o token opaco do cabeçalho.
 - **Fluxo:** 1. `TokenSecret` → `TokenHash`. 2. `Cache.getOrLoad("iam:session:<hash>", ttl = session-cache-ttl)` com o carregamento do banco (sessão + papel do usuário). 3. Sessão inexistente, revogada ou expirada, ou usuário não `ACTIVE`: `UnauthorizedException`, `session_invalid`. 4. `renewIfDue`; só grava quando devolve `true`. 5. Devolve o `Actor` e `mustChangePassword`.
@@ -156,7 +156,7 @@ Só traduzem e chamam um use case; nenhuma regra neles. Rodam **depois do commit
 
 ### `ListUsers`
 
-- **Entrada:** `Actor` (Administrador), filtro opcional (`role`, `status`, texto em nome ou e-mail), `Pageable`. `Criteria` com `@CriteriaField`.
+- **Entrada:** `Actor` (Administrador), filtro opcional (`role`, `status`, texto em nome ou e-mail), `Pageable`. O filtro é o `UserFilter`, lido pelo contrato `UserReader`.
 - **Retorno:** `Page<UserSummary>`: `id`, `name`, `email`, `role`, `status`, `lastUsedAt` (o último uso entre as sessões do usuário; vazio se nunca entrou).
 - **Endpoint:** `GET /users`, Administrador.
 
@@ -183,7 +183,7 @@ Contrato público ([`architecture.md`](../../rules/architecture.md) §7.3). Cód
 | `session_invalid` | 401 | sua sessão não vale mais; entre de novo | token desconhecido, expirado, revogado ou de usuário desativado |
 | `rate_limited` | 429 | muitas tentativas; tente de novo em alguns minutos | limite estourado (código do kernel) |
 | `password_change_required` | 403 | você precisa trocar a senha antes de continuar | sessão com `mustChangePassword` fora de `ChangePassword`, `Logout` e `GetCurrentUser` (ADR-2, [`architecture.md`](../../rules/architecture.md) §4.1) |
-| `csrf_invalid` | 403 | requisição recusada; recarregue a página e tente de novo | escrita por cookie sem o cabeçalho de CSRF (*proposta*: código da cadeia de segurança, ainda não aprovado) |
+| `csrf_invalid` | 403 | requisição recusada; recarregue a página e tente de novo | escrita por cookie sem o cabeçalho de CSRF (*proposta*: código da cadeia de segurança) |
 | `forbidden` | 403 | você não tem permissão para isto | papel insuficiente ou sessão de outro usuário |
 | `invalid_password` | 400 | a senha precisa de `<critério que falta>` | regra do ADR-3 |
 | `link_expired` | 422 | este link expirou | link vencido |

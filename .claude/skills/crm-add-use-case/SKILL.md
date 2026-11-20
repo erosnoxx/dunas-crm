@@ -85,7 +85,7 @@ Nada de `@Component`. Instancie com `new` na `@Configuration` do BC, em `<bc>-in
 
 O controller **injeta use cases e nada mais**: nada de `domain`, repository nem infraestrutura. Uma classe de `web` fala com **um** BC; fluxo que precisa de dois é `orchestration` (§5.4). Erros saem pelo `RestExceptionHandler`, que só conhece tipos de application.
 
-Referência viva: `AuthController`, `UsersController` e `SessionsController`, em `edge/web/src/main/java/com/crm/web/iam/`. O desenho deles (ainda a aprovar pelo usuário):
+Referência viva: `AuthController`, `UsersController` e `SessionsController`, em `edge/web/src/main/java/com/crm/web/iam/`. O desenho deles (registrado aqui; a aprovação do usuário é a regra desta skill):
 
 - **Quem age chega como parâmetro `Actor`.** A cadeia de segurança de `boot` deixa o `Actor` no atributo `ActorRequestAttribute.NAME`; o `ActorArgumentResolver` (registrado em `WebIamConfig`) o entrega ao método, e sem ele responde 401 `session_invalid`. Nenhum controller lê cookie, token nem cabeçalho de credencial, e nenhum confere papel: a checagem é do use case.
 - **Corpo da requisição é um record de `web`** (`com.crm.web.<bc>.requests`), com Bean Validation e mensagem pt-BR (`@NotBlank(message = "é obrigatório")`). O record que carrega senha ou segredo de link sobrescreve o `toString()` sem eles. O controller monta o `Params` do use case a partir do record; papel e enum chegam como texto e o use case os interpreta.

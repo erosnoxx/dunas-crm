@@ -43,7 +43,11 @@ public class ChangeUserRole {
         var user = userRepository.findById(params.userId())
                 .orElseThrow(() -> new NotFoundException("user_not_found", "usuário não encontrado"));
 
-        user.changeRole(params.actor().userId(), role, Instant.now(clock));
+        user.changeRole(
+                params.actor().userId(),
+                role,
+                Instant.now(clock)
+        );
 
         userRepository.save(user);
 

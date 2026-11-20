@@ -58,9 +58,21 @@ public record IamProperties(
      * campo de um tipo aninhado: por isso o default de cada limite é aplicado aqui.
      */
     public IamProperties {
-        loginLimitPerEmail = Limit.orDefault(loginLimitPerEmail, 5, Duration.ofMinutes(15));
-        loginLimitPerOrigin = Limit.orDefault(loginLimitPerOrigin, 20, Duration.ofMinutes(15));
-        passwordResetLimitPerEmail = Limit.orDefault(passwordResetLimitPerEmail, 3, Duration.ofHours(1));
+        loginLimitPerEmail = Limit.orDefault(
+                loginLimitPerEmail,
+                5,
+                Duration.ofMinutes(15)
+        );
+        loginLimitPerOrigin = Limit.orDefault(
+                loginLimitPerOrigin,
+                20,
+                Duration.ofMinutes(15)
+        );
+        passwordResetLimitPerEmail = Limit.orDefault(
+                passwordResetLimitPerEmail,
+                3,
+                Duration.ofHours(1)
+        );
     }
 
     /**
@@ -104,7 +116,13 @@ public record IamProperties(
         }
 
         RateLimit toRateLimit(String scope) {
-            return RateLimit.failClosed(scope, maxAttempts, window, "rate_limited", LIMITED);
+            return RateLimit.failClosed(
+                    scope,
+                    maxAttempts,
+                    window,
+                    "rate_limited",
+                    LIMITED
+            );
         }
     }
 

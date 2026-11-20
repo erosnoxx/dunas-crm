@@ -23,7 +23,12 @@ public class JpaUserRepositoryImpl
             EntityManager em,
             UserMapper mapper
     ) {
-        super(jpaRepository, em, mapper, UserEntity.class);
+        super(
+                jpaRepository,
+                em,
+                mapper,
+                UserEntity.class
+        );
     }
 
     @Override

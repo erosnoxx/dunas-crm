@@ -3,10 +3,8 @@ package com.crm.iam.application.usecases.commands;
 import com.crm.common.application.annotations.UseCase;
 import com.crm.common.application.events.EventPublisher;
 import com.crm.common.application.exceptions.BadRequestException;
-import com.crm.common.application.exceptions.ForbiddenException;
 import com.crm.iam.application.Actor;
 import com.crm.iam.application.contracts.repositories.SessionRepository;
-import com.crm.iam.domain.vos.Role;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Clock;
@@ -42,8 +40,8 @@ public class RevokeAllSessions {
         var actor = params.actor();
         var own = actor.userId().equals(params.userId());
 
-        if (!own && actor.role() != Role.ADMINISTRATOR)
-            throw new ForbiddenException("forbidden", "você não tem permissão para isto");
+        if (!own)
+            actor.requireAdministrator();
 
         if (params.keepCurrent() && !own)
             throw new BadRequestException("manter a sessão atual só vale para o próprio usuário");

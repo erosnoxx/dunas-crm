@@ -126,7 +126,11 @@ public class Session extends AggregateRoot {
      * {@code true} e move {@code lastUsedAt} e {@code expiresAt}; antes disso devolve {@code false}
      * e não muda nada. Sessão inativa é {@code session_invalid}.
      */
-    public boolean renewIfDue(Instant now, Duration validity, Duration minInterval) {
+    public boolean renewIfDue(
+            Instant now,
+            Duration validity,
+            Duration minInterval
+    ) {
         if (!isActiveAt(now))
             throw new DomainException("session_invalid", "sua sessão não vale mais");
 
@@ -147,7 +151,11 @@ public class Session extends AggregateRoot {
         this.revokedAt = now;
         this.revokedBy = by;
 
-        registerEvent(new SessionRevoked(getId(), now, tokenHash));
+        registerEvent(new SessionRevoked(
+                getId(),
+                now,
+                tokenHash
+        ));
     }
 
     /** Ativa quando não foi revogada e {@code now} é anterior a {@code expiresAt}. */

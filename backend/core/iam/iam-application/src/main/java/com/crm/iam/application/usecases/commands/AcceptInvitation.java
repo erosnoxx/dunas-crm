@@ -88,6 +88,10 @@ public class AcceptInvitation {
 
         sessionRepository.save(session);
 
-        return new SessionResponse(secret.getValue(), session.getExpiresAt(), user.isMustChangePassword());
+        return new SessionResponse(
+                secret.getValue(),
+                session.getExpiresAt(),
+                user.isMustChangePassword()
+        );
     }
 }

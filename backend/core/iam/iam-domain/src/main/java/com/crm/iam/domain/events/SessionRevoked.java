@@ -10,5 +10,9 @@ import java.util.UUID;
  * Uma sessão foi encerrada. O listener tira a sessão do cache pelo hash na hora, o que torna o
  * encerramento remoto imediato (ADR-1). Carrega só o {@link TokenHash}, nunca o segredo.
  */
-public record SessionRevoked(UUID aggregateId, Instant occurredOn, TokenHash tokenHash) implements DomainEvent {
+public record SessionRevoked(
+        UUID aggregateId,
+        Instant occurredOn,
+        TokenHash tokenHash
+) implements DomainEvent {
 }

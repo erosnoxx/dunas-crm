@@ -4,12 +4,10 @@ import com.crm.common.infrastructure.persistence.repositories.RepositoryImpl;
 import com.crm.iam.application.contracts.repositories.SessionCriteria;
 import com.crm.iam.application.contracts.repositories.SessionRepository;
 import com.crm.iam.domain.entities.Session;
-import com.crm.iam.domain.vos.TokenHash;
 import jakarta.persistence.EntityManager;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /** Repository de {@link Session} sobre JPA. */
@@ -22,13 +20,12 @@ public class JpaSessionRepositoryImpl
             EntityManager em,
             SessionMapper mapper
     ) {
-        super(jpaRepository, em, mapper, SessionEntity.class);
-    }
-
-    @Override
-    public Optional<Session> findByTokenHash(TokenHash tokenHash) {
-        return jpaRepository.findByTokenHash(tokenHash.getValue())
-                .map(mapper::toDomain);
+        super(
+                jpaRepository,
+                em,
+                mapper,
+                SessionEntity.class
+        );
     }
 
     @Override
