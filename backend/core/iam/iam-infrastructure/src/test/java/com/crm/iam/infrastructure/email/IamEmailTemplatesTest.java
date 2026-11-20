@@ -42,8 +42,11 @@ class IamEmailTemplatesTest {
 
         assertThat(message.to()).isEqualTo("ana@dunas.com");
         assertThat(message.subject()).isEqualTo("Seu convite para o sistema da DUNAS");
-        assertThat(message.html()).contains(link).contains("Ana Souza").contains("48 horas");
-        assertThat(message.text()).contains(link).contains("Ana Souza").contains("48 horas");
+        assertThat(message.html()).contains(link).contains("Ana Souza").contains("48 horas")
+                .contains("Você recebeu um convite para usar o sistema da DUNAS")
+                .contains("Se o link não abrir").doesNotContain("botão").doesNotContain("convidado");
+        assertThat(message.text()).contains(link).contains("Ana Souza").contains("48 horas")
+                .contains("Você recebeu um convite para usar o sistema da DUNAS");
     }
 
     @Test

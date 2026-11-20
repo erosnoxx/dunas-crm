@@ -54,7 +54,7 @@ public class IamEmailTemplates {
                     to,
                     "Seu convite para o sistema da DUNAS",
                     name,
-                    "Você foi convidado para usar o sistema da DUNAS. Crie a sua senha pelo link abaixo.",
+                    "Você recebeu um convite para usar o sistema da DUNAS. Crie a sua senha pelo link abaixo.",
                     "Criar senha",
                     link("/convite", secret),
                     "Se o link vencer, peça um novo convite a um administrador.",
@@ -93,7 +93,7 @@ public class IamEmailTemplates {
         var html = "<p>Olá, " + escape(name) + ".</p>\n"
                 + "<p>" + escape(intro) + "</p>\n"
                 + "<p><a href=\"" + escape(link) + "\">" + escape(action) + "</a></p>\n"
-                + "<p>Se o botão não abrir, copie este endereço no navegador:<br>" + escape(link) + "</p>\n"
+                + "<p>Se o link não abrir, copie este endereço no navegador:<br>" + escape(link) + "</p>\n"
                 + "<p>" + escape(validityText) + " " + escape(closing) + "</p>\n";
 
         return new EmailMessage(to, subject, html, text);

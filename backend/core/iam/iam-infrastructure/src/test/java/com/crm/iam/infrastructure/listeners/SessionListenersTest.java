@@ -1,5 +1,9 @@
 package com.crm.iam.infrastructure.listeners;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.crm.common.application.cache.Cache;
 import com.crm.common.application.events.EventPublisher;
 import com.crm.iam.application.contracts.repositories.SessionRepository;
@@ -10,10 +14,12 @@ import com.crm.iam.domain.events.UserDeactivated;
 import com.crm.iam.domain.events.UserRoleChanged;
 import com.crm.iam.domain.vos.DeviceLabel;
 import com.crm.iam.domain.vos.TokenSecret;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.SimpleTransactionStatus;
@@ -48,12 +54,24 @@ class SessionListenersTest {
     private Cache cache;
     private SessionRepository sessionRepository;
     private EventPublisher publisher;
+    private Logger rootLogger;
+    private ListAppender<ILoggingEvent> appender;
 
     @BeforeEach
     void setUp() {
+        rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        appender = new ListAppender<>();
+        appender.start();
+        rootLogger.addAppender(appender);
+
         cache = mock(Cache.class);
         sessionRepository = mock(SessionRepository.class);
         publisher = mock(EventPublisher.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        rootLogger.detachAppender(appender);
     }
 
     private Session session() {
@@ -149,6 +167,25 @@ class SessionListenersTest {
         listener.on(new UserDeactivated(userId, NOW));
 
         verify(sessionRepository, never()).save(any());
+        assertThat(appender.list).anySatisfy(logged -> {
+            assertThat(logged.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(logged.getThrowableProxy().getMessage()).isEqualTo("banco fora");
+        });
+    }
+
+    @Test
+    @DisplayName("UserRoleChanged com falha ao buscar as sessões não propaga e é logado com a exception")
+    void roleChangedFailureDoesNotPropagate() {
+        when(sessionRepository.findActiveByUserId(userId, NOW)).thenThrow(new IllegalStateException("banco fora"));
+        var listener = new UserRoleChangedListener(sessionRepository, cache, CLOCK);
+
+        listener.on(new UserRoleChanged(userId, NOW));
+
+        verify(cache, never()).evict(any());
+        assertThat(appender.list).anySatisfy(logged -> {
+            assertThat(logged.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(logged.getThrowableProxy().getMessage()).isEqualTo("banco fora");
+        });
     }
 
     private static PlatformTransactionManager transactionManager() {
