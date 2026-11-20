@@ -49,6 +49,7 @@ Em `.claude/skills/`, só procedimentos; as regras ficam em `docs/rules/`.
 | `crm-domain-events` | domain event, integration event, consumidor |
 | `crm-integration-acl` | falar com qualquer sistema de terceiro |
 | `crm-build-and-test` | compilar, testar, build quebrado |
+| `crm-frontend-add-feature` | telas de uma feature no frontend: rota, formulário, teste por tela |
 
 ## Regras operacionais
 

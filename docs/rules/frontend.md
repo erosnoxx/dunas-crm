@@ -42,7 +42,7 @@ test/      setup global de teste
 - **`features/<dominio>/`** só existe se a feature existe em `docs/system-design/`: nunca especulativa. **Uma feature não importa outra**: o que as duas precisam sobe para `shared/`. Arquivos por feature: `<dominio>.service.ts` (chamadas à API), `<dominio>.hooks.ts` (TanStack Query), `<dominio>.schemas.ts` (Zod), componentes e telas.
 - **`shared/ui/`** não tem domínio.
 - **`shared/api/`**: `http-client.ts` é a única instância de axios; nenhum outro lugar importa `axios`.
-- A estrutura de `features/iam/` é fixada pelo plano da feature, e a skill `crm-frontend-add-feature` nasce dela, como as skills de backend nasceram do primeiro BC.
+- **Referência viva: `features/iam/`** (com as rotas em `app/routes/`); o passo a passo de uma feature nova está na skill `crm-frontend-add-feature`.
 
 ## 4. Tema e identidade
 
