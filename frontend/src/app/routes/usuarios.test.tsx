@@ -1,7 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query"
 import { render, screen, within } from "@testing-library/react"
 import { createRoutesStub } from "react-router"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import * as service from "@/features/iam/iam.service"
 import type { CurrentUser, Role } from "@/features/iam/iam.service"
@@ -14,6 +14,8 @@ import UsuariosConvidar from "./usuarios.convidar"
 import UsuariosId from "./usuarios.$id"
 
 vi.mock("@/features/iam/iam.service")
+
+const NOW = "2026-11-19T12:00:00.000Z"
 
 const me = (role: Role): CurrentUser => ({
   id: "1",
@@ -33,7 +35,7 @@ function renderAt(path: string, role: Role) {
         email: "paula@dunas.com",
         role: "COMMERCIAL",
         status: "ACTIVE",
-        lastUsedAt: new Date().toISOString(),
+        lastUsedAt: NOW,
       },
     ],
     page: 0,
@@ -66,7 +68,13 @@ function renderAt(path: string, role: Role) {
   render(<Stub initialEntries={[path]} />)
 }
 
-beforeEach(() => vi.resetAllMocks())
+beforeEach(() => {
+  vi.resetAllMocks()
+  vi.useFakeTimers({ toFake: ["Date"] })
+  vi.setSystemTime(NOW)
+})
+
+afterEach(() => vi.useRealTimers())
 
 describe("rota /usuarios", () => {
   it("o Administrador abre a lista dentro da casca, com o título na barra do celular e o item marcado", async () => {

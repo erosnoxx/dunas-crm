@@ -7,7 +7,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { createQueryClient } from "@/shared/lib/query-client"
 
+import { RedirectIfAuthenticated } from "../guards"
 import * as service from "../iam.service"
+import type { CurrentUser } from "../iam.service"
 import { ResetPasswordScreen } from "./reset-password"
 
 vi.mock("../iam.service")
@@ -21,8 +23,22 @@ const apiError = (status: number, code: string, message: string) => ({
   message,
 })
 
-function renderScreen(url = "/redefinir-senha?token=segredo-do-link") {
+const cachedMe: CurrentUser = {
+  id: "1",
+  name: "Ana",
+  email: "a@b.com",
+  role: "COMMERCIAL",
+  mustChangePassword: false,
+}
+
+function renderScreen(
+  url = "/redefinir-senha?token=segredo-do-link",
+  { cached = false } = {},
+) {
   const client = createQueryClient(() => undefined)
+
+  // Quem já estava logado neste navegador: o `me` fica em cache (staleTime de 1 h).
+  if (cached) client.setQueryData(["me"], cachedMe)
   const invalidate = vi.spyOn(client, "invalidateQueries")
   const Stub = createRoutesStub([
     {
@@ -33,7 +49,19 @@ function renderScreen(url = "/redefinir-senha?token=segredo-do-link") {
       ),
       children: [
         { path: "/redefinir-senha", Component: ResetPasswordScreen },
-        { path: "/entrar", Component: () => <p>tela de entrar</p> },
+        {
+          path: "/entrar",
+          // Com `me` em cache o `/entrar` real passa pela guarda; sem ele, é só a tela.
+          Component: () =>
+            cached ? (
+              <RedirectIfAuthenticated>
+                <p>tela de entrar</p>
+              </RedirectIfAuthenticated>
+            ) : (
+              <p>tela de entrar</p>
+            ),
+        },
+        { path: "/", Component: () => <p>início</p> },
         { path: "/esqueci-senha", Component: () => <p>tela de esqueci a senha</p> },
       ],
     },
@@ -107,6 +135,21 @@ describe("ResetPasswordScreen", () => {
     expect(invalidate).not.toHaveBeenCalled()
     expect(service.getCurrentUser).not.toHaveBeenCalled()
     expect(service.login).not.toHaveBeenCalled()
+  })
+
+  it("descarta o `me` em cache: quem redefiniu a senha não é mandado de /entrar para o início", async () => {
+    vi.mocked(service.resetPassword).mockResolvedValue(undefined)
+    vi.mocked(service.getCurrentUser).mockRejectedValue(
+      apiError(401, "session_invalid", "sessão"),
+    )
+    const { user } = renderScreen(undefined, { cached: true })
+
+    await fillAndSubmit(user)
+
+    expect(await screen.findByText("tela de entrar")).toBeInTheDocument()
+    expect(screen.queryByText("início")).not.toBeInTheDocument()
+    // O guarda consultou a sessão de novo, em vez de confiar no cache de 1 h.
+    expect(service.getCurrentUser).toHaveBeenCalledTimes(1)
   })
 
   it("durante o envio o botão carrega e um clique só dispara um pedido", async () => {

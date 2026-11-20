@@ -3,7 +3,7 @@ import { toast } from "sonner"
 
 import { NewPasswordForm } from "../components/new-password-form"
 import { useResetPassword } from "../iam.hooks"
-import { LinkProblem } from "./link-problem"
+import { LinkProblem } from "../components/link-problem"
 
 /**
  * Redefinir senha (mockup "Redefinir senha, celular"). Como no convite, a tela não consulta o

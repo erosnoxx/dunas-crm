@@ -109,8 +109,18 @@ export function useRequestPasswordReset() {
   return useMutation({ mutationFn: service.requestPasswordReset })
 }
 
+/**
+ * A redefinição revoga todas as sessões do usuário, inclusive a deste navegador: o `me` em cache
+ * deixaria o guarda do login mandar para o início uma sessão morta. `removeQueries` (não
+ * `invalidateQueries`): sem observador a consulta só ficaria obsoleta e o guarda leria o dado velho.
+ */
 export function useResetPassword() {
-  return useMutation({ mutationFn: service.resetPassword })
+  const client = useQueryClient()
+
+  return useMutation({
+    mutationFn: service.resetPassword,
+    onSuccess: () => client.removeQueries({ queryKey: keys.me }),
+  })
 }
 
 /** A troca zera `mustChangePassword` e encerra as outras sessões. */

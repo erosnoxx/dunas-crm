@@ -156,6 +156,7 @@ Valores do mockup que não existem na escala do [`tokens.json`](../../../design-
 | título 32/36 peso 700 | convite, redefinir, esqueci, troca obrigatória (celular) | `display-lg` 36/40 |
 | título 28/32 peso 700 | link inválido, link enviado, diálogo de convite | `title` 24/28 peso 600 |
 | wordmark "DUNAS" 20 px peso 600, espaçamento 0.04em | cabeçalho das telas de acesso e barra lateral | `text-xl` e `tracking-[0.04em]` (fora da escala; pedir um token `wordmark`) |
+| inicial do avatar 18 px (barra superior do celular, avatar de 44 px, e bloco da barra lateral, avatar de 40 px) e 20 px (folha do menu da conta, avatar de 48 px) | barra superior do celular, bloco da conta da barra lateral e folha do menu da conta | `text-lg` (18 px) nos dois primeiros e `text-xl` (20 px) na folha: nenhum dos dois tamanhos está na escala |
 | texto 15 px | item da barra lateral, nome e papel nas linhas da lista web, nome do papel no convite, botão "Convidar usuário" da web | 14 (`body-sm`) ou 16 (`body`, no botão) |
 | 16/22 peso 600 | título do aviso de bloqueio, títulos de seção do detalhe no celular | `body` 16/24 peso 600 |
 | fundo do diálogo e da folha, `ground` a 78% | diálogo de convite, menu da conta | `bg-ground/80` |
@@ -174,6 +175,9 @@ Cada linha foi decidida na implementação, sem mockup; nenhuma está aprovada.
 | Entrar | texto do aviso de credencial com inicial maiúscula, como o mockup ("E-mail ou senha incorretos. Confira os dados e tente de novo."), diferente da frase minúscula da tabela de erros |
 | Entrar, bloqueado | a pausa vive só na tela: recarregar a página religa o formulário (o servidor segue recusando); depois dos 15 minutos não há "tentar de novo" sem recarregar; o "Mostrar" fica visível e desligado |
 | Convite, redefinir, trocar | o aviso de repetição diferente aparece ao vivo, enquanto se digita |
+| Convidar | as mensagens de validação aparecem **ao vivo, enquanto se digita** (o formulário valida a cada tecla), com o texto de `iam.schemas.ts`, sem mockup nem texto aprovado: ao digitar a primeira letra do nome sai "o nome tem no mínimo 2 caracteres", e ao digitar a primeira letra do e-mail sai "informe um e-mail válido" |
+| Esqueci minha senha | as mesmas mensagens de e-mail do Entrar ("informe o e-mail", "informe um e-mail válido"), sem mockup: aparecem no envio e, depois do primeiro envio, passam a seguir a digitação |
+| Convite sem `token` na URL e link de convite usado ou substituído | "Este convite já foi usado ou foi substituído" e "Peça ao administrador para enviar um novo convite." vêm da Tarefa 6 do plano (`docs/plans/2026-11-19-iam-frontend.md`), não de um mockup nem da tabela aprovada de [`telas-complementares.md`](telas-complementares.md); a mesma cópia aparece quando `/convite` é aberto sem `token` |
 | Redefinir e trocar senha | "Senha alterada" sai como aviso flutuante (toast); o texto é aprovado, a forma não; aparece também depois da troca obrigatória |
 | Troca obrigatória | piscada da casca entre salvar e chegar a `/usuarios` (de 95 a 125 ms, seção 3) |
 | Troca voluntária | título "Trocar senha", botão "Salvar nova senha" e rótulos vêm do texto do mockup, não da tabela de cópias de [`telas-complementares.md`](telas-complementares.md) |
@@ -187,9 +191,9 @@ Cada linha foi decidida na implementação, sem mockup; nenhuma está aprovada.
 | Usuários, web | falha da primeira página: sem rodapé nem botão de tentar de novo (recarregar) |
 | Convidar | "Enviar convite" desligado com o cinza dos botões de senha (o mockup só mostra o ligado) |
 | Rótulos | link de volta "Voltar" em todas as telas (os mockups misturam "Voltar" e "Voltar para usuários") |
-| Todas as listas de sessões | último uso relativo: "agora" e "há N min" seguem o mockup; "há 3 horas" e "há 2 dias" saem do `Intl.RelativeTimeFormat` (`last-use.ts`), sem cópia aprovada |
+| Todas as listas de sessões | último uso relativo: "agora", "há N min", "há 3 horas", "há 3 dias" e "há 40 dias" aparecem no mockup `Usuarios-web`; as demais formas ("há 1 hora", "há 2 dias" e as outras contagens) saem do `Intl.RelativeTimeFormat` (`last-use.ts`), sem cópia aprovada |
 | Todas as listas de sessões | o ícone (celular ou monitor) é deduzido do rótulo livre do aparelho por expressão regular |
-| Avisos de erro | erro que não é `ApiError` (falha inesperada do código) mostra a própria mensagem, que pode vir em inglês; erro sem mensagem deixa o aviso vazio |
+| Avisos de erro | erro que não é `ApiError` (falha inesperada do código) mostra a própria mensagem, que pode vir em inglês; erro sem mensagem mostra "Algo deu errado; tente de novo", frase genérica sem texto aprovado |
 | Entrar | o aviso de um envio anterior continua na tela quando o envio seguinte falha na validação do cliente |
 | Todas as listas de sessões | rótulo do aparelho é o `User-Agent` cru ([`open-questions.md`](../open-questions.md), "Como o rótulo do aparelho é obtido") |
 | Usuários, celular | na ordem do teclado, "Convidar usuário" (rodapé fixo) vem antes da lista, embora apareça depois dela |
@@ -216,7 +220,7 @@ Comportamentos e débitos da execução, sem divergência visual de mockup; regi
 | Onde | Pendência |
 |---|---|
 | Link inválido | "Ir para o login" e "Pedir novo link" são `Button` com `role="link"`: também disparam com Espaço |
-| Aceite do convite e redefinição | o cache de outro usuário (`me`) não é limpo ao aceitar um convite nem ao redefinir a senha no mesmo navegador |
+| Aceite do convite | o cache de outro usuário (`me`) não é limpo ao aceitar um convite no mesmo navegador (a redefinição de senha o descarta) |
 | Casca | `/usuarios/`, com barra no fim, perde a barra superior do celular; a barra lateral não rola em janelas muito baixas |
 | Usuários, web | "Anterior" fica sem efeito depois de uma falha ao voltar de página; o aviso de erro do "Carregar mais" sai acima da lista; uma página exibida que fique vazia some com o rodapé |
 | Detalhe do usuário, celular | carregando e erro não têm `h1` (só o "Voltar") |
@@ -226,7 +230,7 @@ Comportamentos e débitos da execução, sem divergência visual de mockup; regi
 | Diálogo de convite | `clip-path` com `overflow-y-auto` pode cortar a barra de rolagem no chanfro |
 | Sessão | `403 password_change_required` não é tratado (a guarda impede chegar lá); a trava do `session_invalid` volta a armar com qualquer sucesso |
 | Testes | sem teste direto de `last-use`, `useMediaQuery`, `useInfiniteUsers` e da remoção do ouvinte de `matchMedia`; sem teste de `aria-current` em `/usuarios/:id`, do alvo `md:min-h-12` do Entrar, de `invalid_credentials` seguido de `rate_limited`, das classes `md:` do link inválido, do "Senha alterada" na troca obrigatória e do toast renderizado (o `sonner` é simulado) |
-| Código | classes da casca de acesso repetidas entre o link inválido e `AuthShell`; o estilo de link de texto montado à mão três vezes; `new-password-form` importa `screens/link-problem`; `ResetPasswordValues` sem uso |
+| Código | classes da casca de acesso repetidas entre o link inválido e `AuthShell`; o estilo de link de texto montado à mão três vezes |
 
 ## 8. Teclado e foco
 

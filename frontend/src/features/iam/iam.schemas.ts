@@ -2,9 +2,9 @@ import { z } from "zod"
 
 import { isPasswordValid, PASSWORD_MAX } from "./password-rules"
 
-const EMAIL_MAX = 254
+export const EMAIL_MAX = 254
 const NAME_MIN = 2
-const NAME_MAX = 80
+export const NAME_MAX = 80
 
 // Nenhum campo de senha usa `.trim()`: aparar alteraria a senha digitada.
 const email = z
@@ -53,7 +53,6 @@ export const inviteUserSchema = z.object({
 
 export type SignInValues = z.infer<typeof signInSchema>
 export type AcceptInvitationValues = z.infer<typeof acceptInvitationSchema>
-export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>
 export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>
 export type ChangePasswordValues = z.infer<typeof changePasswordSchema>
 export type InviteUserValues = z.infer<typeof inviteUserSchema>

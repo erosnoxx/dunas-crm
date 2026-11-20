@@ -14,7 +14,11 @@ import { Panel } from "@/shared/ui/panel"
 import { AuthHeader, AuthShell } from "../components/auth-shell"
 import { useRequestPasswordReset } from "../iam.hooks"
 import { errorMessage } from "../iam.messages"
-import { forgotPasswordSchema, type ForgotPasswordValues } from "../iam.schemas"
+import {
+  EMAIL_MAX,
+  forgotPasswordSchema,
+  type ForgotPasswordValues,
+} from "../iam.schemas"
 
 const TEXT_LINK =
   "inline-flex min-h-11 items-center self-start text-body-sm font-semibold"
@@ -70,7 +74,12 @@ function ForgotPassword() {
             render={({ field }) => (
               <FormItem className="gap-1.5">
                 <FormLabel>E-mail</FormLabel>
-                <Input {...field} type="email" autoComplete="email" />
+                <Input
+                  {...field}
+                  type="email"
+                  autoComplete="email"
+                  maxLength={EMAIL_MAX}
+                />
                 <FormMessage />
               </FormItem>
             )}

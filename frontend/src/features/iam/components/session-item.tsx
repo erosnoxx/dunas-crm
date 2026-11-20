@@ -59,7 +59,7 @@ function SessionItem({
           // O texto visível é "Encerrar"; o nome acessível começa por ele e diz de qual aparelho.
           aria-label={`Encerrar, ${session.device}`}
           onClick={() => !pending && onRevoke(session.id)}
-          className="text-sm [&>span]:bg-panel [&>span]:px-4"
+          className="text-body-sm [&>span]:bg-panel [&>span]:px-4"
         >
           Encerrar
         </Button>
@@ -92,7 +92,7 @@ function SessionItem({
           variant="outline"
           loading={pending}
           onClick={() => !pending && onRevoke(session.id)}
-          className="text-sm md:[&>span]:px-4 [&>span]:bg-panel"
+          className="text-body-sm md:[&>span]:px-4 [&>span]:bg-panel"
         >
           Encerrar esta sessão
         </Button>

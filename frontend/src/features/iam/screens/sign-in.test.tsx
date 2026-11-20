@@ -84,6 +84,17 @@ describe("SignIn", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument()
   })
 
+  it("o campo e-mail corta o que passar de 254 caracteres ao colar", async () => {
+    const user = renderSignIn()
+    const email = screen.getByLabelText("E-mail")
+
+    expect(email).toHaveAttribute("maxlength", "254")
+    await user.click(email)
+    await user.paste("a".repeat(255))
+
+    expect(email).toHaveValue("a".repeat(254))
+  })
+
   it("envia só e-mail e senha, sem aparar a senha, e vai para o início", async () => {
     vi.mocked(service.login).mockResolvedValue(session)
     const user = renderSignIn()

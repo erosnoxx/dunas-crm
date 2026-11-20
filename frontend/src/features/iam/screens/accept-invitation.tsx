@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams } from "react-router"
 
 import { NewPasswordForm } from "../components/new-password-form"
 import { useAcceptInvitation } from "../iam.hooks"
-import { LinkProblem } from "./link-problem"
+import { LinkProblem } from "../components/link-problem"
 
 /**
  * Convite (mockup "Convite · definir senha"). A tela não consulta o token antes de enviar a
