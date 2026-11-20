@@ -6,6 +6,8 @@ import {
 } from "@tanstack/react-query"
 import { useNavigate } from "react-router"
 
+import type { ApiError } from "@/shared/api/api-error"
+
 import * as service from "./iam.service"
 import type { Role } from "./iam.service"
 
@@ -160,6 +162,11 @@ export function useRevokeSession() {
   return useMutation({
     mutationFn: service.revokeSession,
     onSuccess: () => Promise.all([invalidateSessions(client), invalidateUsers(client)]),
+    // Já terminou em outro lugar: a lista na tela está velha.
+    onError: (error) => {
+      if ((error as Partial<ApiError>).code === "session_not_found")
+        void invalidateSessions(client)
+    },
   })
 }
 

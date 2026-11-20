@@ -23,6 +23,17 @@ describe("Button", () => {
     expect(button.firstElementChild).toHaveClass("bg-ground", "cut-sm")
   })
 
+  it("o contorno do secundário tem 1 px nas laterais e deixa o miolo esticar até o alvo de toque", () => {
+    render(<Button variant="outline">Cancelar</Button>)
+
+    const button = screen.getByRole("button", { name: "Cancelar" })
+
+    expect(button).toHaveClass("px-px")
+    expect(button).not.toHaveClass("px-5")
+    expect(button.firstElementChild).toHaveClass("self-stretch")
+    expect(button.firstElementChild).not.toHaveClass("min-h-[inherit]")
+  })
+
   it("no tamanho do celular o corte é o maior e o alvo de toque tem 52 px", () => {
     render(<Button size="lg">Entrar</Button>)
 

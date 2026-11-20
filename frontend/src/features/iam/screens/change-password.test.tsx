@@ -148,6 +148,7 @@ describe("ChangePasswordScreen, voluntária", () => {
     expect(currentInput()).toHaveAccessibleDescription("a senha atual está incorreta")
     expect(screen.queryByRole("alert")).not.toBeInTheDocument()
     expect(screen.queryByText("início")).not.toBeInTheDocument()
+    expect(currentInput()).toHaveFocus()
   })
 
   it("invalid_password mostra o detail da API num alerta", async () => {
@@ -186,6 +187,15 @@ describe("ChangePasswordScreen, obrigatória", () => {
     expect(screen.queryByRole("navigation")).not.toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Sair" })).toBeInTheDocument()
     expect(submit()).toBeDisabled()
+  })
+
+  it("o Sair mantém o alvo de toque de 44 px em qualquer tamanho", async () => {
+    renderScreen(true)
+
+    const exit = await screen.findByRole("button", { name: "Sair" })
+
+    expect(exit).toHaveClass("min-h-11")
+    expect(exit.className).not.toMatch(/md:min-h-/)
   })
 
   it("Sair encerra a sessão e vai para o login", async () => {

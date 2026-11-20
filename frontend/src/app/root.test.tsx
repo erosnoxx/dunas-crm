@@ -1,22 +1,28 @@
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
+import { useQueryClient } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
 import { createRoutesStub } from "react-router"
 import { describe, expect, it } from "vitest"
 
 import App from "./root"
-import Home from "./routes/home"
+
+// `useQueryClient` lança sem o provider: a rota só renderiza se os providers envolvem o `Outlet`.
+function Probe() {
+  useQueryClient()
+
+  return <p>rota dentro dos providers</p>
+}
 
 describe("raiz da aplicação", () => {
   it("renderiza a rota inicial dentro dos providers", () => {
     const Stub = createRoutesStub([
-      { path: "/", Component: App, children: [{ index: true, Component: Home }] },
+      { path: "/", Component: App, children: [{ index: true, Component: Probe }] },
     ])
 
     render(<Stub initialEntries={["/"]} />)
 
-    expect(screen.getByRole("img", { name: "DUNAS" })).toBeInTheDocument()
-    expect(screen.getByText("Em construção")).toBeInTheDocument()
+    expect(screen.getByText("rota dentro dos providers")).toBeInTheDocument()
   })
 
   it("declara o idioma pt-BR e a viewport do celular", () => {
