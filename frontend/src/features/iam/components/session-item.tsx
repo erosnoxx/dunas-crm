@@ -4,24 +4,9 @@ import { Button } from "@/shared/ui/button"
 import { StatusChip } from "@/shared/ui/status-chip"
 
 import type { SessionSummary } from "../iam.service"
+import { lastUse } from "../last-use"
 
-const MINUTE = 60_000
-const HOUR = 60 * MINUTE
-const DAY = 24 * HOUR
-
-const relative = new Intl.RelativeTimeFormat("pt-BR", { numeric: "always" })
 const shortDate = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit" })
-
-/** "agora", "há 5 minutos", "há 3 horas", "há 2 dias". Relógio torto (futuro) conta como agora. */
-function lastUse(iso: string, now: Date): string {
-  const elapsed = now.getTime() - new Date(iso).getTime()
-
-  if (elapsed < MINUTE) return "agora"
-  if (elapsed < HOUR) return relative.format(-Math.floor(elapsed / MINUTE), "minute")
-  if (elapsed < DAY) return relative.format(-Math.floor(elapsed / HOUR), "hour")
-
-  return relative.format(-Math.floor(elapsed / DAY), "day")
-}
 
 // shortcut: a API só manda o rótulo livre do aparelho, sem tipo; tablets (iPad) e rótulos fora da lista são aproximação, troca por um campo `kind` se o backend passar a mandar.
 const PHONE = /iphone|ipad|\bios\b|android|galaxy|\bapp\b/i

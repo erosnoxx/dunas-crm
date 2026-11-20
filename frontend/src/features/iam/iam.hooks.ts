@@ -1,4 +1,6 @@
 import {
+  keepPreviousData,
+  useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
@@ -33,10 +35,22 @@ export function useCurrentUser() {
   })
 }
 
+/** Uma página por vez (web). Trocar de página mantém a anterior na tela até a nova chegar. */
 export function useUsers(input: { page: number; size: number }) {
   return useQuery({
     queryKey: [...keys.users, input],
     queryFn: () => service.listUsers(input),
+    placeholderData: keepPreviousData,
+  })
+}
+
+/** Páginas acumuladas (celular, "Carregar mais"). Mesma raiz `["users"]`: a invalidação cobre as duas. */
+export function useInfiniteUsers(size: number) {
+  return useInfiniteQuery({
+    queryKey: [...keys.users, "infinite", size],
+    queryFn: ({ pageParam }) => service.listUsers({ page: pageParam, size }),
+    initialPageParam: 0,
+    getNextPageParam: (last) => (last.page + 1 < last.totalPages ? last.page + 1 : null),
   })
 }
 

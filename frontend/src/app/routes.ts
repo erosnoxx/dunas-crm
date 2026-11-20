@@ -7,6 +7,7 @@ export default [
   route("redefinir-senha", "routes/redefinir-senha.tsx"),
   layout("routes/authenticated.tsx", [
     index("routes/home.tsx"),
+    route("usuarios", "routes/usuarios.tsx", [route(":id", "routes/usuarios.$id.tsx")]),
     route("conta/sessoes", "routes/conta.sessoes.tsx"),
     route("conta/trocar-senha", "routes/conta.trocar-senha.tsx"),
   ]),
