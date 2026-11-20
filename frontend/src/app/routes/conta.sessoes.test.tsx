@@ -1,7 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query"
 import { render, screen, within } from "@testing-library/react"
 import { createRoutesStub } from "react-router"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import * as service from "@/features/iam/iam.service"
 import type { CurrentUser } from "@/features/iam/iam.service"
@@ -12,6 +12,8 @@ import ContaSessoes from "./conta.sessoes"
 
 vi.mock("@/features/iam/iam.service")
 
+const NOW = "2026-11-19T12:00:00.000Z"
+
 const me: CurrentUser = {
   id: "7",
   name: "Rafael Souza",
@@ -20,7 +22,13 @@ const me: CurrentUser = {
   mustChangePassword: false,
 }
 
-beforeEach(() => vi.resetAllMocks())
+beforeEach(() => {
+  vi.resetAllMocks()
+  vi.useFakeTimers({ toFake: ["Date"] })
+  vi.setSystemTime(NOW)
+})
+
+afterEach(() => vi.useRealTimers())
 
 describe("rota /conta/sessoes", () => {
   it("abre dentro da casca autenticada, com o título na barra do celular e o item marcado", async () => {
@@ -29,8 +37,8 @@ describe("rota /conta/sessoes", () => {
       {
         id: "s1",
         device: "Chrome, Windows",
-        startedAt: new Date().toISOString(),
-        lastUsedAt: new Date().toISOString(),
+        startedAt: NOW,
+        lastUsedAt: NOW,
         current: true,
       },
     ])
