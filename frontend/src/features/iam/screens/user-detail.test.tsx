@@ -148,7 +148,13 @@ describe("usuário ativo (web)", () => {
     expect(
       screen.getByRole("heading", { level: 3, name: "Sessões ativas" }),
     ).toBeVisible()
-    expect(screen.getAllByRole("button", { name: "Encerrar" })).toHaveLength(2)
+    // O texto visível é "Encerrar"; o nome acessível diz de qual aparelho.
+    expect(
+      screen.getAllByRole("button", { name: /^Encerrar, / }).map((b) => b.textContent),
+    ).toEqual(["Encerrar", "Encerrar"])
+    expect(
+      screen.getByRole("button", { name: "Encerrar, Galaxy A54, app DUNAS" }),
+    ).toBeVisible()
     expect(button("Encerrar todas as sessões")).toBeEnabled()
     expect(screen.getByRole("combobox", { name: "Papel" })).toHaveValue("TECHNICIAN")
     expect(button("Desativar usuário")).toBeVisible()
@@ -191,7 +197,9 @@ describe("usuário ativo (web)", () => {
     await screen.findByText("Galaxy A54, app DUNAS")
 
     const li = screen.getByText("Galaxy A54, app DUNAS").closest("li") as HTMLElement
-    await user.click(within(li).getByRole("button", { name: "Encerrar" }))
+    await user.click(
+      within(li).getByRole("button", { name: "Encerrar, Galaxy A54, app DUNAS" }),
+    )
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
     expect(service.revokeSession).toHaveBeenCalledWith("s1", expect.anything())
@@ -280,7 +288,7 @@ describe("usuário ativo (web)", () => {
     const user = renderAt(RAFAEL_ID)
     await screen.findByText("Rafael Souza")
 
-    const [first, second] = screen.getAllByRole("button", { name: "Encerrar" })
+    const [first, second] = screen.getAllByRole("button", { name: /^Encerrar, / })
     await user.click(first)
 
     expect(first).toHaveAttribute("aria-busy", "true")
@@ -708,6 +716,69 @@ describe("erros e id inválido", () => {
     expect(screen.getByRole("link", { name: "Voltar" })).toHaveAttribute(
       "href",
       "/usuarios",
+    )
+  })
+})
+
+describe("troca de usuário no painel", () => {
+  it("o erro e o carregamento de um usuário não vão para o painel do outro (já visitado)", async () => {
+    vi.mocked(service.listUsers).mockResolvedValue({
+      content: [marcos, rafael, tiago],
+      page: 0,
+      size: 5,
+      totalElements: 3,
+      totalPages: 1,
+    })
+    vi.mocked(service.getUser).mockImplementation(async (id) =>
+      id === TIAGO_ID ? detail(tiago) : detail(rafael, [GALAXY]),
+    )
+    vi.mocked(service.deactivateUser).mockImplementation(async (id) => {
+      if (id === RAFAEL_ID) throw { status: 422, code: "user_not_active", message: "x" }
+      return new Promise<void>(() => undefined)
+    })
+    const client = createQueryClient(() => undefined)
+    const Stub = createRoutesStub([
+      {
+        Component: () => (
+          <QueryClientProvider client={client}>
+            <Outlet />
+          </QueryClientProvider>
+        ),
+        children: [
+          {
+            path: "/usuarios",
+            Component: UsersScreen,
+            children: [{ path: ":id", Component: UserDetailScreen }],
+          },
+        ],
+      },
+    ])
+    render(<Stub initialEntries={[`/usuarios/${TIAGO_ID}`]} />)
+    const user = userEvent.setup()
+    await screen.findByRole("heading", { level: 2, name: "Tiago Alves" })
+
+    // Tiago fica em cache; Rafael falha ao desativar.
+    await user.click(screen.getByRole("link", { name: /Rafael Souza/ }))
+    await user.click(await screen.findByRole("button", { name: "Desativar usuário" }))
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Este usuário não está ativo",
+    )
+
+    await user.click(screen.getByRole("link", { name: /Tiago Alves/ }))
+    await screen.findByRole("heading", { level: 2, name: "Tiago Alves" })
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Reenviar convite" })).not.toHaveAttribute(
+      "aria-busy",
+    )
+
+    // Tiago começa a desativar (nunca termina); Rafael, em cache, não herda o carregamento.
+    await user.click(screen.getByRole("button", { name: "Desativar usuário" }))
+    await user.click(screen.getByRole("link", { name: /Rafael Souza/ }))
+    await screen.findByRole("heading", { level: 2, name: "Rafael Souza" })
+
+    expect(screen.getByRole("button", { name: "Desativar usuário" })).not.toHaveAttribute(
+      "aria-busy",
     )
   })
 })

@@ -1,3 +1,5 @@
+import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
+
 import type { Role, UserStatus } from "./iam.service"
 
 /**
@@ -48,3 +50,14 @@ export const sentence = (text: string) => text.charAt(0).toUpperCase() + text.sl
 /** O nome na tela: o do próprio usuário leva "(você)". */
 export const displayName = (name: string, isMe: boolean) =>
   isMe ? `${name} (você)` : name
+
+/** Tom do chip de cada situação (círculo cheio, anel ou cortado). */
+export const STATUS_TONE: Record<UserStatus, "ok" | "pending" | "off"> = {
+  ACTIVE: "ok",
+  INVITED: "pending",
+  DEACTIVATED: "off",
+}
+
+/** A mensagem de um erro da API para o aviso: pelo `code`, senão a da própria API, senão a genérica. */
+export const errorMessage = (error: Partial<ApiError>) =>
+  sentence(messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE))

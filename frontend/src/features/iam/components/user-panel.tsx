@@ -1,7 +1,7 @@
 import * as React from "react"
 import { toast } from "sonner"
 
-import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
+import type { ApiError } from "@/shared/api/api-error"
 import { cn } from "@/shared/lib/cn"
 import { useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
@@ -18,15 +18,9 @@ import {
   useRevokeOtherSessions,
   useRevokeSession,
 } from "../iam.hooks"
-import { displayName, LABELS, messageFor, ROLES, sentence } from "../iam.messages"
-import type { Role, SessionSummary, UserStatus, UserSummary } from "../iam.service"
+import { displayName, errorMessage, LABELS, ROLES, STATUS_TONE } from "../iam.messages"
+import type { Role, SessionSummary, UserSummary } from "../iam.service"
 import { SessionItem } from "./session-item"
-
-const TONE: Record<UserStatus, "ok" | "pending" | "off"> = {
-  ACTIVE: "ok",
-  INVITED: "pending",
-  DEACTIVATED: "off",
-}
 
 // Textos aprovados em docs/system-design/01-iam/design/telas-complementares.md.
 const SELF_NOTE = "Você não pode mudar o seu papel nem desativar a sua conta."
@@ -203,17 +197,13 @@ function UserPanel({ user, sessions, isSelf }: UserPanelProps) {
   const manageable = !isSelf && (active || invited)
   const failure = actions.error
   const chip = (
-    <StatusChip tone={TONE[user.status]}>{LABELS.status[user.status]}</StatusChip>
+    <StatusChip tone={STATUS_TONE[user.status]}>{LABELS.status[user.status]}</StatusChip>
   )
   const title = displayName(user.name, isSelf)
   // Só quem está ativo tem sessões; o servidor já manda a lista vazia nos outros casos.
   const showSessions = active
 
-  const alert = failure && (
-    <Alert tone="danger">
-      {sentence(messageFor(failure.code, failure.message || UNKNOWN_ERROR_MESSAGE))}
-    </Alert>
-  )
+  const alert = failure && <Alert tone="danger">{errorMessage(failure)}</Alert>
 
   const primary = invited ? (
     <Button

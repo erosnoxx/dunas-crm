@@ -1,5 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query"
-import { render, screen, waitFor } from "@testing-library/react"
+import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { createRoutesStub, Link, Outlet } from "react-router"
 import { toast } from "sonner"
@@ -236,6 +236,49 @@ describe("convidar usuário (web, diálogo)", () => {
 
     expect(send()).toHaveAttribute("aria-busy", "true")
     expect(service.inviteUser).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("convidar usuário (web): viewport baixo e mudança de tela", () => {
+  it("o diálogo cabe no viewport e rola por dentro (contrato de classes: o jsdom não calcula layout)", async () => {
+    const { user } = renderInvite()
+    await user.click(screen.getByRole("link", { name: "Convidar usuário" }))
+
+    const dialog = await screen.findByRole("dialog")
+
+    expect(dialog).toHaveClass("max-h-[calc(100dvh-3rem)]", "overflow-y-auto")
+  })
+
+  it("cruzar o breakpoint com o convite aberto mantém o que foi digitado", async () => {
+    let matches = true
+    const listeners = new Set<() => void>()
+    window.matchMedia = ((query: string) => ({
+      get matches() {
+        return matches
+      },
+      media: query,
+      addEventListener: (_: string, listener: () => void) => listeners.add(listener),
+      removeEventListener: (_: string, listener: () => void) =>
+        listeners.delete(listener),
+    })) as unknown as typeof window.matchMedia
+    const { user } = renderInvite()
+    await user.click(screen.getByRole("link", { name: "Convidar usuário" }))
+    await fill(user, "Técnico")
+    expect(screen.getByRole("dialog")).toBeVisible()
+
+    act(() => {
+      matches = false
+      listeners.forEach((listener) => listener())
+    })
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Convidar usuário" }),
+    ).toBeVisible()
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+    expect(screen.getByLabelText("Nome completo")).toHaveValue("Renata Costa")
+    expect(screen.getByLabelText("E-mail")).toHaveValue("renata@exemplo.com.br")
+    expect(screen.getByRole("radio", { name: "Técnico" })).toBeChecked()
+    await waitFor(() => expect(send()).toBeEnabled())
   })
 })
 

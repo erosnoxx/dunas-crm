@@ -80,16 +80,25 @@ describe("SessionItem: disposição no painel do usuário", () => {
     const onRevoke = vi.fn()
     renderItem("inline", onRevoke)
 
-    await userEvent.click(screen.getByRole("button", { name: "Encerrar" }))
+    await userEvent.click(
+      screen.getByRole("button", { name: "Encerrar, Galaxy A54, app DUNAS" }),
+    )
 
     expect(onRevoke).toHaveBeenCalledWith("s")
     expect(screen.getByText("Último uso: há 2 min")).toBeVisible()
     expect(screen.queryByText(/Entrou em/)).not.toBeInTheDocument()
   })
 
+  it("inline: o ícone fica centrado com o texto (sem a margem do ícone empilhado)", () => {
+    renderItem("inline")
+
+    expect(screen.getByRole("listitem").querySelector("svg")).not.toHaveClass("mt-0.5")
+  })
+
   it("stacked: sem cartão, com a linha de baixo, e o botão do próprio usuário", () => {
     renderItem("stacked")
 
+    expect(screen.getByRole("listitem").querySelector("svg")).toHaveClass("mt-0.5")
     expect(screen.getByRole("listitem")).toHaveClass("border-b")
     expect(screen.getByRole("listitem")).not.toHaveClass("bg-panel")
     expect(screen.getByRole("button", { name: "Encerrar esta sessão" })).toBeVisible()

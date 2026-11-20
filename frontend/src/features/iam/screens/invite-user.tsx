@@ -1,9 +1,8 @@
 import * as React from "react"
 import { Dialog } from "@base-ui/react/dialog"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronLeftIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { Link, useNavigate } from "react-router"
+import { useNavigate } from "react-router"
 import { toast } from "sonner"
 
 import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
@@ -14,9 +13,10 @@ import { Button } from "@/shared/ui/button"
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/form"
 import { Input } from "@/shared/ui/input"
 
+import { MobileHeader } from "../components/mobile-header"
 import { RolePicker } from "../components/role-picker"
 import { useInviteUser } from "../iam.hooks"
-import { messageFor, sentence } from "../iam.messages"
+import { errorMessage, messageFor } from "../iam.messages"
 import { inviteUserSchema, type InviteUserValues } from "../iam.schemas"
 
 const EMAIL_TAKEN = "email_already_registered"
@@ -85,9 +85,7 @@ function Fields({ form, invite, onSubmit, id }: InviteForm & { id: string }) {
         className="flex flex-col gap-4 md:**:data-[slot=input]:bg-ground"
       >
         {error && error.code !== EMAIL_TAKEN && (
-          <Alert tone="danger">
-            {sentence(messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE))}
-          </Alert>
+          <Alert tone="danger">{errorMessage(error)}</Alert>
         )}
         <FormField
           control={form.control}
@@ -173,7 +171,7 @@ function InviteUserScreen() {
           <Dialog.Backdrop className="fixed inset-0 bg-ground/80" />
           <Dialog.Popup
             aria-modal="true"
-            className="cut-lg fixed top-1/2 left-1/2 flex w-[min(30rem,calc(100%-3rem))] -translate-x-1/2 -translate-y-1/2 flex-col gap-6 bg-panel p-8"
+            className="cut-lg fixed top-1/2 left-1/2 flex max-h-[calc(100dvh-3rem)] overflow-y-auto w-[min(30rem,calc(100%-3rem))] -translate-x-1/2 -translate-y-1/2 flex-col gap-6 bg-panel p-8"
           >
             <div className="flex flex-col gap-2">
               <Dialog.Title render={<h1 />} className="text-title">
@@ -206,16 +204,7 @@ function InviteUserScreen() {
 
   return (
     <>
-      <header className="flex h-16 items-center gap-1 border-b border-line bg-nav px-2">
-        <Link
-          to={USERS_PATH}
-          aria-label="Voltar"
-          className="flex size-12 items-center justify-center"
-        >
-          <ChevronLeftIcon aria-hidden="true" className="size-6" />
-        </Link>
-        <h1 className="text-title">Convidar usuário</h1>
-      </header>
+      <MobileHeader to={USERS_PATH} title="Convidar usuário" />
       <div className="flex flex-col gap-4 px-4 pt-5 pb-28">
         <p className="text-body-sm text-text-muted">{INTRO}</p>
         <Fields {...invite} id={formId} />

@@ -36,14 +36,17 @@ function SessionItem({
   layout = "card",
 }: SessionItemProps) {
   const DeviceIcon = PHONE.test(session.device) ? SmartphoneIcon : MonitorIcon
-  const icon = (
-    <DeviceIcon aria-hidden="true" className="mt-0.5 size-6 shrink-0 text-text-muted" />
+  const icon = (inline: boolean) => (
+    <DeviceIcon
+      aria-hidden="true"
+      className={cn("size-6 shrink-0 text-text-muted", !inline && "mt-0.5")}
+    />
   )
 
   if (layout === "inline")
     return (
       <li className="flex items-center gap-3 border-b border-line pb-3">
-        {icon}
+        {icon(true)}
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="text-body-sm font-semibold">{session.device}</span>
           <span className="text-label font-normal text-text-muted">
@@ -53,6 +56,8 @@ function SessionItem({
         <Button
           variant="outline"
           loading={pending}
+          // O texto visível é "Encerrar"; o nome acessível começa por ele e diz de qual aparelho.
+          aria-label={`Encerrar, ${session.device}`}
           onClick={() => !pending && onRevoke(session.id)}
           className="text-sm [&>span]:bg-panel [&>span]:px-4"
         >
@@ -69,7 +74,7 @@ function SessionItem({
       )}
     >
       <div className="flex items-start gap-3">
-        {icon}
+        {icon(false)}
         <div className="flex flex-col gap-0.5">
           <span className="text-body font-semibold">{session.device}</span>
           <span className="text-body-sm text-text-muted">

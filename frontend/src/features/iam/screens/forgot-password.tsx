@@ -3,7 +3,7 @@ import { MailIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { Link } from "react-router"
 
-import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
+import type { ApiError } from "@/shared/api/api-error"
 import { cn } from "@/shared/lib/cn"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
@@ -13,7 +13,7 @@ import { Panel } from "@/shared/ui/panel"
 
 import { AuthHeader, AuthShell } from "../components/auth-shell"
 import { useRequestPasswordReset } from "../iam.hooks"
-import { messageFor, sentence } from "../iam.messages"
+import { errorMessage } from "../iam.messages"
 import { forgotPasswordSchema, type ForgotPasswordValues } from "../iam.schemas"
 
 const TEXT_LINK =
@@ -60,7 +60,7 @@ function ForgotPassword() {
         >
           {error && (
             <Alert tone={error.code === "rate_limited" ? "warning" : "danger"}>
-              {sentence(messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE))}
+              {errorMessage(error)}
             </Alert>
           )}
 

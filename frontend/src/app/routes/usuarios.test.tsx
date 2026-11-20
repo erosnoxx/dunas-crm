@@ -140,6 +140,29 @@ describe("rota /usuarios/convidar", () => {
     )
   })
 
+  it("na web, a ligação direta mostra o convite como diálogo sobre a lista", async () => {
+    const original = window.matchMedia
+    window.matchMedia = ((query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    })) as unknown as typeof window.matchMedia
+
+    try {
+      renderAt("/usuarios/convidar", "ADMINISTRATOR")
+
+      expect(
+        await screen.findByRole("dialog", { name: "Convidar usuário" }),
+      ).toBeVisible()
+      // A lista segue atrás do diálogo (modal: fora da árvore de acessibilidade, mas no DOM).
+      expect(await screen.findByText("Paula Lima")).toBeInTheDocument()
+      expect(service.getUser).not.toHaveBeenCalled()
+    } finally {
+      window.matchMedia = original
+    }
+  })
+
   it("só o Administrador chega", async () => {
     renderAt("/usuarios/convidar", "TECHNICIAN")
 

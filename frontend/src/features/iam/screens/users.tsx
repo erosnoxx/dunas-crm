@@ -2,7 +2,7 @@ import { Loader2Icon } from "lucide-react"
 import * as React from "react"
 import { Link, Outlet, useMatch, useParams } from "react-router"
 
-import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
+import type { ApiError } from "@/shared/api/api-error"
 import { cn } from "@/shared/lib/cn"
 import { useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
@@ -10,7 +10,7 @@ import { Button } from "@/shared/ui/button"
 
 import { UserRow } from "../components/user-row"
 import { useCurrentUser, useInfiniteUsers, useUsers } from "../iam.hooks"
-import { messageFor, sentence } from "../iam.messages"
+import { errorMessage } from "../iam.messages"
 import type { Page, UserSummary } from "../iam.service"
 
 // Os mockups mostram 5 linhas por página ("Mostrando 1 a 5 de 54 usuários").
@@ -32,9 +32,7 @@ function Body({ users, error, footer, meId, now }: BodyProps) {
     <>
       {failure && (
         <div className="md:p-5">
-          <Alert tone="danger">
-            {sentence(messageFor(failure.code, failure.message || UNKNOWN_ERROR_MESSAGE))}
-          </Alert>
+          <Alert tone="danger">{errorMessage(failure)}</Alert>
         </div>
       )}
 

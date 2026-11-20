@@ -1,14 +1,15 @@
-import { ChevronLeftIcon, Loader2Icon } from "lucide-react"
+import { Loader2Icon } from "lucide-react"
 import type { ReactNode } from "react"
-import { Link, useParams } from "react-router"
+import { useParams } from "react-router"
 
-import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
+import type { ApiError } from "@/shared/api/api-error"
 import { useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
 
+import { MobileHeader } from "../components/mobile-header"
 import { UserPanel } from "../components/user-panel"
 import { useCurrentUser, useUser } from "../iam.hooks"
-import { displayName, messageFor, sentence } from "../iam.messages"
+import { displayName, errorMessage } from "../iam.messages"
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -21,29 +22,14 @@ function Frame({ title, children }: { title?: string; children: ReactNode }) {
 
   return (
     <>
-      {!isDesktop && (
-        <header className="flex h-16 items-center gap-1 border-b border-line bg-nav px-2">
-          <Link
-            to="/usuarios"
-            aria-label="Voltar"
-            className="flex size-12 items-center justify-center"
-          >
-            <ChevronLeftIcon aria-hidden="true" className="size-6" />
-          </Link>
-          {title && <h1 className="text-title">{title}</h1>}
-        </header>
-      )}
+      {!isDesktop && <MobileHeader to="/usuarios" title={title} />}
       <div className="flex flex-col gap-4 max-md:p-4 max-md:pb-28">{children}</div>
     </>
   )
 }
 
 function Failure({ error }: { error: Partial<ApiError> }) {
-  return (
-    <Alert tone="danger">
-      {sentence(messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE))}
-    </Alert>
-  )
+  return <Alert tone="danger">{errorMessage(error)}</Alert>
 }
 
 function Detail({ id }: { id: string }) {
@@ -67,7 +53,13 @@ function Detail({ id }: { id: string }) {
         </div>
       )}
       {ready && (
-        <UserPanel user={detail.user} sessions={detail.sessions} isSelf={isSelf} />
+        // A chave troca o painel inteiro ao mudar de usuário: o erro e o carregamento das ações não passam para o outro.
+        <UserPanel
+          key={detail.user.id}
+          user={detail.user}
+          sessions={detail.sessions}
+          isSelf={isSelf}
+        />
       )}
     </Frame>
   )

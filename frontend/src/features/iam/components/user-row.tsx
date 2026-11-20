@@ -2,15 +2,9 @@ import { NavLink } from "react-router"
 
 import { StatusChip } from "@/shared/ui/status-chip"
 
-import { displayName, LABELS } from "../iam.messages"
-import type { UserStatus, UserSummary } from "../iam.service"
+import { displayName, LABELS, STATUS_TONE } from "../iam.messages"
+import type { UserSummary } from "../iam.service"
 import { lastUse } from "../last-use"
-
-const TONE: Record<UserStatus, "ok" | "pending" | "off"> = {
-  ACTIVE: "ok",
-  INVITED: "pending",
-  DEACTIVATED: "off",
-}
 
 type UserRowProps = { user: UserSummary; isMe: boolean; now: Date }
 
@@ -43,7 +37,9 @@ function UserRow({ user, isMe, now }: UserRowProps) {
             </span>
           </span>
           <span className="max-md:col-start-2 max-md:row-span-2 max-md:row-start-1 md:order-3">
-            <StatusChip tone={TONE[user.status]}>{LABELS.status[user.status]}</StatusChip>
+            <StatusChip tone={STATUS_TONE[user.status]}>
+              {LABELS.status[user.status]}
+            </StatusChip>
           </span>
         </span>
       </NavLink>

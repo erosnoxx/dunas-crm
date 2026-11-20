@@ -1,10 +1,10 @@
-import { ChevronLeftIcon, Loader2Icon } from "lucide-react"
-import { Link } from "react-router"
+import { Loader2Icon } from "lucide-react"
 
-import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
+import type { ApiError } from "@/shared/api/api-error"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
 
+import { MobileHeader } from "../components/mobile-header"
 import { SessionItem } from "../components/session-item"
 import {
   useCurrentUser,
@@ -13,7 +13,7 @@ import {
   useRevokeSession,
   useSessions,
 } from "../iam.hooks"
-import { messageFor, sentence } from "../iam.messages"
+import { errorMessage } from "../iam.messages"
 
 /**
  * Minhas sessões (mockups "Minhas sessões, celular" e "Minhas sessões, web"). Encerrar uma
@@ -44,16 +44,13 @@ function Sessions({ userId }: { userId: string }) {
   return (
     <div className="flex flex-col">
       {/* Celular: cabeçalho próprio com Voltar (a casca não põe barra superior aqui). Web: só o h1. */}
-      <header className="flex h-16 items-center gap-1 border-b border-line bg-nav px-2 md:h-auto md:border-0 md:bg-transparent md:px-10 md:pt-8">
-        <Link
-          to="/"
-          aria-label="Voltar"
-          className="flex size-12 items-center justify-center md:hidden"
-        >
-          <ChevronLeftIcon aria-hidden="true" className="size-6" />
-        </Link>
-        <h1 className="text-title md:text-display-lg">Minhas sessões</h1>
-      </header>
+      <MobileHeader
+        to="/"
+        title="Minhas sessões"
+        className="md:h-auto md:border-0 md:bg-transparent md:px-10 md:pt-8"
+        backClassName="md:hidden"
+        titleClassName="md:text-display-lg"
+      />
       <main className="flex flex-col gap-4 px-4 pt-5 pb-6 md:gap-6 md:px-10 md:pt-6 md:pb-8">
         <p className="text-body-sm text-text-muted md:max-w-140">
           Aparelhos conectados à sua conta. Encerre os que você não reconhece.
@@ -65,7 +62,7 @@ function Sessions({ userId }: { userId: string }) {
 
         {error && (
           <Alert tone="danger" className="md:max-w-160">
-            {sentence(messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE))}
+            {errorMessage(error)}
           </Alert>
         )}
 
