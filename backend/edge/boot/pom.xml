@@ -46,6 +46,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- so a cadeia de seguranca (com.crm.boot.security) usa: e a excecao declarada em architecture.md 4.1 -->
+        <dependency>
+            <groupId>com.crm</groupId>
+            <artifactId>iam-application</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>

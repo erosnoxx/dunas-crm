@@ -120,7 +120,7 @@ boot           →  web + orchestration + common-infrastructure + <bc>-infrastru
 - **`web` injeta use cases e nada mais.** Não depende de `<bc>-domain` nem da infraestrutura, exceto `..infrastructure.integrations..` do BC que recebe um webhook (§4.3). **Travado:** `webDependsOnlyOnApplicationAndIntegrations`.
 - **Uma classe de `web` depende da `application` de no máximo um BC.** Se o fluxo precisa de mais, a composição mora em `orchestration` (§5.4). **Travado:** `webDependsOnAtMostOneBoundedContextPerClass`.
 - **`boot` recebe só configuração que enxerga mais de um BC**: a cadeia de segurança, o Flyway dos módulos, CORS global, Actuator, profiles, o filtro de correlação. Config de um BC só mora na `<bc>-infrastructure` dele (§9).
-- **A cadeia de segurança de `boot` usa um use case do `iam`** (`AuthenticateSession`, que devolve quem está agindo) e é a **única** classe de `boot` que depende de `iam-application`: é a exceção declarada. Ela também impõe a sessão restrita (conta que precisa trocar a senha só chama `ChangePassword`, `Logout` e `GetCurrentUser`). Nenhum outro BC enxerga o IAM: as demais features recebem o `Actor` já montado pela `web`. O ArchUnit confere se a regra continua válida quando a cadeia for escrita.
+- **A cadeia de segurança de `boot` usa um use case do `iam`** (`AuthenticateSession`, que devolve quem está agindo) e é a **única** classe de `boot` que depende de `iam-application`: é a exceção declarada. Ela também impõe a sessão restrita (conta que precisa trocar a senha só chama `ChangePassword`, `Logout` e `GetCurrentUser`). Nenhum outro BC enxerga o IAM: as demais features recebem o `Actor` já montado pela `web`. **Travado:** `bootDependsOnApplicationOnlyInTheSecurityChain` (só o pacote `com.crm.boot.security..` enxerga a application do `iam`, e de nenhum outro BC).
 
 Os BCs são descobertos do classpath (todo `com.crm.<nome>` com camada `domain`, exceto `common` e `shared`): um BC novo entra nas regras sem editar nenhum teste.
 
@@ -390,7 +390,7 @@ O Maven barra o import não declarado, mas um `pom.xml` pode ser editado, e regr
 
 | Teste | Trava |
 |---|---|
-| `BoundedContextRulesTest` | isolamento entre BCs, direção das camadas, framework fora de `domain` e `application`, fronteiras de `common` e `shared`, `web` só com `application` (e integrações) de um BC por classe, sem ciclos |
+| `BoundedContextRulesTest` | isolamento entre BCs, direção das camadas, framework fora de `domain` e `application`, fronteiras de `common` e `shared`, `web` só com `application` (e integrações) de um BC por classe, `boot` só com a `application` do `iam` e só na cadeia de segurança (`com.crm.boot.security..`), sem ciclos |
 | `ClockRulesTest` | toda leitura de hora passa pelo `Clock` de `TimeConfig` |
 | `AntiCorruptionLayerRulesTest` | terceiro só em `integrations`, DTO externo contido, `ServiceImpl` usa o Translator |
 | `FlywayConfigTest` | a descoberta dos módulos de migration |
@@ -425,7 +425,6 @@ Critério de aceite de toda mudança no backend: `mvn test` verde (o `BoundedCon
 
 Decisões ainda não tomadas ou peças ainda não escritas. Item resolvido sai daqui.
 
-- **Segurança:** a cadeia de segurança (regra em §4.1) é escrita junto da feature `01-iam`, que ainda não tem código. Enquanto ela não existir, vale o padrão do Spring Security: **toda rota exige autenticação**.
 - **Stack Docker de desenvolvimento** (`infra/`): ainda por escrever; o app espera Postgres, Redis e RabbitMQ.
 - **Perfil `prod`:** `application-prod.properties` ainda não existe.
 - **Heartbeat de jobs agendados** (outbox, e os que vierem): depende de onde ficará o monitor.
