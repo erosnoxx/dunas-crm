@@ -21,7 +21,17 @@ Dados de teste: usuários criados pelo próprio fluxo (Administrador semeado, co
 | Aviso de erro com 12 px de respiro em volta; o mockup tem 12 em cima e embaixo e 14 nas laterais | `Alert` de erro (Entrar, convite, sessões, ...) | `px-3.5 py-3` |
 | Item atual da conta na barra lateral ("Minhas sessões") em peso normal; o mockup "Minhas sessões · web" o marca em seminegrito | casca, web | `aria-[current=page]:font-semibold` |
 
+As duas últimas correções vieram depois das medições: as linhas da seção 3 que as citam não foram medidas de novo no navegador; o teste de classe de cada uma cobre a mudança.
+
+Corrigido antes, durante a execução, e conferido aqui:
+
+| Achado | Onde | Correção |
+|---|---|---|
+| O `Button` de contorno compartilhado tinha respiro lateral na camada externa (o anel saía mais largo que o mockup) e ficava 2 px mais alto | todos os botões de contorno; mudou também "Esqueci minha senha" (link enviado) e o link inválido | camada externa `px-px` e camada interna `self-stretch` com `min-h-[inherit]`; medido aqui: 52 px e 1 px de anel, como o mockup. O corte interno fica 1 px maior que o do mockup |
+
 ## 3. Tela a tela
+
+Iguais ao mockup, sem ressalva: Entrar (390 e 1280, vazio), Usuários web com o painel aberto (rolagem da lista), detalhe pendente, desativado e o próprio na web, o próprio no celular, Início na web, cópia do link de redefinição inválido. As demais linhas são iguais com as ressalvas que cada uma diz.
 
 Legenda do resultado: **igual** (os valores do markup e os medidos coincidem), **aproximação** (sem token para o valor do mockup, seção 4), **sem mockup** (seção 5), **derivada** (seção 6).
 
@@ -30,7 +40,7 @@ Legenda do resultado: **igual** (os valores do markup e os medidos coincidem), *
 | Tamanho | Artboard | Comparado | Resultado | Feito / decisão |
 |---|---|---|---|---|
 | 390 | `Entrar-erro` | respiros 32/24/24 e 32 do cabeçalho; título 36/40 peso 700; apoio 14/20 `text-muted`; rótulos 13/18 peso 600 a 6 px do campo; campos 52 px `panel` com borda `line-strong`; "Mostrar" 72×52 `brand`; botão 52 px corte 12; link 44 px; nota no pé | igual | — |
-| 390 | `Entrar-erro` | aviso: contorno `danger`, ícone 20, texto 14/20 `danger-text`, mesmo lugar | igual (após a seção 2) | texto com inicial maiúscula, como o mockup (seção 5) |
+| 390 | `Entrar-erro` | aviso: contorno `danger`, ícone 20, texto 14/20 `danger-text`, mesmo lugar | igual após a seção 2 (o respiro 12×14 não foi medido de novo) | texto com inicial maiúscula, como o mockup (seção 5) |
 | 390 | `Entrar-bloqueado` | painel `highlight` corte 16, ícone de relógio 24, título e corpo; rótulos e campos em `text-muted`/`line`; botão `line` com texto `text-muted` | igual, exceto: título do aviso 16/24 (mockup 16/22, aproximação) e o "Mostrar" continua visível e desligado (o mockup não o desenha) | "Mostrar" desligado: decisão do usuário |
 | 390 | sem artboard | erros de validação no cliente (e-mail vazio ou inválido, senha vazia) | sem mockup | seção 5 |
 | 1280 | `Main` (Entrar · web) | cabeçalho 24/32; painel 440 `panel` corte 16 com respiro 40/36 e espaço 24; campos 48 px `ground`; botão 48 px corte 10; nota centralizada | igual | — |
@@ -103,7 +113,7 @@ A tela não consulta o link antes do envio (ADR-12): o estado aparece depois de 
 |---|---|---|---|---|
 | 390 | `Sessoes` | cabeçalho próprio com "Voltar"; respiro 20/16/24 e espaço 16; cartões `panel` corte 16 respiro 16 espaço 12; ícone 24; aparelho 16/24 peso 600, último uso 14/20, entrada 12/16; chip "Esta sessão" 30 px; "Encerrar esta sessão" de contorno 44 corte 10; "Encerrar todas as outras" de contorno 52 em `danger-text`; "Sair deste aparelho" 52 `brand`; nota 12/16 | igual, exceto: rótulo do aparelho é o `User-Agent` cru (o mockup mostra "Chrome, Windows"); o rodapé não fica preso ao pé; "Dados de exemplo" não aparece (é do mockup) | rótulo do aparelho: pendência aberta em [`open-questions.md`](../open-questions.md) |
 | 390 | sem artboard | carregando (indicador sem texto), lista só com a sessão atual ("Encerrar todas as outras" desligado) | sem mockup | seção 5 |
-| 1280 | `Sessoes-web` | título 36/40; lista até 640 px; "Encerrar todas as outras" de contorno 48 corte 10 em `danger-text`; sem "Sair deste aparelho"; item atual da conta marcado | igual (item atual após a seção 2); a nota "A sessão dura 30 dias..." é um segundo parágrafo sob o texto de apoio, no mockup é o mesmo parágrafo | decisão do usuário (diferença de marcação, mesma aparência em duas linhas) |
+| 1280 | `Sessoes-web` | título 36/40; lista até 640 px; "Encerrar todas as outras" de contorno 48 corte 10 em `danger-text`; sem "Sair deste aparelho"; item atual da conta marcado | igual após a seção 2 (o peso do item atual não foi medido de novo); a nota "A sessão dura 30 dias..." é um segundo parágrafo sob o texto de apoio, no mockup é o mesmo parágrafo | decisão do usuário (diferença de marcação, mesma aparência em duas linhas) |
 
 ### Usuários: lista
 
@@ -150,6 +160,7 @@ Valores do mockup que não existem na escala do [`tokens.json`](../../../design-
 | 16/22 peso 600 | título do aviso de bloqueio, títulos de seção do detalhe no celular | `body` 16/24 peso 600 |
 | fundo do diálogo e da folha, `ground` a 78% | diálogo de convite, menu da conta | `bg-ground/80` |
 | ícone de regra atendida: círculo preenchido `chip-ok` com visto | checklist da senha | `CircleCheck` do lucide (contorno) |
+| 13 px peso 400 | nota do Entrar, papel na barra lateral, entrada da sessão, e-mail e papel nas linhas da lista, contagem e "Mostrando N de M", nota do próprio usuário | `text-label font-normal` (o token `label` é 13/18 peso 600; o peso é sobrescrito) |
 | espaços do celular: 24/20 no convite contra 32/24 no Entrar | telas de acesso | seguido cada mockup (prop `compact`); os mockups discordam entre si |
 
 ## 5. Interface sem mockup nem texto aprovado (decisão do usuário)
@@ -165,15 +176,21 @@ Cada linha foi decidida na implementação, sem mockup; nenhuma está aprovada.
 | Convite, redefinir, trocar | o aviso de repetição diferente aparece ao vivo, enquanto se digita |
 | Redefinir e trocar senha | "Senha alterada" sai como aviso flutuante (toast); o texto é aprovado, a forma não; aparece também depois da troca obrigatória |
 | Troca obrigatória | piscada da casca entre salvar e chegar a `/usuarios` (de 95 a 125 ms, seção 3) |
+| Troca voluntária | título "Trocar senha", botão "Salvar nova senha" e rótulos vêm do texto do mockup, não da tabela de cópias de [`telas-complementares.md`](telas-complementares.md) |
 | Troca voluntária | "Voltar" vai para `/`, não para a tela anterior; depois de `wrong_current_password` o botão fica desligado até um campo mudar |
 | Esqueci minha senha | `rate_limited`: aviso amarelo com a frase da tabela de erros, sem título, botão ligado |
+| Entrar aberto por quem já tem sessão | vai direto para o início |
 | Convite aberto por quem já tem sessão | a tela de convite abre normalmente, sem redirecionar |
-| Minhas sessões e detalhe do usuário | carregando: indicador sem texto (sem nome para leitor de tela); "Encerrar todas as outras" desligado quando só existe a sessão atual; usuário sem sessões: contagem 0 e "Encerrar todas as sessões" desligado |
+| Minhas sessões e detalhe do usuário | carregando: indicador sem texto (sem nome para leitor de tela); falha ao carregar: o aviso de erro de sempre; lista vazia: nenhuma lista; "Encerrar todas as outras" desligado quando só existe a sessão atual; usuário sem sessões: contagem 0 e "Encerrar todas as sessões" desligado |
 | Detalhe do usuário | erro de rede mostra a mensagem da API; id que não é UUID mostra "Usuário não encontrado" sem pedir ao servidor |
 | Usuários, celular | tamanho de página 5 (o mockup mostra "Mostrando 4 de 54"); com um usuário só, "1 usuários" |
 | Usuários, web | falha da primeira página: sem rodapé nem botão de tentar de novo (recarregar) |
 | Convidar | "Enviar convite" desligado com o cinza dos botões de senha (o mockup só mostra o ligado) |
 | Rótulos | link de volta "Voltar" em todas as telas (os mockups misturam "Voltar" e "Voltar para usuários") |
+| Todas as listas de sessões | último uso relativo: "agora" e "há N min" seguem o mockup; "há 3 horas" e "há 2 dias" saem do `Intl.RelativeTimeFormat` (`last-use.ts`), sem cópia aprovada |
+| Todas as listas de sessões | o ícone (celular ou monitor) é deduzido do rótulo livre do aparelho por expressão regular |
+| Avisos de erro | erro que não é `ApiError` (falha inesperada do código) mostra a própria mensagem, que pode vir em inglês; erro sem mensagem deixa o aviso vazio |
+| Entrar | o aviso de um envio anterior continua na tela quando o envio seguinte falha na validação do cliente |
 | Todas as listas de sessões | rótulo do aparelho é o `User-Agent` cru ([`open-questions.md`](../open-questions.md), "Como o rótulo do aparelho é obtido") |
 | Usuários, celular | na ordem do teclado, "Convidar usuário" (rodapé fixo) vem antes da lista, embora apareça depois dela |
 
@@ -192,15 +209,33 @@ As derivadas listadas em [`telas-complementares.md`](telas-complementares.md) se
 | Usuários na web sem ninguém escolhido | a lista na largura toda, sem painel de detalhe |
 | Convidar na web | diálogo aberto pela rota `/usuarios/convidar` sobre a lista; fechar volta para `/usuarios` |
 
-## 7. Teclado e foco
+## 7. Pendências menores
 
-Em todas as telas e nos dois tamanhos, o `Tab` passa por todos os controles na ordem da tela (exceção: a lista de usuários no celular, seção 5), o anel de foco é o do tema (2 px `highlight`, afastado 2 px, o mesmo do mockup) e todo alvo tem pelo menos 44 px de altura, menos o rádio de 20 px do papel, que fica dentro do cartão de 48/52 px clicável. Campos de formulário têm rótulo associado; erros saem em `role="alert"`; botões em envio têm `aria-busy`.
+Comportamentos e débitos da execução, sem divergência visual de mockup; registrados para não se perderem:
 
-## 8. Ponta a ponta com o backend real
+| Onde | Pendência |
+|---|---|
+| Link inválido | "Ir para o login" e "Pedir novo link" são `Button` com `role="link"`: também disparam com Espaço |
+| Aceite do convite e redefinição | o cache de outro usuário (`me`) não é limpo ao aceitar um convite nem ao redefinir a senha no mesmo navegador |
+| Casca | `/usuarios/`, com barra no fim, perde a barra superior do celular; a barra lateral não rola em janelas muito baixas |
+| Usuários, web | "Anterior" fica sem efeito depois de uma falha ao voltar de página; o aviso de erro do "Carregar mais" sai acima da lista; uma página exibida que fique vazia some com o rodapé |
+| Detalhe do usuário, celular | carregando e erro não têm `h1` (só o "Voltar") |
+| Detalhe do usuário | ação iniciada num usuário perde o aviso de sucesso ou de erro se o Administrador abrir outro antes de terminar; encerramentos seguidos perdem o erro de cada chamada |
+| Minhas sessões | dois cliques rápidos em "Encerrar esta sessão" perdem o carregando do primeiro; um aviso de erro antigo fica depois de um "Encerrar todas as outras" bem-sucedido; os botões "Encerrar esta sessão" têm o mesmo nome acessível |
+| Diálogo de convite | `clip-path` com `overflow-y-auto` pode cortar a barra de rolagem no chanfro |
+| Sessão | `403 password_change_required` não é tratado (a guarda impede chegar lá); a trava do `session_invalid` volta a armar com qualquer sucesso |
+| Testes | sem teste direto de `last-use`, `useMediaQuery`, `useInfiniteUsers` e da remoção do ouvinte de `matchMedia`; sem teste de `aria-current` em `/usuarios/:id`, do alvo `md:min-h-12` do Entrar, de `invalid_credentials` seguido de `rate_limited`, das classes `md:` do link inválido, do "Senha alterada" na troca obrigatória e do toast renderizado (o `sonner` é simulado) |
+| Código | classes da casca de acesso repetidas entre o link inválido e `AuthShell`; o estilo de link de texto montado à mão três vezes; `new-password-form` importa `screens/link-problem`; `ResetPasswordValues` sem uso |
+
+## 8. Teclado e foco
+
+Em todas as telas e nos dois tamanhos, o `Tab` passa por todos os controles na ordem da tela (exceção: a lista de usuários no celular, seção 5), o anel de foco computado é o do tema, 2 px sólido `highlight` afastado 2 px, o mesmo valor escrito no estilo dos artboards (`outline:2px solid #FFC15A; outline-offset:2px`; comparação dos valores, não da imagem) e todo alvo tem pelo menos 44 px de altura, menos o rádio de 20 px do papel, que fica dentro do cartão de 48/52 px clicável. Campos de formulário têm rótulo associado; erros saem em `role="alert"`; botões em envio têm `aria-busy`.
+
+## 9. Ponta a ponta com o backend real
 
 Rodado num Chrome de verdade (headless), contra o backend do mesmo commit: o Administrador semeado entra e cai em "Troque a senha inicial", sem navegação; troca e chega a `/usuarios`; convida um Técnico pelo diálogo; o e-mail chega ao coletor com o link `/convite?token=...`; o convidado abre o link noutro navegador, define a senha e entra; o Administrador encerra a sessão dele no detalhe, e a ação seguinte do convidado o leva a `/entrar`; o Administrador desativa, e o login do desativado mostra a mesma mensagem única de credencial; o Administrador reativa, e o login volta a funcionar. Nenhum erro no console do navegador.
 
-## 9. Não verificado
+## 10. Não verificado
 
 - Nenhum artboard renderizado; nenhuma comparação pixel a pixel nem lado a lado (seção 1).
 - Estado "link expirado" (`link_expired`): exige um convite com mais de 48 h ou um link de redefinição com mais de 1 h; coberto só pelos testes de unidade da tela.

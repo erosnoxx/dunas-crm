@@ -9,7 +9,7 @@ Regras e motivo: [`frontend.md`](../../../docs/rules/frontend.md) §3 (estrutura
 
 ## Antes de começar
 
-1. A feature existe em `docs/system-design/<NN-feature>/`: `usecases.md` dá os campos, os limites e a **tabela de erros por `code`**; `design/` dá os mockups aprovados. Sem isso, sinalize a lacuna e pare.
+1. A feature existe em `docs/system-design/<NN-feature>/`: `usecases.md` dá os campos, os limites e a **tabela de erros por `code`**; `design/` dá os mockups aprovados. Sem isso, vale a regra de operação do [`CLAUDE.md`](../../../CLAUDE.md) raiz.
 2. Cada tela, em cada tamanho (390 e 1280), aponta o artboard que segue. Tamanho sem artboard é **derivado** e vai à comparação final; tela sem artboard nenhum não começa.
 3. Leia o artboard campo a campo e traduza cada valor para um token do tema (`bg-panel`, `text-label`, `cut-lg`, ...). Valor sem token é divergência: sinalize ao usuário **antes** de escrever a tela.
 
@@ -21,12 +21,12 @@ Em `frontend/src/features/<feature>/`, como em `features/iam/`:
 |---|---|---|
 | `<feature>.service.ts` | uma função por chamada à API, pelo `httpClient` de `shared/api`, com os tipos de pedido e resposta | `iam.service.ts` |
 | `<feature>.hooks.ts` | TanStack Query: chaves num objeto `keys`, uma consulta por leitura, uma mutation por escrita, que invalida as chaves que mudou | `iam.hooks.ts` |
-| `<feature>.schemas.ts` | Zod dos formulários, com os limites do domínio; senha **nunca** com `.trim()` | `iam.schemas.ts` |
+| `<feature>.schemas.ts` | Zod dos formulários, com os limites do domínio ([`frontend.md`](../../../docs/rules/frontend.md) §6) | `iam.schemas.ts` |
 | `<feature>.messages.ts` | `MESSAGES` (a tabela de erros de `usecases.md`, por `code`), `messageFor(code, fallback)`, `errorMessage(error)` e os rótulos da feature (`LABELS`) | `iam.messages.ts` |
 | `components/` | peças da feature usadas por mais de uma tela | `auth-shell`, `password-field`, `new-password-fields`, `mobile-header`, `session-item` |
 | `screens/` | uma tela por arquivo, com o teste ao lado | `sign-in.tsx` e `sign-in.test.tsx` |
 
-Peça que outra feature também precise sobe para `shared/ui/` (uma feature não importa outra).
+Peça que outra feature também precise: [`frontend.md`](../../../docs/rules/frontend.md) §3.
 
 ## Rota
 
@@ -57,7 +57,7 @@ Um `h1` por tamanho de tela:
 ## Formulário
 
 - `useForm` com `zodResolver(<schema>)` e os componentes de `shared/ui/form` (`Form`, `FormField`, `FormItem`, `FormLabel`, `FormMessage`), `Input` e `Button`. O rótulo vem do `FormLabel`: o teste acha o campo por `getByLabelText`.
-- `maxLength` no campo com o limite do domínio. Senha: `PasswordField` (mostrar/ocultar, contador com `showCount`), e para nova senha `NewPasswordFields`/`PasswordChecklist`; nunca aparada nem registrada.
+- `maxLength` no campo com o limite do domínio. Senha: `PasswordField` (mostrar/ocultar, contador com `showCount`), e para nova senha `NewPasswordFields`/`PasswordChecklist`.
 - Envio: `Button` com `loading` (dá o `aria-busy` e segura o segundo clique). Erro em `Alert` (`role="alert"`). Sucesso com texto aprovado em `toast` do `sonner`.
 - Toda consulta assíncrona mostra carregando, erro e vazio; estado sem mockup é divergência a sinalizar.
 
