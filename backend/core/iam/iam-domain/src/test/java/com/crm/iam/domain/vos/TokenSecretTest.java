@@ -63,4 +63,25 @@ class TokenSecretTest {
                 .isInstanceOf(ValidationException.class)
                 .hasMessage("formato de segredo do link inválido");
     }
+
+    @Test
+    @DisplayName("isWellFormed aceita o que generate produz, e o que of aceita (com as pontas aparadas)")
+    void isWellFormedAcceptsWhatOfAccepts() {
+        var value = TokenSecret.generate().getValue();
+
+        assertThat(TokenSecret.isWellFormed(value)).isTrue();
+        assertThat(TokenSecret.isWellFormed(" " + value + " ")).isTrue();
+        assertThat(TokenSecret.of(" " + value + " ").getValue()).isEqualTo(value);
+    }
+
+    @Test
+    @DisplayName("isWellFormed é falso, sem lançar, para nulo, vazio, curto, longo e caractere fora do alfabeto")
+    void isWellFormedRejectsWhatOfRejects() {
+        assertThat(TokenSecret.isWellFormed(null)).isFalse();
+        assertThat(TokenSecret.isWellFormed("")).isFalse();
+        assertThat(TokenSecret.isWellFormed("  ")).isFalse();
+        assertThat(TokenSecret.isWellFormed("curto")).isFalse();
+        assertThat(TokenSecret.isWellFormed("a".repeat(44))).isFalse();
+        assertThat(TokenSecret.isWellFormed("+".repeat(43))).isFalse();
+    }
 }

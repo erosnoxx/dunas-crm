@@ -91,6 +91,30 @@ class PasswordTest {
     }
 
     @Test
+    @DisplayName("isValid é verdadeiro para o que of aceita, incluindo os limites, acentuada e especial não ASCII")
+    void isValidAcceptsWhatOfAccepts() {
+        assertThat(Password.isValid("Dunas#2026")).isTrue();
+        assertThat(Password.isValid("Aa1#aaaa")).isTrue();
+        assertThat(Password.isValid("Aa1#" + "a".repeat(26))).isTrue();
+        assertThat(Password.isValid(" Dunas#2026 ")).isTrue();
+        assertThat(Password.isValid("Açúcar1€")).isTrue();
+    }
+
+    @Test
+    @DisplayName("isValid é falso, sem lançar, para nulo e para cada critério que falta")
+    void isValidRejectsWhatOfRejects() {
+        assertThat(Password.isValid(null)).isFalse();
+        assertThat(Password.isValid("")).isFalse();
+        assertThat(Password.isValid("Aa1#aaa")).isFalse();
+        assertThat(Password.isValid("Aa1#" + "a".repeat(27))).isFalse();
+        assertThat(Password.isValid("dunas#2026")).isFalse();
+        assertThat(Password.isValid("DUNAS#2026")).isFalse();
+        assertThat(Password.isValid("Dunas#Solar")).isFalse();
+        assertThat(Password.isValid("Dunas2026")).isFalse();
+        assertThat(Password.isValid("Aa1     ")).isFalse();
+    }
+
+    @Test
     @DisplayName("toString não contém o valor")
     void toStringIsMasked() {
         var password = Password.of("Dunas#2026");

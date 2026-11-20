@@ -28,27 +28,45 @@ public final class Password extends ValueObject<String> {
         return new Password(value);
     }
 
+    /**
+     * Diz se {@link #of} aceitaria o texto, sem lançar; nulo é inválido. Serve a quem precisa tratar
+     * uma senha fora da regra como credencial errada, sem revelar a regra a quem não tem conta.
+     */
+    public static boolean isValid(String value) {
+        return value != null && violation(value) == null;
+    }
+
     @Override
     protected String validate(String value) {
-        if (value.length() < MIN_LENGTH)
-            throw reject("no mínimo " + MIN_LENGTH + " caracteres");
+        var violation = violation(value);
 
-        if (value.length() > MAX_LENGTH)
-            throw reject("no máximo " + MAX_LENGTH + " caracteres");
-
-        if (value.chars().noneMatch(Character::isUpperCase))
-            throw reject("ao menos uma letra maiúscula");
-
-        if (value.chars().noneMatch(Character::isLowerCase))
-            throw reject("ao menos uma letra minúscula");
-
-        if (value.chars().noneMatch(Character::isDigit))
-            throw reject("ao menos um número");
-
-        if (value.chars().noneMatch(Password::isSpecial))
-            throw reject("ao menos um caractere especial");
+        if (violation != null)
+            throw reject(violation);
 
         return value;
+    }
+
+    /** Primeiro critério que o texto não cumpre, ou nulo se cumpre todos: a regra mora só aqui. */
+    private static String violation(String value) {
+        if (value.length() < MIN_LENGTH)
+            return "no mínimo " + MIN_LENGTH + " caracteres";
+
+        if (value.length() > MAX_LENGTH)
+            return "no máximo " + MAX_LENGTH + " caracteres";
+
+        if (value.chars().noneMatch(Character::isUpperCase))
+            return "ao menos uma letra maiúscula";
+
+        if (value.chars().noneMatch(Character::isLowerCase))
+            return "ao menos uma letra minúscula";
+
+        if (value.chars().noneMatch(Character::isDigit))
+            return "ao menos um número";
+
+        if (value.chars().noneMatch(Password::isSpecial))
+            return "ao menos um caractere especial";
+
+        return null;
     }
 
     private static boolean isSpecial(int codePoint) {
