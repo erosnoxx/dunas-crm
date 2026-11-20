@@ -1,5 +1,6 @@
 package com.crm.iam.application;
 
+import com.crm.common.application.exceptions.ForbiddenException;
 import com.crm.iam.domain.vos.Role;
 
 import java.util.UUID;
@@ -19,4 +20,10 @@ public record Actor(
         Role role,
         UUID sessionId
 ) {
+
+    /** Só o Administrador gerencia usuários (ADR-5): a checagem é do use case, nunca do controller. */
+    public void requireAdministrator() {
+        if (role != Role.ADMINISTRATOR)
+            throw new ForbiddenException("forbidden", "você não tem permissão para isto");
+    }
 }
