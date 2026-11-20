@@ -11,7 +11,7 @@ import { Button } from "@/shared/ui/button"
 import { UserRow } from "../components/user-row"
 import { useCurrentUser, useInfiniteUsers, useUsers } from "../iam.hooks"
 import { messageFor, sentence } from "../iam.messages"
-import type { UserSummary } from "../iam.service"
+import type { Page, UserSummary } from "../iam.service"
 
 // Os mockups mostram 5 linhas por página ("Mostrando 1 a 5 de 54 usuários").
 const PAGE_SIZE = 5
@@ -24,7 +24,7 @@ type BodyProps = ListProps & {
   footer: React.ReactNode
 }
 
-/** Erro, carregando, vazio ou as linhas (com as colunas na web), e o rodapé de paginação. */
+/** Erro, carregando ou as linhas (com as colunas na web), e o rodapé de paginação. Lista vazia não mostra nada. */
 function Body({ users, error, footer, meId, now }: BodyProps) {
   const failure = error as Partial<ApiError> | null
 
@@ -45,12 +45,6 @@ function Body({ users, error, footer, meId, now }: BodyProps) {
             className="size-6 animate-spin text-text-muted"
           />
         </div>
-      )}
-
-      {users?.length === 0 && (
-        <p className="py-6 text-center text-body-sm text-text-muted">
-          Nenhum usuário encontrado
-        </p>
       )}
 
       {users && users.length > 0 && (
@@ -79,34 +73,43 @@ function Body({ users, error, footer, meId, now }: BodyProps) {
 /** Web: uma página por vez, com "Anterior" e "Próxima" (mockup "O próprio usuário e paginação, web"). */
 function WebList(props: ListProps) {
   const [page, setPage] = React.useState(0)
+  const [lastGood, setLastGood] = React.useState<Page<UserSummary>>()
   const query = useUsers({ page, size: PAGE_SIZE })
-  const data = query.data
-  const from = page * PAGE_SIZE + 1
+
+  // Página que falha não leva as linhas: a última boa fica na tela, com o aviso e a navegação.
+  if (query.data && query.data !== lastGood) setLastGood(query.data)
+
+  // Linhas, texto e botões seguem o que está na tela (a anterior enquanto a nova carrega), não o `page`.
+  const shown = query.data ?? lastGood
+  const from = shown ? shown.page * shown.size + 1 : 0
 
   return (
     <Body
       {...props}
-      users={data?.content}
+      users={shown?.content}
       error={query.error}
       footer={
-        data && (
+        shown && (
           <div className="flex items-center justify-between gap-4 px-5 py-3">
-            <p className="text-label font-normal text-text-muted">
-              {`Mostrando ${from} a ${from + data.content.length - 1} de ${data.totalElements} usuários`}
+            <p className="text-label font-normal text-text-muted tabular-nums">
+              {`Mostrando ${from} a ${from + shown.content.length - 1} de ${shown.totalElements} usuários`}
             </p>
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                disabled={page === 0 || query.isPlaceholderData}
-                onClick={() => setPage(page - 1)}
+                disabled={shown.page === 0 || query.isPlaceholderData}
+                onClick={() => setPage(shown.page - 1)}
                 className="text-sm [&>span]:bg-panel"
               >
                 Anterior
               </Button>
+              {/* Sem rótulo de "tentar de novo" aprovado: Próxima refaz o pedido da página que falhou. */}
               <Button
                 variant="outline"
-                disabled={page + 1 >= data.totalPages || query.isPlaceholderData}
-                onClick={() => setPage(page + 1)}
+                disabled={shown.page + 1 >= shown.totalPages || query.isPlaceholderData}
+                onClick={() =>
+                  shown.page + 1 === page ? void query.refetch() : setPage(shown.page + 1)
+                }
                 className="text-sm [&>span]:bg-panel"
               >
                 Próxima
@@ -134,8 +137,8 @@ function MobileList(props: ListProps) {
         users &&
         pages && (
           <div className="flex flex-col gap-3 pt-3">
-            <p className="text-center text-label font-normal text-text-muted">
-              {`Mostrando ${users.length} de ${pages[0].totalElements} usuários`}
+            <p className="text-center text-label font-normal text-text-muted tabular-nums">
+              {`Mostrando ${users.length} de ${pages[pages.length - 1].totalElements} usuários`}
             </p>
             <Button
               variant="outline"
@@ -175,7 +178,8 @@ function UsersScreen() {
   return (
     <main
       className={cn(
-        "flex flex-col gap-6 md:px-10 md:py-8",
+        // No celular o cabeçalho é só o título oculto e o rodapé fixo: sem vão entre ele e a lista.
+        "flex flex-col gap-6 max-md:gap-0 md:px-10 md:py-8",
         !selected && "max-md:px-4 max-md:pt-4 max-md:pb-28",
       )}
     >

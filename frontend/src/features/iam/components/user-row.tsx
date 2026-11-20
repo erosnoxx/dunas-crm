@@ -38,7 +38,7 @@ function UserRow({ user, isMe, now }: UserRowProps) {
               {LABELS.role[user.role]}
             </span>
             <span className="md:hidden">, </span>
-            <span className="md:order-4 md:text-body-sm">
+            <span className="tabular-nums md:order-4 md:text-body-sm">
               {user.lastUsedAt ? lastUse(user.lastUsedAt, now) : "nunca entrou"}
             </span>
           </span>

@@ -1,5 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query"
-import { render, screen, waitFor, within } from "@testing-library/react"
+import { act, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { createRoutesStub, Outlet, useParams } from "react-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { createQueryClient } from "@/shared/lib/query-client"
 
 import * as service from "../iam.service"
-import type { CurrentUser, UserSummary } from "../iam.service"
+import type { CurrentUser, Page, UserSummary } from "../iam.service"
 import { UsersScreen } from "./users"
 
 vi.mock("../iam.service")
@@ -153,7 +153,7 @@ describe("linhas (celular)", () => {
     expect(within(row("Marcos Silva (você)")).getByText("agora")).toBeVisible()
     expect(within(row("Paula Lima")).getByText("Comercial")).toBeVisible()
     expect(within(row("Paula Lima")).getByText("há 3 horas")).toBeVisible()
-    expect(within(row("Rafael Souza")).getByText("há 2 minutos")).toBeVisible()
+    expect(within(row("Rafael Souza")).getByText("há 2 min")).toBeVisible()
     expect(within(row("Tiago Alves")).getByText("nunca entrou")).toBeVisible()
     expect(within(row("Carlos Pinto")).getByText("há 40 dias")).toBeVisible()
   })
@@ -225,6 +225,30 @@ describe("paginação no celular", () => {
     expect(screen.getByText("Mostrando 10 de 54 usuários")).toBeVisible()
   })
 
+  it("o total do rodapé é o da última página carregada", async () => {
+    vi.mocked(service.listUsers).mockImplementation(async ({ page, size }) => ({
+      content: ALL.slice(page * size, (page + 1) * size),
+      page,
+      size,
+      totalElements: page === 0 ? 54 : 55,
+      totalPages: 11,
+    }))
+    const user = renderScreen()
+    await screen.findByText("Paula Lima")
+
+    await user.click(screen.getByRole("button", { name: "Carregar mais" }))
+
+    expect(await screen.findByText("Mostrando 10 de 55 usuários")).toBeVisible()
+  })
+
+  it("a lista começa a 16 px do topo: o cabeçalho vazio não soma o espaço entre blocos", async () => {
+    renderScreen()
+
+    const main = (await screen.findByRole("main")) as HTMLElement
+
+    expect(main).toHaveClass("max-md:gap-0", "max-md:pt-4")
+  })
+
   it("Carregar mais fica desligado quando todos já foram carregados", async () => {
     serve(ALL.slice(0, 7))
     const user = renderScreen()
@@ -277,6 +301,86 @@ describe("paginação na web", () => {
 
     expect(await screen.findByText("Mostrando 51 a 54 de 54 usuários")).toBeVisible()
     expect(screen.getByRole("button", { name: "Próxima" })).toBeDisabled()
+  })
+
+  it("enquanto a próxima página carrega, o rodapé segue as linhas na tela e os botões ficam desligados", async () => {
+    const user = renderScreen()
+    await screen.findByText("Paula Lima")
+    let resolve!: (page: Page<UserSummary>) => void
+    vi.mocked(service.listUsers).mockImplementationOnce(
+      () => new Promise((done) => (resolve = done)),
+    )
+
+    await user.click(screen.getByRole("button", { name: "Próxima" }))
+    await waitFor(() => expect(service.listUsers).toHaveBeenCalledTimes(2))
+
+    expect(screen.getByText("Paula Lima")).toBeInTheDocument()
+    expect(screen.getByText("Mostrando 1 a 5 de 54 usuários")).toBeVisible()
+    expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Próxima" })).toBeDisabled()
+
+    act(() =>
+      resolve({
+        content: ALL.slice(5, 10),
+        page: 1,
+        size: 5,
+        totalElements: 54,
+        totalPages: 11,
+      }),
+    )
+
+    expect(await screen.findByText("Mostrando 6 a 10 de 54 usuários")).toBeVisible()
+    expect(screen.getByText("Usuário 6")).toBeInTheDocument()
+  })
+
+  it("página que falha mantém a anterior e a navegação; Próxima tenta de novo", async () => {
+    const user = renderScreen()
+    await screen.findByText("Paula Lima")
+    vi.mocked(service.listUsers).mockRejectedValueOnce({
+      status: 403,
+      code: "forbidden",
+      message: "Forbidden",
+    })
+
+    await user.click(screen.getByRole("button", { name: "Próxima" }))
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Você não tem permissão para isto",
+    )
+    expect(screen.getByText("Paula Lima")).toBeInTheDocument()
+    expect(screen.getByText("Mostrando 1 a 5 de 54 usuários")).toBeVisible()
+    expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Próxima" })).toBeEnabled()
+
+    await user.click(screen.getByRole("button", { name: "Próxima" }))
+
+    expect(await screen.findByText("Mostrando 6 a 10 de 54 usuários")).toBeVisible()
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument()
+  })
+
+  it("falha na terceira página deixa voltar: Anterior vai para a segunda", async () => {
+    const user = renderScreen()
+    await screen.findByText("Paula Lima")
+    await user.click(screen.getByRole("button", { name: "Próxima" }))
+    await screen.findByText("Mostrando 6 a 10 de 54 usuários")
+    vi.mocked(service.listUsers).mockRejectedValueOnce({
+      status: 403,
+      code: "forbidden",
+      message: "Forbidden",
+    })
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Próxima" })).toBeEnabled(),
+    )
+    await user.click(screen.getByRole("button", { name: "Próxima" }))
+    await screen.findByRole("alert")
+
+    expect(screen.getByText("Mostrando 6 a 10 de 54 usuários")).toBeVisible()
+    expect(screen.getByRole("button", { name: "Anterior" })).toBeEnabled()
+
+    await user.click(screen.getByRole("button", { name: "Anterior" }))
+
+    expect(await screen.findByText("Mostrando 1 a 5 de 54 usuários")).toBeVisible()
   })
 
   it("mostra as colunas e o e-mail de cada usuário", async () => {
@@ -346,14 +450,5 @@ describe("estados", () => {
       "Não foi possível conectar ao servidor",
     )
     expect(screen.queryAllByRole("listitem")).toHaveLength(0)
-  })
-
-  it("lista vazia tem estado próprio, sem rodapé de paginação", async () => {
-    serve([])
-    renderScreen()
-
-    expect(await screen.findByText("Nenhum usuário encontrado")).toBeVisible()
-    expect(screen.queryAllByRole("listitem")).toHaveLength(0)
-    expect(screen.queryByText(/Mostrando/)).not.toBeInTheDocument()
   })
 })

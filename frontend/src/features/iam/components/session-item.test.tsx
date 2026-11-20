@@ -35,7 +35,7 @@ describe("SessionItem: último uso relativo", () => {
   it.each([
     [10_000, "Último uso: agora"],
     [-5 * MINUTE, "Último uso: agora"],
-    [5 * MINUTE, "Último uso: há 5 minutos"],
+    [5 * MINUTE, "Último uso: há 5 min"],
     [60 * MINUTE, "Último uso: há 1 hora"],
     [3 * 60 * MINUTE, "Último uso: há 3 horas"],
     [24 * 60 * MINUTE, "Último uso: há 1 dia"],
