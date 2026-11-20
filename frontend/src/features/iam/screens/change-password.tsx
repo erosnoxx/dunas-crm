@@ -17,7 +17,7 @@ import {
 } from "../components/new-password-fields"
 import { PasswordField } from "../components/password-field"
 import { useChangePassword, useCurrentUser, useLogout } from "../iam.hooks"
-import { messageFor, sentence } from "../iam.messages"
+import { errorMessage, messageFor } from "../iam.messages"
 import { changePasswordSchema, type ChangePasswordValues } from "../iam.schemas"
 
 const WRONG_CURRENT = "wrong_current_password"
@@ -78,12 +78,8 @@ function ChangePassword({ initialMandatory }: { initialMandatory: boolean }) {
         className="flex flex-col gap-5 md:gap-6"
       >
         {error && error.code !== WRONG_CURRENT && (
-          <Alert tone="danger">
-            {sentence(
-              // `invalid_password` não está na tabela: a API diz o primeiro critério que falta.
-              messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE),
-            )}
-          </Alert>
+          // `invalid_password` não está na tabela: a API diz o primeiro critério que falta.
+          <Alert tone="danger">{errorMessage(error)}</Alert>
         )}
 
         <div className="flex flex-col gap-4">

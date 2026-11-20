@@ -97,7 +97,7 @@ function WebList(props: ListProps) {
                 variant="outline"
                 disabled={shown.page === 0 || query.isPlaceholderData}
                 onClick={() => setPage(shown.page - 1)}
-                className="text-sm [&>span]:bg-panel"
+                className="text-body-sm [&>span]:bg-panel"
               >
                 Anterior
               </Button>
@@ -108,7 +108,7 @@ function WebList(props: ListProps) {
                 onClick={() =>
                   shown.page + 1 === page ? void query.refetch() : setPage(shown.page + 1)
                 }
-                className="text-sm [&>span]:bg-panel"
+                className="text-body-sm [&>span]:bg-panel"
               >
                 Próxima
               </Button>

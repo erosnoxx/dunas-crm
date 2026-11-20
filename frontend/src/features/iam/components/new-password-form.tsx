@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
-import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
+import type { ApiError } from "@/shared/api/api-error"
 import { Alert } from "@/shared/ui/alert"
 import { Form } from "@/shared/ui/form"
 
-import { messageFor, sentence } from "../iam.messages"
+import { errorMessage } from "../iam.messages"
 import { acceptInvitationSchema, type AcceptInvitationValues } from "../iam.schemas"
 import { LinkProblem } from "../screens/link-problem"
 import { AuthShell } from "./auth-shell"
@@ -71,12 +71,8 @@ function NewPasswordForm({
           className="flex flex-col gap-5 md:gap-6"
         >
           {error && (
-            <Alert tone="danger">
-              {sentence(
-                // `invalid_password` não está na tabela: a API diz o primeiro critério que falta.
-                messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE),
-              )}
-            </Alert>
+            // `invalid_password` não está na tabela: a API diz o primeiro critério que falta.
+            <Alert tone="danger">{errorMessage(error)}</Alert>
           )}
 
           <div className="flex flex-col gap-4">

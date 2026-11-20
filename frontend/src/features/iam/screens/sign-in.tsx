@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Link, useNavigate } from "react-router"
 
-import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
+import type { ApiError } from "@/shared/api/api-error"
 import { cn } from "@/shared/lib/cn"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
@@ -12,7 +12,7 @@ import { Input } from "@/shared/ui/input"
 import { AuthShell } from "../components/auth-shell"
 import { PasswordField } from "../components/password-field"
 import { useLogin } from "../iam.hooks"
-import { messageFor, sentence } from "../iam.messages"
+import { errorMessage } from "../iam.messages"
 import { signInSchema, type SignInValues } from "../iam.schemas"
 
 const INVALID_CREDENTIALS =
@@ -70,9 +70,7 @@ function SignIn() {
               <Alert tone="danger">
                 {error.code === "invalid_credentials"
                   ? INVALID_CREDENTIALS
-                  : sentence(
-                      messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE),
-                    )}
+                  : errorMessage(error)}
               </Alert>
             )
           )}

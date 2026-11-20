@@ -159,8 +159,8 @@ function Sessions({ sessions, self, isDesktop, actions, now }: SessionsProps) {
         loading={self ? actions.revokingOthers : actions.revokingAll}
         onClick={everyone}
         className={cn(
-          "w-full text-sm text-danger-text md:[&>span]:px-4 [&>span]:bg-panel",
-          !self && "max-md:text-base",
+          "w-full text-body-sm text-danger-text md:[&>span]:px-4 [&>span]:bg-panel",
+          !self && "max-md:text-body",
         )}
       >
         {self ? "Encerrar todas as outras" : "Encerrar todas as sessões"}
@@ -169,7 +169,7 @@ function Sessions({ sessions, self, isDesktop, actions, now }: SessionsProps) {
   )
 }
 
-const DEACTIVATE_LINK = "min-h-11 self-start text-sm underline"
+const DEACTIVATE_LINK = "min-h-11 self-start text-body-sm underline"
 
 type UserPanelProps = {
   user: UserSummary

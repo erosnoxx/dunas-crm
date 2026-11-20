@@ -53,7 +53,6 @@ export const inviteUserSchema = z.object({
 
 export type SignInValues = z.infer<typeof signInSchema>
 export type AcceptInvitationValues = z.infer<typeof acceptInvitationSchema>
-export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>
 export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>
 export type ChangePasswordValues = z.infer<typeof changePasswordSchema>
 export type InviteUserValues = z.infer<typeof inviteUserSchema>
