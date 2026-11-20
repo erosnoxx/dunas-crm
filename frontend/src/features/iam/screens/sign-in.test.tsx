@@ -258,3 +258,20 @@ describe("SignIn", () => {
     )
   })
 })
+
+describe("teclado", () => {
+  it("percorre os controles pelo Tab na ordem da tela", async () => {
+    const user = renderSignIn()
+
+    await user.tab()
+    expect(screen.getByLabelText("E-mail")).toHaveFocus()
+    await user.tab()
+    expect(screen.getByLabelText("Senha")).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole("button", { name: "Mostrar" })).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole("button", { name: "Entrar" })).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole("link", { name: "Esqueci minha senha" })).toHaveFocus()
+  })
+})

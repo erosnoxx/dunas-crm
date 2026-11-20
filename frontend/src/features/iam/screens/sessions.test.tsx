@@ -333,3 +333,25 @@ describe("estados", () => {
     expect(service.listSessions).toHaveBeenCalledTimes(1)
   })
 })
+
+describe("teclado", () => {
+  it("percorre voltar, as sessões e as ações pelo Tab na ordem da tela", async () => {
+    const user = renderScreen()
+    await screen.findAllByRole("button", { name: "Encerrar esta sessão" })
+
+    await user.tab()
+    expect(screen.getByRole("link", { name: "Voltar" })).toHaveFocus()
+    await user.tab()
+    expect(
+      screen.getAllByRole("button", { name: "Encerrar esta sessão" })[0],
+    ).toHaveFocus()
+    await user.tab()
+    expect(
+      screen.getAllByRole("button", { name: "Encerrar esta sessão" })[1],
+    ).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole("button", { name: "Encerrar todas as outras" })).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole("button", { name: "Sair deste aparelho" })).toHaveFocus()
+  })
+})

@@ -117,6 +117,17 @@ describe("ChangePasswordScreen, voluntária", () => {
     expect(await screen.findByText("início")).toBeInTheDocument()
   })
 
+  it("durante o envio o botão anuncia o carregamento (aria-busy)", async () => {
+    vi.mocked(service.changePassword).mockReturnValue(new Promise<void>(() => undefined))
+    const { user } = renderScreen(false)
+    await screen.findByRole("heading", { name: "Trocar senha" })
+
+    await fill(user)
+    await user.click(submit())
+
+    await waitFor(() => expect(submit()).toHaveAttribute("aria-busy", "true"))
+  })
+
   it("não bloqueia uma nova senha igual à atual", async () => {
     vi.mocked(service.changePassword).mockResolvedValue(undefined)
     const { user } = renderScreen(false)
@@ -220,5 +231,25 @@ describe("ChangePasswordScreen, obrigatória", () => {
 
     expect(await screen.findByText("início")).toBeInTheDocument()
     expect(client.getQueryData<CurrentUser>(["me"])?.mustChangePassword).toBe(false)
+  })
+})
+
+describe("teclado", () => {
+  it("a troca obrigatória percorre senha atual, nova senha, repetição e Sair pelo Tab", async () => {
+    const { user } = renderScreen(true)
+    await screen.findByRole("heading", { name: "Troque a senha inicial" })
+
+    await user.tab()
+    expect(currentInput()).toHaveFocus()
+    await user.tab()
+    expect(screen.getAllByRole("button", { name: "Mostrar" })[0]).toHaveFocus()
+    await user.tab()
+    expect(newInput()).toHaveFocus()
+    await user.tab()
+    expect(screen.getAllByRole("button", { name: "Mostrar" })[1]).toHaveFocus()
+    await user.tab()
+    expect(screen.getByLabelText("Repita a senha")).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole("button", { name: "Sair" })).toHaveFocus()
   })
 })
