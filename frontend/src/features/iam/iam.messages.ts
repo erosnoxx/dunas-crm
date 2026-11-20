@@ -1,3 +1,5 @@
+import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
+
 import type { Role, UserStatus } from "./iam.service"
 
 /**
@@ -39,5 +41,23 @@ export const LABELS: { role: Record<Role, string>; status: Record<UserStatus, st
     status: { ACTIVE: "Ativo", INVITED: "Convite pendente", DEACTIVATED: "Desativado" },
   }
 
+/** Os papéis na ordem em que as telas os listam. */
+export const ROLES = Object.keys(LABELS.role) as Role[]
+
 /** As mensagens da API vêm em minúscula; no aviso a frase começa com maiúscula. */
 export const sentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
+
+/** O nome na tela: o do próprio usuário leva "(você)". */
+export const displayName = (name: string, isMe: boolean) =>
+  isMe ? `${name} (você)` : name
+
+/** Tom do chip de cada situação (círculo cheio, anel ou cortado). */
+export const STATUS_TONE: Record<UserStatus, "ok" | "pending" | "off"> = {
+  ACTIVE: "ok",
+  INVITED: "pending",
+  DEACTIVATED: "off",
+}
+
+/** A mensagem de um erro da API para o aviso: pelo `code`, senão a da própria API, senão a genérica. */
+export const errorMessage = (error: Partial<ApiError>) =>
+  sentence(messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE))

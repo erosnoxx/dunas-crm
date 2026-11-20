@@ -2,10 +2,8 @@ import * as React from "react"
 
 import { cn } from "@/shared/lib/cn"
 
-import { LABELS } from "../iam.messages"
+import { LABELS, ROLES } from "../iam.messages"
 import type { Role } from "../iam.service"
-
-const ROLES = Object.keys(LABELS.role) as Role[]
 
 type RolePickerProps = {
   value?: Role

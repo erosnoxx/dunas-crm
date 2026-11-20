@@ -30,6 +30,9 @@ const TITLES: Record<string, string> = {
 /** Rotas com cabeçalho próprio no celular (com "Voltar"): a casca não põe a barra superior. */
 const OWN_HEADER = [CHANGE_PASSWORD_PATH, "/conta/sessoes"]
 
+/** `/usuarios/:id` (detalhe) e `/usuarios/convidar` são telas do celular com cabeçalho próprio (com "Voltar"). */
+const USER_SCREENS = "/usuarios/"
+
 const ACCOUNT_LINK =
   "flex min-h-11 items-center px-2 text-body-sm text-text-muted hover:text-text aria-[current=page]:text-text"
 
@@ -47,7 +50,7 @@ function AppShell({ children }: { children: ReactNode }) {
 
   if (!me || me.mustChangePassword) return children
 
-  const topBar = !OWN_HEADER.includes(pathname)
+  const topBar = !OWN_HEADER.includes(pathname) && !pathname.startsWith(USER_SCREENS)
 
   return (
     <div className="flex min-h-dvh flex-col md:flex-row">
