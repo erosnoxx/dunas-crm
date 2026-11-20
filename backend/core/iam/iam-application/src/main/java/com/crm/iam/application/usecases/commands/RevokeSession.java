@@ -2,11 +2,9 @@ package com.crm.iam.application.usecases.commands;
 
 import com.crm.common.application.annotations.UseCase;
 import com.crm.common.application.events.EventPublisher;
-import com.crm.common.application.exceptions.ForbiddenException;
 import com.crm.common.application.exceptions.NotFoundException;
 import com.crm.iam.application.Actor;
 import com.crm.iam.application.contracts.repositories.SessionRepository;
-import com.crm.iam.domain.vos.Role;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Clock;
@@ -41,8 +39,8 @@ public class RevokeSession {
         var session = sessionRepository.findById(params.sessionId())
                 .orElseThrow(() -> new NotFoundException("session_not_found", "sessão não encontrada"));
 
-        if (!session.getUserId().equals(actor.userId()) && actor.role() != Role.ADMINISTRATOR)
-            throw new ForbiddenException("forbidden", "você não tem permissão para isto");
+        if (!session.getUserId().equals(actor.userId()))
+            actor.requireAdministrator();
 
         session.revoke(actor.userId(), Instant.now(clock));
 

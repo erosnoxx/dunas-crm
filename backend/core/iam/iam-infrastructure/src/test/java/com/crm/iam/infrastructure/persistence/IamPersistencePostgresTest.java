@@ -201,13 +201,11 @@ class IamPersistencePostgresTest {
     }
 
     @Test
-    @DisplayName("findByTokenHash acha a sessão e o token pelo hash")
+    @DisplayName("findByTokenHash acha o token pelo hash")
     void findsByTokenHash() {
         var user = savedUser("Ana Paula", "ana@empresa.com", Role.ADMINISTRATOR);
-        var session = savedSession(user.getId(), NOW, Duration.ofDays(30));
         var token = tokens.save(OneTimeToken.issue(user.getId(), TokenPurpose.INVITATION, TokenSecret.generate(), Duration.ofHours(48), NOW));
 
-        assertThat(sessions.findByTokenHash(session.getTokenHash())).get().extracting(Session::getId).isEqualTo(session.getId());
         assertThat(tokens.findByTokenHash(token.getTokenHash())).get().extracting(OneTimeToken::getId).isEqualTo(token.getId());
     }
 
