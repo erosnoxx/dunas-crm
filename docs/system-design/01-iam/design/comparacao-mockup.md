@@ -77,7 +77,7 @@ A tela não consulta o link antes do envio (ADR-12): o estado aparece depois de 
 |---|---|---|---|---|
 | 390 | `Trocar-obrigatoria-celular` | sem navegação nem voltar; "Senha atual" com "Mostrar", nova senha com contador e checklist, repetição; "Salvar e continuar"; "Sair" 14 peso 600 `brand` no pé | igual, exceto o título 36/40 (mockup 32/36) e o ícone da regra | aproximação |
 | 1280 | sem artboard | o painel de 440 do Entrar, sem casca | derivada; em 1280×800 a página rola e o "Sair" fica abaixo da dobra | seção 6 |
-| ambos | sem artboard | transição para a casca depois de salvar: medida quadro a quadro, a casca aparece em `/` com o título "Trocar senha" por um quadro e com a página inicial vazia por ~70 ms, antes de ir para `/usuarios` (~95 ms no total) | piscada visível | decisão do usuário (seção 5) |
+| ambos | sem artboard | transição para a casca depois de salvar: medida quadro a quadro, a casca aparece em `/` com o título "Trocar senha" por um quadro e com a página inicial vazia por ~70 ms, antes de ir para `/usuarios` (de 95 a 125 ms no total, em duas medições) | piscada visível | decisão do usuário (seção 5) |
 
 ### Trocar senha (voluntária)
 
@@ -164,7 +164,7 @@ Cada linha foi decidida na implementação, sem mockup; nenhuma está aprovada.
 | Entrar, bloqueado | a pausa vive só na tela: recarregar a página religa o formulário (o servidor segue recusando); depois dos 15 minutos não há "tentar de novo" sem recarregar; o "Mostrar" fica visível e desligado |
 | Convite, redefinir, trocar | o aviso de repetição diferente aparece ao vivo, enquanto se digita |
 | Redefinir e trocar senha | "Senha alterada" sai como aviso flutuante (toast); o texto é aprovado, a forma não; aparece também depois da troca obrigatória |
-| Troca obrigatória | piscada da casca entre salvar e chegar a `/usuarios` (~95 ms, seção 3) |
+| Troca obrigatória | piscada da casca entre salvar e chegar a `/usuarios` (de 95 a 125 ms, seção 3) |
 | Troca voluntária | "Voltar" vai para `/`, não para a tela anterior; depois de `wrong_current_password` o botão fica desligado até um campo mudar |
 | Esqueci minha senha | `rate_limited`: aviso amarelo com a frase da tabela de erros, sem título, botão ligado |
 | Convite aberto por quem já tem sessão | a tela de convite abre normalmente, sem redirecionar |
