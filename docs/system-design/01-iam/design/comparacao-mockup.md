@@ -156,7 +156,7 @@ Valores do mockup que não existem na escala do [`tokens.json`](../../../design-
 | título 32/36 peso 700 | convite, redefinir, esqueci, troca obrigatória (celular) | `display-lg` 36/40 |
 | título 28/32 peso 700 | link inválido, link enviado, diálogo de convite | `title` 24/28 peso 600 |
 | wordmark "DUNAS" 20 px peso 600, espaçamento 0.04em | cabeçalho das telas de acesso e barra lateral | `text-xl` e `tracking-[0.04em]` (fora da escala; pedir um token `wordmark`) |
-| inicial do avatar 18 px | barra superior do celular e bloco da conta da barra lateral; folha do menu da conta | `text-lg` (18 px) nos dois primeiros e `text-xl` (20 px) no avatar de 48 da folha: os dois tamanhos ficam fora da escala (o mockup dá 18 px, sem token) |
+| inicial do avatar 18 px (barra superior do celular, avatar de 44 px, e bloco da barra lateral, avatar de 40 px) e 20 px (folha do menu da conta, avatar de 48 px) | barra superior do celular, bloco da conta da barra lateral e folha do menu da conta | `text-lg` (18 px) nos dois primeiros e `text-xl` (20 px) na folha: nenhum dos dois tamanhos está na escala |
 | texto 15 px | item da barra lateral, nome e papel nas linhas da lista web, nome do papel no convite, botão "Convidar usuário" da web | 14 (`body-sm`) ou 16 (`body`, no botão) |
 | 16/22 peso 600 | título do aviso de bloqueio, títulos de seção do detalhe no celular | `body` 16/24 peso 600 |
 | fundo do diálogo e da folha, `ground` a 78% | diálogo de convite, menu da conta | `bg-ground/80` |
@@ -191,7 +191,7 @@ Cada linha foi decidida na implementação, sem mockup; nenhuma está aprovada.
 | Usuários, web | falha da primeira página: sem rodapé nem botão de tentar de novo (recarregar) |
 | Convidar | "Enviar convite" desligado com o cinza dos botões de senha (o mockup só mostra o ligado) |
 | Rótulos | link de volta "Voltar" em todas as telas (os mockups misturam "Voltar" e "Voltar para usuários") |
-| Todas as listas de sessões | último uso relativo: "agora", "há N min", "há 3 horas" e "há 40 dias" aparecem no mockup `Usuarios-web`; as demais formas ("há 1 hora", "há 2 dias" e as outras contagens) saem do `Intl.RelativeTimeFormat` (`last-use.ts`), sem cópia aprovada |
+| Todas as listas de sessões | último uso relativo: "agora", "há N min", "há 3 horas", "há 3 dias" e "há 40 dias" aparecem no mockup `Usuarios-web`; as demais formas ("há 1 hora", "há 2 dias" e as outras contagens) saem do `Intl.RelativeTimeFormat` (`last-use.ts`), sem cópia aprovada |
 | Todas as listas de sessões | o ícone (celular ou monitor) é deduzido do rótulo livre do aparelho por expressão regular |
 | Avisos de erro | erro que não é `ApiError` (falha inesperada do código) mostra a própria mensagem, que pode vir em inglês; erro sem mensagem mostra "Algo deu errado; tente de novo", frase genérica sem texto aprovado |
 | Entrar | o aviso de um envio anterior continua na tela quando o envio seguinte falha na validação do cliente |
