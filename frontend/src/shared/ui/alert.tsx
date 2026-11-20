@@ -23,7 +23,7 @@ function Alert({ tone, title, children, className }: AlertProps) {
       className={cn(
         "flex items-start gap-3",
         tone === "danger"
-          ? "border border-danger p-3 text-body-sm text-danger-text"
+          ? "border border-danger px-3.5 py-3 text-body-sm text-danger-text"
           : "cut-lg bg-highlight p-4 text-body-sm text-on-highlight",
         className,
       )}
