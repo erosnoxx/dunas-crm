@@ -17,7 +17,12 @@ import { MobileHeader } from "../components/mobile-header"
 import { RolePicker } from "../components/role-picker"
 import { useInviteUser } from "../iam.hooks"
 import { errorMessage, messageFor } from "../iam.messages"
-import { inviteUserSchema, type InviteUserValues } from "../iam.schemas"
+import {
+  EMAIL_MAX,
+  inviteUserSchema,
+  NAME_MAX,
+  type InviteUserValues,
+} from "../iam.schemas"
 
 const EMAIL_TAKEN = "email_already_registered"
 const USERS_PATH = "/usuarios"
@@ -93,7 +98,7 @@ function Fields({ form, invite, onSubmit, id }: InviteForm & { id: string }) {
           render={({ field }) => (
             <FormItem className="gap-1.5">
               <FormLabel>Nome completo</FormLabel>
-              <Input {...field} type="text" autoComplete="off" />
+              <Input {...field} type="text" autoComplete="off" maxLength={NAME_MAX} />
               <FormMessage />
             </FormItem>
           )}
@@ -104,7 +109,7 @@ function Fields({ form, invite, onSubmit, id }: InviteForm & { id: string }) {
           render={({ field }) => (
             <FormItem className="gap-1.5">
               <FormLabel>E-mail</FormLabel>
-              <Input {...field} type="email" autoComplete="off" />
+              <Input {...field} type="email" autoComplete="off" maxLength={EMAIL_MAX} />
               <FormMessage />
             </FormItem>
           )}

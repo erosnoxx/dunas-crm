@@ -2,9 +2,9 @@ import { z } from "zod"
 
 import { isPasswordValid, PASSWORD_MAX } from "./password-rules"
 
-const EMAIL_MAX = 254
+export const EMAIL_MAX = 254
 const NAME_MIN = 2
-const NAME_MAX = 80
+export const NAME_MAX = 80
 
 // Nenhum campo de senha usa `.trim()`: aparar alteraria a senha digitada.
 const email = z

@@ -60,6 +60,17 @@ describe("ForgotPassword", () => {
     for (const fn of Object.values(service)) expect(fn).not.toHaveBeenCalled()
   })
 
+  it("o campo e-mail corta o que passar de 254 caracteres ao colar", async () => {
+    const user = renderScreen()
+    const email = screen.getByLabelText("E-mail")
+
+    expect(email).toHaveAttribute("maxlength", "254")
+    await user.click(email)
+    await user.paste("a".repeat(255))
+
+    expect(email).toHaveValue("a".repeat(254))
+  })
+
   it("e-mail vazio ou inválido mostra o erro do campo e não chama a API", async () => {
     const user = renderScreen()
     await screen.findByRole("heading", { name: "Esqueceu a senha?" })

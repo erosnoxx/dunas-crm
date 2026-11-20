@@ -13,7 +13,7 @@ import { AuthShell } from "../components/auth-shell"
 import { PasswordField } from "../components/password-field"
 import { useLogin } from "../iam.hooks"
 import { errorMessage } from "../iam.messages"
-import { signInSchema, type SignInValues } from "../iam.schemas"
+import { EMAIL_MAX, signInSchema, type SignInValues } from "../iam.schemas"
 
 const INVALID_CREDENTIALS =
   "E-mail ou senha incorretos. Confira os dados e tente de novo."
@@ -88,6 +88,7 @@ function SignIn() {
                     {...field}
                     type="email"
                     autoComplete="username"
+                    maxLength={EMAIL_MAX}
                     placeholder="nome@empresa.com.br"
                     disabled={locked}
                   />

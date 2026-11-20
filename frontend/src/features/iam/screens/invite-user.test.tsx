@@ -139,7 +139,7 @@ describe("convidar usuário (web, diálogo)", () => {
     await waitFor(() => expect(send()).toBeEnabled())
   })
 
-  it("e-mail inválido, nome longo e e-mail longo mantêm o botão desligado, com o motivo", async () => {
+  it("e-mail inválido mantém o botão desligado, com o motivo", async () => {
     const { user } = renderInvite()
     await user.click(screen.getByRole("link", { name: "Convidar usuário" }))
     await fill(user)
@@ -149,16 +149,23 @@ describe("convidar usuário (web, diálogo)", () => {
     await user.type(screen.getByLabelText("E-mail"), "sem-arroba")
     await waitFor(() => expect(send()).toBeDisabled())
     expect(await screen.findByText("informe um e-mail válido")).toBeVisible()
+  })
 
-    await user.clear(screen.getByLabelText("E-mail"))
-    await user.click(screen.getByLabelText("E-mail"))
-    await user.paste(`${"a".repeat(250)}@x.com`)
-    await waitFor(() => expect(send()).toBeDisabled())
+  it("nome e e-mail cortam o que passar de 80 e 254 caracteres ao colar", async () => {
+    const { user } = renderInvite()
+    await user.click(screen.getByRole("link", { name: "Convidar usuário" }))
+    const name = await screen.findByLabelText("Nome completo")
+    const email = screen.getByLabelText("E-mail")
 
-    await user.clear(screen.getByLabelText("Nome completo"))
-    await user.click(screen.getByLabelText("Nome completo"))
+    expect(name).toHaveAttribute("maxlength", "80")
+    expect(email).toHaveAttribute("maxlength", "254")
+    await user.click(name)
     await user.paste("n".repeat(81))
-    expect(await screen.findByText("o nome tem no máximo 80 caracteres")).toBeVisible()
+    await user.click(email)
+    await user.paste("e".repeat(255))
+
+    expect(name).toHaveValue("n".repeat(80))
+    expect(email).toHaveValue("e".repeat(254))
   })
 
   it("envia nome e e-mail aparados e o papel; sucesso fecha, atualiza a lista e avisa", async () => {
