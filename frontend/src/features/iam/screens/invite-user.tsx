@@ -7,7 +7,7 @@ import { toast } from "sonner"
 
 import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
 import { cn } from "@/shared/lib/cn"
-import { useMediaQuery } from "@/shared/lib/use-media-query"
+import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/form"
@@ -161,7 +161,7 @@ function SendButton({
  * botão no rodapé. Fechar ou concluir volta para `/usuarios`.
  */
 function InviteUserScreen() {
-  const isDesktop = useMediaQuery("(min-width: 48rem)")
+  const isDesktop = useMediaQuery(MD_UP)
   const navigate = useNavigate()
   const formId = React.useId()
   const close = () => void navigate(USERS_PATH)

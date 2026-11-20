@@ -7,6 +7,7 @@ import { useLogout } from "@/features/iam/iam.hooks"
 import { LABELS } from "@/features/iam/iam.messages"
 import type { CurrentUser } from "@/features/iam/iam.service"
 import { cn } from "@/shared/lib/cn"
+import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 
 /** Avatar com a inicial do nome (mockups "Usuários · web" e "Menu da conta, celular"). */
 function UserAvatar({ name, className }: { name: string; className?: string }) {
@@ -37,14 +38,9 @@ function AccountMenu({ user }: { user: CurrentUser }) {
   const close = () => setOpen(false)
 
   // A folha some em `md` (`md:hidden`), mas o diálogo seguiria modal: fecha ao cruzar o breakpoint.
-  React.useEffect(() => {
-    const query = window.matchMedia("(min-width: 48rem)")
-    const onChange = (event: { matches: boolean }) => event.matches && setOpen(false)
+  const isDesktop = useMediaQuery(MD_UP)
 
-    query.addEventListener("change", onChange)
-
-    return () => query.removeEventListener("change", onChange)
-  }, [])
+  if (isDesktop && open) setOpen(false)
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>

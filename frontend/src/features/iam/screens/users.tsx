@@ -4,7 +4,7 @@ import { Link, Outlet, useMatch, useParams } from "react-router"
 
 import type { ApiError } from "@/shared/api/api-error"
 import { cn } from "@/shared/lib/cn"
-import { useMediaQuery } from "@/shared/lib/use-media-query"
+import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
 
@@ -165,7 +165,7 @@ function MobileList(props: ListProps) {
 function UsersScreen() {
   const { data: me } = useCurrentUser()
   const { id } = useParams()
-  const isDesktop = useMediaQuery("(min-width: 48rem)")
+  const isDesktop = useMediaQuery(MD_UP)
   // `/usuarios/convidar` é rota irmã de `:id` (sem `id`): no celular também troca a lista pela tela.
   const inviting = useMatch("/usuarios/convidar") !== null
   const selected = id !== undefined || inviting

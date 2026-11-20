@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 import { useParams } from "react-router"
 
 import type { ApiError } from "@/shared/api/api-error"
-import { useMediaQuery } from "@/shared/lib/use-media-query"
+import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
 
 import { MobileHeader } from "../components/mobile-header"
@@ -18,7 +18,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
  * não põe a barra superior em `/usuarios/*`. Na web o nome é o h2 do painel; o h1 é o da lista.
  */
 function Frame({ title, children }: { title?: string; children: ReactNode }) {
-  const isDesktop = useMediaQuery("(min-width: 48rem)")
+  const isDesktop = useMediaQuery(MD_UP)
 
   return (
     <>

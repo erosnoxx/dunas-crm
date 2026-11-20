@@ -188,14 +188,16 @@ describe("menu da conta no celular", () => {
 
   it("fecha a folha aberta quando a tela cruza o breakpoint md", async () => {
     const original = window.matchMedia
-    const listeners = new Set<(event: { matches: boolean }) => void>()
+    // `matches` acompanha o estado, como no navegador: `useMediaQuery` o lê de novo ao ser avisado.
+    let matches = false
+    const listeners = new Set<() => void>()
     window.matchMedia = ((query: string) => ({
-      matches: false,
+      get matches() {
+        return matches
+      },
       media: query,
-      addEventListener: (_: string, fn: (event: { matches: boolean }) => void) =>
-        listeners.add(fn),
-      removeEventListener: (_: string, fn: (event: { matches: boolean }) => void) =>
-        listeners.delete(fn),
+      addEventListener: (_: string, fn: () => void) => listeners.add(fn),
+      removeEventListener: (_: string, fn: () => void) => listeners.delete(fn),
     })) as unknown as typeof window.matchMedia
 
     try {
@@ -205,7 +207,8 @@ describe("menu da conta no celular", () => {
       await user.click(trigger())
       await screen.findByRole("dialog", { name: "Minha conta" })
 
-      act(() => listeners.forEach((fn) => fn({ matches: true })))
+      matches = true
+      act(() => listeners.forEach((fn) => fn()))
 
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
     } finally {
