@@ -3,6 +3,7 @@ package com.crm.iam.infrastructure.persistence;
 import com.crm.common.application.pages.Page;
 import com.crm.common.application.pages.Pageable;
 import com.crm.iam.application.contracts.readers.UserReader;
+import com.crm.iam.application.schemas.CurrentUser;
 import com.crm.iam.application.schemas.UserFilter;
 import com.crm.iam.application.schemas.UserSummary;
 import jakarta.persistence.EntityManager;
@@ -67,6 +68,20 @@ public class JpaUserReaderImpl implements UserReader {
     @Override
     public Optional<UserSummary> findSummary(UUID id) {
         return em.createQuery(SELECT + "where u.id = :id", UserSummary.class)
+                .setParameter("id", id)
+                .getResultList().stream()
+                .findFirst();
+    }
+
+    @Override
+    public Optional<CurrentUser> findCurrent(UUID id) {
+        return em.createQuery("""
+                        select new com.crm.iam.application.schemas.CurrentUser(
+                            u.id, u.name, u.email, u.role, u.mustChangePassword
+                        )
+                        from UserEntity u
+                        where u.id = :id
+                        """, CurrentUser.class)
                 .setParameter("id", id)
                 .getResultList().stream()
                 .findFirst();

@@ -2,6 +2,7 @@ package com.crm.iam.application.contracts.readers;
 
 import com.crm.common.application.pages.Page;
 import com.crm.common.application.pages.Pageable;
+import com.crm.iam.application.schemas.CurrentUser;
 import com.crm.iam.application.schemas.UserFilter;
 import com.crm.iam.application.schemas.UserSummary;
 
@@ -17,4 +18,7 @@ public interface UserReader {
     );
 
     Optional<UserSummary> findSummary(UUID id);
+
+    /** Quem está logado, com a flag de troca de senha que o resumo não traz. */
+    Optional<CurrentUser> findCurrent(UUID id);
 }

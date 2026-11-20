@@ -287,6 +287,25 @@ class IamPersistencePostgresTest {
     }
 
     @Test
+    @DisplayName("findCurrent devolve o usuário com a flag de troca de senha e vazio se não existe")
+    void findCurrentExposesMustChangePassword() {
+        var regular = savedUser("Ana Comercial", "ana@empresa.com", Role.COMMERCIAL);
+        var seeded = savedUser("Admin Inicial", "admin@empresa.com", Role.ADMINISTRATOR);
+        seeded.markPasswordChangeRequired();
+        users.save(seeded);
+
+        var current = userReader.findCurrent(regular.getId()).orElseThrow();
+
+        assertThat(current.id()).isEqualTo(regular.getId());
+        assertThat(current.name()).isEqualTo("Ana Comercial");
+        assertThat(current.email()).isEqualTo("ana@empresa.com");
+        assertThat(current.role()).isEqualTo(Role.COMMERCIAL);
+        assertThat(current.mustChangePassword()).isFalse();
+        assertThat(userReader.findCurrent(seeded.getId()).orElseThrow().mustChangePassword()).isTrue();
+        assertThat(userReader.findCurrent(UUID.randomUUID())).isEmpty();
+    }
+
+    @Test
     @DisplayName("findActiveByUser lista as sessões ativas e marca a corrente")
     void listsActiveSessionsMarkingCurrent() {
         var user = savedUser("Ana Paula", "ana@empresa.com", Role.ADMINISTRATOR);
