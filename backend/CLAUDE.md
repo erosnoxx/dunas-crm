@@ -13,7 +13,7 @@ Estrutura, regra de dependência e o que mora em cada módulo: [`docs/rules/arch
 
 ## Rodar e testar
 
-`mvn test` a partir desta pasta, em **JDK 21**. Um teste (`IdempotencyGuardPostgresTest`) exige Docker. Ambiente, comandos e falhas comuns: skill `crm-build-and-test`.
+`mvn test` a partir desta pasta, em **JDK 21**. Os testes `*PostgresTest` e o `IamEndToEndTest` exigem Docker. Ambiente, comandos e falhas comuns: skill `crm-build-and-test`.
 
 ## Antes de mexer
 

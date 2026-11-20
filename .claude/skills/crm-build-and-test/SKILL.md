@@ -31,11 +31,23 @@ Moram em `edge/boot/src/test/java/com/crm/` (único módulo que vê o classpath 
 
 ## Teste que precisa de Docker
 
-`IdempotencyGuardPostgresTest` usa Testcontainers (Postgres). Sem Docker rodando, falha. Para o resto do build:
+Três classes usam Testcontainers e falham sem Docker rodando:
+
+| Classe | Módulo | Sobe |
+|---|---|---|
+| `IdempotencyGuardPostgresTest` | `common-infrastructure` | Postgres |
+| `IamPersistencePostgresTest` | `iam-infrastructure` | Postgres |
+| `IamEndToEndTest` | `edge/boot` | Postgres e Redis, com a aplicação inteira num Tomcat de verdade |
+
+Para o resto do build:
 
 ```
-mvn test -Dtest='!IdempotencyGuardPostgresTest'
+mvn test -Dtest='!*PostgresTest,!IamEndToEndTest'
 ```
+
+O `IamEndToEndTest` é o único teste do contexto real da aplicação: é ele que acha erro de ligação (bean que falta, listener que não grava, cache que não é invalidado). Mudança na cadeia de segurança, num listener ou numa `@Configuration` só termina com ele verde.
+
+**Falha intermitente conhecida:** de vez em quando o Testcontainers estoura o tempo de 10 s esperando o container subir. Rode de novo uma vez antes de suspeitar do código.
 
 Diga no PR quando esse teste não pôde rodar; não o omita. O Testcontainers está fixado em `1.21.4` no pai: o do BOM do Spring Boot (1.20.6) fala com o Docker pela API 1.32, que o Docker Engine 29 recusa (`client version 1.32 is too old`). Subir o Spring Boot é rever essa versão.
 

@@ -94,7 +94,7 @@ Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `querie
 
 - **Entrada:** `Actor`, `userId`, `role`.
 - **Pré-condições:** Administrador; usuário existe; `cannot_change_own_role`; usuário `ACTIVE`.
-- **Fluxo:** `User.changeRole(actor.userId, role)`, salva, publica `UserRoleChanged`.
+- **Fluxo:** `User.changeRole(actor.userId, role, now)`, salva, publica `UserRoleChanged`.
 - **Endpoint:** `PUT /users/{userId}/role`, Administrador.
 
 ### `DeactivateUser`
@@ -171,7 +171,7 @@ Só traduzem e chamam um use case; nenhuma regra neles. Rodam **depois do commit
 - **Retorno:** lista de `SessionSummary`: `id`, `device`, `startedAt`, `lastUsedAt`, `current` (só quando é a sessão do `Actor`). Só as ativas, da mais recente para a mais antiga.
 - **Endpoint:** `GET /users/{userId}/sessions`, autenticado ("Minhas sessões" usa o `userId` do próprio `Actor`).
 
-> Queries não carregam aggregate: leem por um contrato de leitura em `iam-application` (`application.contracts`), devolvendo projeção. O desenho dele nasce na implementação desta feature e é registrado na skill `crm-add-use-case`, que hoje não tem query de referência.
+> Queries não carregam aggregate: leem por um contrato de leitura em `iam-application` (`application.contracts.readers`: `UserReader`, `SessionReader`), devolvendo projeção. O desenho está registrado na skill `crm-add-use-case`.
 
 ## Erros
 
@@ -182,7 +182,8 @@ Contrato público ([`architecture.md`](../../rules/architecture.md) §7.3). Cód
 | `invalid_credentials` | 401 | e-mail ou senha incorretos | login com qualquer falha de credencial |
 | `session_invalid` | 401 | sua sessão não vale mais; entre de novo | token desconhecido, expirado, revogado ou de usuário desativado |
 | `rate_limited` | 429 | muitas tentativas; tente de novo em alguns minutos | limite estourado (código do kernel) |
-| `password_change_required` | 403 | você precisa trocar a senha antes de continuar | sessão com `mustChangePassword` fora de `ChangePassword`/`Logout` |
+| `password_change_required` | 403 | você precisa trocar a senha antes de continuar | sessão com `mustChangePassword` fora de `ChangePassword`, `Logout` e `GetCurrentUser` (ADR-2, [`architecture.md`](../../rules/architecture.md) §4.1) |
+| `csrf_invalid` | 403 | requisição recusada; recarregue a página e tente de novo | escrita por cookie sem o cabeçalho de CSRF (*proposta*: código da cadeia de segurança, ainda não aprovado) |
 | `forbidden` | 403 | você não tem permissão para isto | papel insuficiente ou sessão de outro usuário |
 | `invalid_password` | 400 | a senha precisa de `<critério que falta>` | regra do ADR-3 |
 | `link_expired` | 422 | este link expirou | link vencido |
