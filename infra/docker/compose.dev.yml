@@ -1,0 +1,165 @@
+# Stack completo de desenvolvimento do crm.
+#
+# Suba pelo script, nunca chamando este arquivo direto: infra/scripts/dev-up.cmd
+# (ele passa o --env-file certo).
+#
+#   navegador ──► frontend (nginx) ──/api──► backend ──► postgres, rabbitmq, redis, mailpit
+#
+# O navegador so fala com o frontend: frontend e API no mesmo site, sem CORS. A porta da API
+# fica exposta so para o Swagger e para depuracao.
+
+name: crm
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+
+  # --- infraestrutura ------------------------------------------------------------
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: crm-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      TZ: America/Sao_Paulo
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    logging: *logging
+
+  rabbitmq:
+    image: rabbitmq:4.1-management-alpine
+    container_name: crm-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+    ports:
+      - "${RABBIT_HOST_PORT:-5672}:5672"
+      - "${RABBIT_UI_HOST_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+    logging: *logging
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: crm-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_HOST_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    logging: *logging
+
+  # SMTP de desenvolvimento: captura todo e-mail da API (convite e redefinicao de senha) e
+  # guarda numa caixa web. Nada sai da maquina.
+  mailpit:
+    image: axllent/mailpit:v1.27
+    container_name: crm-mailpit
+    restart: unless-stopped
+    environment:
+      TZ: America/Sao_Paulo
+    ports:
+      - "${MAILPIT_UI_HOST_PORT:-8025}:8025"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    logging: *logging
+
+  # --- aplicacao -------------------------------------------------------------------
+
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: ../infra/docker/context/backend.Dockerfile
+    image: crm-backend:dev
+    container_name: crm-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+
+      # Banco: o application-dev.properties monta jdbc:postgresql://${DB_URL}.
+      DB_URL: postgres:5432/${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      # Redis, RabbitMQ e SMTP entram pelos nomes nativos do Spring (spring.data.redis.*,
+      # spring.rabbitmq.*, spring.mail.*).
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: ${RABBIT_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBIT_PASSWORD}
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: 1025
+
+      # crm.email.from e crm.iam.app-url. O app-url e a base dos links de convite e de
+      # redefinicao: o endereco que o navegador usa para abrir o frontend.
+      CRM_EMAIL_FROM: ${EMAIL_FROM}
+      CRM_IAM_APPURL: http://localhost:${FRONTEND_HOST_PORT:-8090}
+
+      # Administrador inicial: o seeder so cria quando o banco nao tem nenhum usuario.
+      CRM_ADMIN_NAME: ${CRM_ADMIN_NAME}
+      CRM_ADMIN_EMAIL: ${CRM_ADMIN_EMAIL}
+      CRM_ADMIN_PASSWORD: ${CRM_ADMIN_PASSWORD}
+    ports:
+      - "${API_HOST_PORT:-8080}:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+    logging: *logging
+
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: ../infra/docker/context/frontend.Dockerfile
+      additional_contexts:
+        nginx: ./context/nginx
+    image: crm-frontend:dev
+    container_name: crm-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "${FRONTEND_HOST_PORT:-8090}:80"
+    logging: *logging
+
+volumes:
+  postgres_data:
+    name: crm_postgres_data
+  rabbitmq_data:
+    name: crm_rabbitmq_data

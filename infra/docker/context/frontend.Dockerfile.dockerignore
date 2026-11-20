@@ -1,0 +1,8 @@
+# Aplicado ao contexto frontend/ so por estar ao lado de frontend.Dockerfile (BuildKit).
+node_modules/
+build/
+.react-router/
+.claude/
+**/*.log
+.env
+.env.*
