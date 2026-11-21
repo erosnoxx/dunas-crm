@@ -33,8 +33,15 @@ function Glyph({ shape }: { shape: Shape }) {
   )
 }
 
+type StatusChipProps = {
+  tone: Tone
+  /** A forma, quando a da feature difere da do tom (o catálogo lê o desativado como círculo vazado). */
+  shape?: Shape
+  children: React.ReactNode
+}
+
 /** Chip de situação. `ok` é o fundo `chip-ok`; as demais têm contorno (duas camadas). */
-function StatusChip({ tone, children }: { tone: Tone; children: React.ReactNode }) {
+function StatusChip({ tone, shape = SHAPE[tone], children }: StatusChipProps) {
   const label = (
     <span
       className={cn(
@@ -43,7 +50,7 @@ function StatusChip({ tone, children }: { tone: Tone; children: React.ReactNode 
         tone === "off" ? "text-text-muted" : "text-text",
       )}
     >
-      <Glyph shape={SHAPE[tone]} />
+      <Glyph shape={shape} />
       {children}
     </span>
   )

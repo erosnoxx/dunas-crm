@@ -6,7 +6,7 @@ import { Label } from "@/shared/ui/label"
 
 import { PASSWORD_MAX } from "../password-rules"
 
-type PasswordFieldProps = Omit<React.ComponentProps<"input">, "type" | "id"> & {
+type PasswordFieldProps = Omit<React.ComponentProps<"input">, "type" | "id" | "size"> & {
   id: string
   label: string
   error?: string

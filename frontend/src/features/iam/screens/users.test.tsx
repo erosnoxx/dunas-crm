@@ -4,10 +4,11 @@ import userEvent from "@testing-library/user-event"
 import { createRoutesStub, Outlet, useParams } from "react-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
+import type { Page } from "@/shared/api/page"
 import { createQueryClient } from "@/shared/lib/query-client"
 
 import * as service from "../iam.service"
-import type { CurrentUser, Page, UserSummary } from "../iam.service"
+import type { CurrentUser, UserSummary } from "../iam.service"
 import { UsersScreen } from "./users"
 
 vi.mock("../iam.service")

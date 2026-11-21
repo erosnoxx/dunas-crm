@@ -36,6 +36,18 @@ Canvas com 13 telas na identidade DUNAS (tema escuro, [`tokens.json`](../../../d
 - Fabricante só tem nome. **Sem** ficha técnica, foto, contagem de unidades instaladas nem histórico (ADR-8).
 - Unidades disponíveis: kW, W, Wp e BTU/h.
 
+## Divergências do mockup aprovadas para a implementação (2026-11-21)
+
+O mockup traz o que o esqueleto do frontend ainda não tem. Aprovado seguir o mockup, no menor escopo:
+
+- **Altura do campo:** 44 px na web e 48 px no celular, por uma variante `size="compact"` no `Input`; o padrão (e o IAM) não muda.
+- **Seleção e caixa de marcar:** `NativeSelect` e `Checkbox` simples em `shared/ui`, sobre os tokens.
+- **Barra inferior no celular:** `BottomNav` na casca, junto desta feature.
+- **Abas do catálogo:** `CatalogTabs` na feature, com links de verdade.
+- **`Page<T>`:** sobe para `shared/api/page.ts`, para uma feature não importar outra.
+
+Toda divergência nova achada depois entra na comparação final, para o usuário decidir.
+
 ## O que o mockup não mostra e a implementação precisa decidir sem inventar
 
 - **Obrigatória travada:** o mockup só mostra a unidade travada; a caixa "Obrigatória" também trava quando liga de `false` para `true` com modelos (ADR-4). A tela deve desabilitá-la com o mesmo aviso, e isso entra na comparação como divergência sinalizada.

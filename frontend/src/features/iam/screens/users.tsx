@@ -3,6 +3,7 @@ import * as React from "react"
 import { Link, Outlet, useMatch, useParams } from "react-router"
 
 import type { ApiError } from "@/shared/api/api-error"
+import type { Page } from "@/shared/api/page"
 import { cn } from "@/shared/lib/cn"
 import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
@@ -11,7 +12,7 @@ import { Button } from "@/shared/ui/button"
 import { UserRow } from "../components/user-row"
 import { useCurrentUser, useInfiniteUsers, useUsers } from "../iam.hooks"
 import { errorMessage } from "../iam.messages"
-import type { Page, UserSummary } from "../iam.service"
+import type { UserSummary } from "../iam.service"
 
 // Os mockups mostram 5 linhas por página ("Mostrando 1 a 5 de 54 usuários").
 const PAGE_SIZE = 5

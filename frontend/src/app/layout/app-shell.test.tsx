@@ -36,6 +36,10 @@ function renderAt(path: string, user: CurrentUser) {
       children: [
         { path: "/", Component: Home },
         { path: "/usuarios", Component: () => <p>tela de usuários</p> },
+        { path: "/catalogo", Component: () => <p>tela do catálogo</p> },
+        { path: "/catalogo/fabricantes", Component: () => <p>tela de fabricantes</p> },
+        { path: "/catalogo/tipos/novo", Component: () => <p>tela de novo tipo</p> },
+        { path: "/catalogo/modelos/novo", Component: () => <p>tela de novo modelo</p> },
         { path: "/conta/sessoes", Component: () => <p>tela de sessões</p> },
         { path: "/conta/trocar-senha", Component: ContaTrocarSenha },
       ],
@@ -49,6 +53,7 @@ function renderAt(path: string, user: CurrentUser) {
 }
 
 const sidebar = () => screen.getByRole("navigation", { name: "Principal" })
+const bottomBar = () => screen.getByRole("navigation", { name: "Principal no celular" })
 const trigger = () => screen.getByRole("button", { name: "Minha conta, Marcos Silva" })
 
 beforeEach(() => vi.resetAllMocks())
@@ -122,7 +127,7 @@ describe("barra lateral", () => {
   it("o teclado alcança todos os itens, do primeiro ao Sair", async () => {
     const user = renderAt("/", me("ADMINISTRATOR"))
     const nav = await findSidebar()
-    const order = ["Usuários", "Minhas sessões", "Trocar senha", "Sair"]
+    const order = ["Catálogo", "Usuários", "Minhas sessões", "Trocar senha", "Sair"]
 
     // O avatar da barra superior vem antes na ordem do documento.
     await user.tab()
@@ -256,6 +261,73 @@ describe("troca de senha", () => {
     expect(sidebar()).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "Voltar" })).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: /Minha conta/ })).not.toBeInTheDocument()
+  })
+})
+
+describe("item Catálogo", () => {
+  it("o Administrador vê Catálogo e Usuários na barra lateral e na inferior", async () => {
+    renderAt("/catalogo", me("ADMINISTRATOR"))
+
+    for (const nav of [await findSidebar(), bottomBar()]) {
+      expect(within(nav).getByRole("link", { name: "Catálogo" })).toHaveAttribute(
+        "href",
+        "/catalogo",
+      )
+      expect(within(nav).getByRole("link", { name: "Usuários" })).toHaveAttribute(
+        "href",
+        "/usuarios",
+      )
+    }
+  })
+
+  it("o Técnico vê só Catálogo, na barra lateral e na inferior", async () => {
+    renderAt("/catalogo", me("TECHNICIAN"))
+
+    for (const nav of [await findSidebar(), bottomBar()]) {
+      expect(within(nav).getByRole("link", { name: "Catálogo" })).toBeInTheDocument()
+      expect(
+        within(nav).queryByRole("link", { name: "Usuários" }),
+      ).not.toBeInTheDocument()
+    }
+  })
+
+  it("na barra inferior, o item da seção atual é marcado em brand-text", async () => {
+    renderAt("/catalogo/fabricantes", me("COMMERCIAL"))
+    await findSidebar()
+
+    const item = within(bottomBar()).getByRole("link", { name: "Catálogo" })
+
+    expect(item).toHaveAttribute("aria-current", "page")
+    expect(item).toHaveClass("aria-[current=page]:text-brand-text")
+    expect(bottomBar()).toHaveClass("md:hidden")
+  })
+
+  it("/catalogo/fabricantes tem o título Catálogo e mantém as duas barras", async () => {
+    renderAt("/catalogo/fabricantes", me("ADMINISTRATOR"))
+    await findSidebar()
+
+    expect(within(screen.getByRole("banner")).getByText("Catálogo")).toBeInTheDocument()
+    expect(bottomBar()).toBeInTheDocument()
+  })
+
+  it("/catalogo/modelos/novo tem cabeçalho próprio: sem barra superior nem inferior", async () => {
+    renderAt("/catalogo/modelos/novo", me("ADMINISTRATOR"))
+    await screen.findByText("tela de novo modelo")
+
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("navigation", { name: "Principal no celular" }),
+    ).not.toBeInTheDocument()
+  })
+
+  it("um formulário de tipo (/catalogo/tipos/novo) também não tem as barras do celular", async () => {
+    renderAt("/catalogo/tipos/novo", me("COMMERCIAL"))
+    await screen.findByText("tela de novo tipo")
+
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("navigation", { name: "Principal no celular" }),
+    ).not.toBeInTheDocument()
   })
 })
 

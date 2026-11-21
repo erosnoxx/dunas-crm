@@ -1,37 +1,58 @@
 import type { ReactNode } from "react"
-import { UsersIcon } from "lucide-react"
+import { PackageIcon, UsersIcon } from "lucide-react"
 import { NavLink, useLocation } from "react-router"
 
 import { CHANGE_PASSWORD_PATH } from "@/features/iam/guards"
 import { useCurrentUser, useLogout } from "@/features/iam/iam.hooks"
 import { LABELS } from "@/features/iam/iam.messages"
-import type { Role } from "@/features/iam/iam.service"
 import { Logo } from "@/shared/ui/logo"
 
 import { AccountMenu, UserAvatar } from "./account-menu"
+import { BottomNav, type NavItem } from "./bottom-nav"
 
-type NavItem = { to: string; label: string; roles: Role[] }
-
-/** Itens de trabalho da barra lateral. Só o Administrador tem item hoje (ADR-5: só ele gerencia usuários). */
+/**
+ * Itens de trabalho, na barra lateral e na inferior. Catálogo é de todos os papéis (o Técnico só
+ * consulta, ADR-6); Usuários é só do Administrador (ADR-5).
+ */
 const NAV_ITEMS: NavItem[] = [
-  { to: "/usuarios", label: "Usuários", roles: ["ADMINISTRATOR"] },
+  {
+    to: "/catalogo",
+    label: "Catálogo",
+    icon: PackageIcon,
+    roles: ["ADMINISTRATOR", "COMMERCIAL", "TECHNICIAN"],
+  },
+  { to: "/usuarios", label: "Usuários", icon: UsersIcon, roles: ["ADMINISTRATOR"] },
 ]
 
 /**
- * Título da barra superior do celular, por rota exata. Contrato: a página é dona do h1 e o
- * esconde com `max-md:sr-only` no celular; rota aninhada precisa de entrada aqui ou de casamento
- * por prefixo. As rotas de `OWN_HEADER` não passam por aqui: a página desenha o cabeçalho.
+ * Título da barra superior do celular, por rota exata ou pelo item do menu sob o qual a rota está
+ * (`/catalogo`, `/catalogo/fabricantes`...). Contrato: a página é dona do h1 e o esconde com
+ * `max-md:sr-only` no celular; rota aninhada precisa de entrada aqui ou de item do menu. As rotas
+ * de `OWN_HEADER` não passam por aqui: a página desenha o cabeçalho.
  */
 const TITLES: Record<string, string> = {
   "/": "Início",
   "/usuarios": "Usuários",
 }
 
-/** Rotas com cabeçalho próprio no celular (com "Voltar"): a casca não põe a barra superior. */
+/** Rotas com cabeçalho próprio no celular (com "Voltar"): a casca não põe a barra superior nem a inferior. */
 const OWN_HEADER = [CHANGE_PASSWORD_PATH, "/conta/sessoes"]
 
-/** `/usuarios/:id` (detalhe) e `/usuarios/convidar` são telas do celular com cabeçalho próprio (com "Voltar"). */
-const USER_SCREENS = "/usuarios/"
+/**
+ * O mesmo, por prefixo, com a barra final: `/usuarios/:id` e `/usuarios/convidar`, o modelo
+ * (`/catalogo/modelos/novo` e `:id`) e os formulários de fabricante e tipo. A barra final deixa
+ * as listas (`/catalogo/fabricantes`, `/catalogo/tipos`) com as barras da casca.
+ */
+const OWN_HEADER_PREFIXES = [
+  "/usuarios/",
+  "/catalogo/modelos/",
+  "/catalogo/fabricantes/",
+  "/catalogo/tipos/",
+]
+
+const titleOf = (pathname: string) =>
+  TITLES[pathname] ??
+  NAV_ITEMS.find(({ to }) => pathname === to || pathname.startsWith(`${to}/`))?.label
 
 const ACCOUNT_LINK =
   "flex min-h-11 items-center px-2 text-body-sm text-text-muted hover:text-text aria-[current=page]:font-semibold aria-[current=page]:text-text"
@@ -50,14 +71,17 @@ function AppShell({ children }: { children: ReactNode }) {
 
   if (!me || me.mustChangePassword) return children
 
-  const topBar = !OWN_HEADER.includes(pathname) && !pathname.startsWith(USER_SCREENS)
+  const topBar =
+    !OWN_HEADER.includes(pathname) &&
+    !OWN_HEADER_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  const items = NAV_ITEMS.filter((item) => item.roles.includes(me.role))
 
   return (
     <div className="flex min-h-dvh flex-col md:flex-row">
       {topBar && (
         <header className="flex h-16 shrink-0 items-center gap-3 border-b border-line bg-nav px-4 md:hidden">
           <Logo size={36} alt="" />
-          <p className="text-title flex-1">{TITLES[pathname]}</p>
+          <p className="text-title flex-1">{titleOf(pathname)}</p>
           <AccountMenu user={me} />
         </header>
       )}
@@ -74,15 +98,15 @@ function AppShell({ children }: { children: ReactNode }) {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          {NAV_ITEMS.filter((item) => item.roles.includes(me.role)).map((item) => (
+          {items.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className="group flex h-11 text-body-sm font-semibold"
             >
               {/* O corte fica no miolo: `clip-path` no link cortaria o anel de foco. */}
-              <span className="cut-sm flex flex-1 items-center gap-3 px-3.5 group-aria-[current=page]:bg-chip-ok">
-                <UsersIcon aria-hidden="true" className="size-5" />
+              <span className="cut-sm flex flex-1 items-center gap-3 px-3.5 text-text-muted group-aria-[current=page]:bg-chip-ok group-aria-[current=page]:text-text">
+                <item.icon aria-hidden="true" className="size-5" />
                 {item.label}
               </span>
             </NavLink>
@@ -117,6 +141,8 @@ function AppShell({ children }: { children: ReactNode }) {
       </nav>
 
       <div className="min-w-0 flex-1">{children}</div>
+
+      {topBar && <BottomNav items={items} />}
     </div>
   )
 }
