@@ -1,5 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query"
-import { render, screen, within } from "@testing-library/react"
+import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { createRoutesStub, Outlet } from "react-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -225,6 +225,28 @@ describe("web", () => {
     expect(screen.getByLabelText("Nome *")).toBeInTheDocument()
     expect(await screen.findByText("Huawei")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Salvar fabricante" })).toBeInTheDocument()
+  })
+
+  it("salvar pelo painel da própria lista esvazia o campo, e um segundo envio vazio não chama o serviço", async () => {
+    vi.mocked(service.registerManufacturer).mockResolvedValue({ id: "f-new" })
+    const user = renderScreen()
+    const name = await screen.findByLabelText("Nome *")
+    await user.type(name, "Solis")
+
+    await user.click(screen.getByRole("button", { name: "Salvar fabricante" }))
+
+    await waitFor(() =>
+      expect(service.registerManufacturer).toHaveBeenCalledWith(
+        { name: "Solis" },
+        expect.anything(),
+      ),
+    )
+    await waitFor(() => expect(screen.getByLabelText("Nome *")).toHaveValue(""))
+
+    await user.click(screen.getByRole("button", { name: "Salvar fabricante" }))
+
+    expect(await screen.findByText("o nome tem no mínimo 2 caracteres")).toBeVisible()
+    expect(service.registerManufacturer).toHaveBeenCalledTimes(1)
   })
 
   it("abrir um fabricante põe o painel de edição ao lado da lista", async () => {

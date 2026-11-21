@@ -115,6 +115,8 @@ function useNameForm(
 
     try {
       await send(values.name)
+      // Na web o painel da própria lista não remonta ao voltar para a mesma URL: o campo esvazia aqui.
+      form.reset()
     } catch (e) {
       const error = e as Partial<ApiError>
 
