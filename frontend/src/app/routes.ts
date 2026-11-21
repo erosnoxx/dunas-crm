@@ -16,6 +16,11 @@ export default [
     // Estática antes de `:id`: `/catalogo/modelos/novo` não vira o modelo "novo".
     route("catalogo/modelos/novo", "routes/catalogo.modelos.novo.tsx"),
     route("catalogo/modelos/:id", "routes/catalogo.modelos.$id.tsx"),
+    route("catalogo/fabricantes", "routes/catalogo.fabricantes.tsx", [
+      // Estática, irmã de `:id`: `/catalogo/fabricantes/novo` não vira o fabricante "novo".
+      route("novo", "routes/catalogo.fabricantes.novo.tsx"),
+      route(":id", "routes/catalogo.fabricantes.$id.tsx"),
+    ]),
     route("conta/sessoes", "routes/conta.sessoes.tsx"),
     route("conta/trocar-senha", "routes/conta.trocar-senha.tsx"),
   ]),
