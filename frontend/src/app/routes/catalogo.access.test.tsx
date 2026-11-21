@@ -3,6 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
+import { useCurrentUser } from "@/features/iam/iam.hooks"
 import * as service from "@/features/iam/iam.service"
 import type { CurrentUser, Role } from "@/features/iam/iam.service"
 import { createQueryClient } from "@/shared/lib/query-client"
@@ -25,7 +26,9 @@ function renderCanEdit() {
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   )
 
-  return renderHook(() => useCanEditCatalog(), { wrapper })
+  return renderHook(() => ({ canEdit: useCanEditCatalog(), user: useCurrentUser() }), {
+    wrapper,
+  })
 }
 
 beforeEach(() => vi.resetAllMocks())
@@ -36,7 +39,7 @@ describe("useCanEditCatalog", () => {
 
     const { result } = renderCanEdit()
 
-    await waitFor(() => expect(result.current).toBe(true))
+    await waitFor(() => expect(result.current.canEdit).toBe(true))
   })
 
   it("o Técnico só consulta", async () => {
@@ -44,8 +47,9 @@ describe("useCanEditCatalog", () => {
 
     const { result } = renderCanEdit()
 
-    await waitFor(() => expect(service.getCurrentUser).toHaveBeenCalled())
-    await waitFor(() => expect(result.current).toBe(false))
+    // Espera o usuário chegar: antes disso o hook já é false, e o teste passaria à toa.
+    await waitFor(() => expect(result.current.user.data?.role).toBe("TECHNICIAN"))
+    expect(result.current.canEdit).toBe(false)
   })
 
   it("sem usuário carregado, não edita", () => {
@@ -53,6 +57,6 @@ describe("useCanEditCatalog", () => {
 
     const { result } = renderCanEdit()
 
-    expect(result.current).toBe(false)
+    expect(result.current.canEdit).toBe(false)
   })
 })
