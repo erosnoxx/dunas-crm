@@ -343,6 +343,16 @@ describe("web", () => {
     expect(header.lastElementChild).toHaveClass("invisible")
   })
 
+  it("a barra de filtros quebra linha quando a largura da web não cabe tudo", async () => {
+    renderScreen()
+
+    const search = await screen.findByLabelText("Buscar modelo")
+    const bar = search.parentElement?.parentElement as HTMLElement
+
+    expect(bar).toHaveClass("md:flex-wrap")
+    expect(search.parentElement).toHaveClass("md:min-w-60")
+  })
+
   it('pagina com "Mostrando 1 a 20 de 25 modelos" e Próxima', async () => {
     const user = renderScreen()
     await screen.findByText("SUN2000-3KTL-L1")
