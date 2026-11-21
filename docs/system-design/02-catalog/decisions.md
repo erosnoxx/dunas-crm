@@ -56,7 +56,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Decisão:** um `CatalogSeeder` (contrato `Seeder<T>` do kernel) lê `seed/catalog.json` e grava **pelo domínio**. Só roda quando **não existe nenhum fabricante nem tipo**. **Nenhuma característica é inventada**: o conteúdo vem da lista do dono.
 
-**Consequência:** reiniciar não recria o que a equipe renomeou ou desativou, e modelo novo depois da carga vai à mão. Enquanto a lista não chega, o arquivo não existe e o seeder não roda (pendência em [`open-questions.md`](open-questions.md)).
+**Consequência:** reiniciar não recria o que a equipe renomeou ou desativou, e modelo novo depois da carga vai à mão. Enquanto a lista não chega, o arquivo existe vazio (`[]`) e o seeder não grava nada (pendência em [`open-questions.md`](open-questions.md)).
 
 ## ADR-8: fora desta rodada
 

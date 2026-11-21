@@ -27,7 +27,7 @@ Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `querie
 
 - **Pacote:** `...catalog.usecases.commands`. **Anotação:** `@UseCase`.
 - **Entrada:** ator, `name`.
-- **Pré-condições:** papel Administrador ou Comercial (`ForbiddenException`, `forbidden`). Nome ainda não usado, sem diferenciar maiúsculas (`ConflictException`, `manufacturer_name_taken`, traduzida pelo repository a partir do `UNIQUE`).
+- **Pré-condições:** papel Administrador ou Comercial (`ForbiddenException`, `forbidden`). Nome ainda não usado, sem diferenciar maiúsculas (`ConflictException`, `manufacturer_name_taken`: o use case confere antes, para a resposta amigável, e o `UNIQUE` do banco é a rede de segurança contra a corrida, que sai como 409 genérico).
 - **Fluxo:** `Manufacturer.register(name)`, salva.
 - **Retorno:** `UUIDResponse`.
 - **Endpoint:** `POST /catalog/manufacturers`.
