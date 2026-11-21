@@ -6,8 +6,11 @@ import { amountText } from "../amount"
 import type { EquipmentModelSummary } from "../catalog.service"
 import { CatalogStatusChip } from "./catalog-status"
 
-// As colunas da tabela na web: a linha e o cabeçalho usam a mesma grade.
+// As colunas da tabela na web: a linha e o cabeçalho usam a mesma grade, e o cabeçalho leva o
+// "Abrir" invisível (sem altura, para não mudar a do cabeçalho), para a coluna `auto` (e as
+// frações) terem a mesma largura nos dois.
 const COLUMNS = "md:grid-cols-[1fr_1.1fr_1.6fr_1.4fr_1fr_auto]"
+const OPEN = "text-body-sm font-semibold"
 
 /** O cabeçalho da tabela (só na web): `th` do mockup 1, `label` em `text-muted`. */
 function ModelTableHeader() {
@@ -24,7 +27,7 @@ function ModelTableHeader() {
       <span>Modelo</span>
       <span>Característica</span>
       <span>Situação</span>
-      <span />
+      <span className={cn(OPEN, "invisible h-0")}>Abrir</span>
     </div>
   )
 }
@@ -47,7 +50,7 @@ function ModelRow({ model }: { model: EquipmentModelSummary }) {
             COLUMNS,
           )}
         >
-          <span className="col-span-2 text-body font-semibold md:order-3 md:col-span-1 md:text-body-sm">
+          <span className="col-span-2 text-body font-semibold md:order-3 md:col-span-1 md:text-body-sm md:font-semibold">
             {model.name}
           </span>
           <span className="col-span-2 text-body-sm text-text-muted md:contents md:text-text">
@@ -61,7 +64,7 @@ function ModelRow({ model }: { model: EquipmentModelSummary }) {
           <span className="mt-2 justify-self-end md:order-5 md:mt-0 md:justify-self-start">
             <CatalogStatusChip status={model.status} />
           </span>
-          <span className="text-body-sm font-semibold text-brand-text max-md:hidden md:order-6">
+          <span className={cn(OPEN, "text-brand-text max-md:hidden md:order-6")}>
             Abrir
           </span>
         </span>

@@ -330,6 +330,19 @@ describe("web", () => {
     expect(within(row("SUN2000-3KTL-L1")).getByText("Abrir")).toBeVisible()
   })
 
+  it("o nome do modelo sai em peso 600 e o cabeçalho tem Abrir invisível na última coluna, para alinhar", async () => {
+    renderScreen()
+    await screen.findByText("SUN2000-3KTL-L1")
+
+    // `md:text-body-sm` traz o peso 400 do token e vence o `font-semibold` sem variante.
+    expect(within(row("SUN2000-3KTL-L1")).getByText("SUN2000-3KTL-L1")).toHaveClass(
+      "md:font-semibold",
+    )
+    const header = screen.getByText("Característica").parentElement as HTMLElement
+    expect(header.lastElementChild).toHaveTextContent("Abrir")
+    expect(header.lastElementChild).toHaveClass("invisible")
+  })
+
   it('pagina com "Mostrando 1 a 20 de 25 modelos" e Próxima', async () => {
     const user = renderScreen()
     await screen.findByText("SUN2000-3KTL-L1")

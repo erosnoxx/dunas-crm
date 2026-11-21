@@ -368,6 +368,10 @@ describe("novo modelo", () => {
       "href",
       "/catalogo",
     )
+    // `md:text-body-sm` traz o peso 400 do token; o botão é 600 (mockup 3).
+    expect(screen.getByRole("button", { name: "Salvar modelo" })).toHaveClass(
+      "md:font-semibold",
+    )
   })
 })
 
@@ -621,5 +625,18 @@ describe("editar modelo", () => {
     expect(
       screen.getByRole("complementary", { name: "Situação do modelo" }),
     ).toBeInTheDocument()
+  })
+
+  it("web: Reativar modelo fica em peso 600", async () => {
+    setDesktop(true)
+    vi.mocked(service.getEquipmentModel).mockResolvedValue({
+      ...SUN,
+      status: "DEACTIVATED",
+    })
+    renderForm("/catalogo/modelos/m1")
+
+    expect(await screen.findByRole("button", { name: "Reativar modelo" })).toHaveClass(
+      "md:font-semibold",
+    )
   })
 })

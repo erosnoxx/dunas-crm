@@ -323,6 +323,25 @@ describe("web", () => {
     expect(button("Salvar fabricante").parentElement).not.toHaveClass("fixed")
   })
 
+  it("Salvar fabricante fica em peso 600 (o `md:text-body-sm` traz o 400 do token)", async () => {
+    renderPanel("/catalogo/fabricantes/novo")
+
+    expect(await screen.findByRole("button", { name: "Salvar fabricante" })).toHaveClass(
+      "md:font-semibold",
+    )
+  })
+
+  it("Reativar fabricante fica em peso 600", async () => {
+    vi.mocked(service.listManufacturers).mockResolvedValue(
+      page([{ ...HUAWEI, status: "DEACTIVATED" }]),
+    )
+    renderPanel("/catalogo/fabricantes/f-huawei")
+
+    expect(
+      await screen.findByRole("button", { name: "Reativar fabricante" }),
+    ).toHaveClass("md:font-semibold")
+  })
+
   it("a edição tem Cancelar, que leva para a lista", async () => {
     const user = renderPanel("/catalogo/fabricantes/f-huawei")
 

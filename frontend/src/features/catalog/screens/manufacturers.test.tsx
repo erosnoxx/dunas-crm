@@ -216,6 +216,37 @@ describe("web", () => {
     expect(within(row("Huawei")).getByText("Editar")).toBeVisible()
   })
 
+  it("o nome sai em peso 600 e o chip fica do tamanho do texto, sem esticar na coluna", async () => {
+    renderScreen()
+    await screen.findByText("Huawei")
+
+    // `md:text-body-sm` traz o peso 400 do token e vence o `font-semibold` sem variante.
+    expect(within(row("Huawei")).getByText("Huawei")).toHaveClass("md:font-semibold")
+    // O chip ativo é o próprio rótulo; o que fica na célula da grade é o invólucro dele.
+    expect(within(row("Huawei")).getByText("Ativo").parentElement).toHaveClass(
+      "md:justify-self-start",
+    )
+  })
+
+  it("o cabeçalho tem na última coluna o mesmo conteúdo da linha, invisível, para as colunas alinharem", async () => {
+    renderScreen()
+    await screen.findByText("Huawei")
+
+    const header = screen.getByText("Situação").parentElement as HTMLElement
+
+    expect(header.lastElementChild).toHaveTextContent("Editar")
+    expect(header.lastElementChild).toHaveClass("invisible")
+  })
+
+  it("Técnico: sem Editar, o cabeçalho também deixa a última coluna vazia", async () => {
+    renderScreen("/catalogo/fabricantes", false)
+    await screen.findByText("Huawei")
+
+    const header = screen.getByText("Situação").parentElement as HTMLElement
+
+    expect(header.lastElementChild).toBeEmptyDOMElement()
+  })
+
   it("a lista e o painel Novo fabricante ficam lado a lado, sem botão de abrir", async () => {
     renderScreen()
 
