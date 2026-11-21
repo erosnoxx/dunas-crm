@@ -7,9 +7,9 @@ import { toast } from "sonner"
 import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
 import { Alert } from "@/shared/ui/alert"
 import { Form, FormField } from "@/shared/ui/form"
+import { MobileHeader } from "@/shared/ui/mobile-header"
 import { Panel } from "@/shared/ui/panel"
 
-import { MobileHeader } from "../components/mobile-header"
 import { AuthShell } from "../components/auth-shell"
 import {
   NewPasswordFields,

@@ -1,5 +1,6 @@
 import {
   keepPreviousData,
+  useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
@@ -40,6 +41,18 @@ export function useEquipmentModels(input: ListModelsInput) {
   return useQuery({
     queryKey: [...keys.models, "list", input],
     queryFn: () => service.listEquipmentModels(input),
+    placeholderData: keepPreviousData,
+  })
+}
+
+/** Páginas acumuladas (celular, "Carregar mais"). Mesma raiz `["catalog", "models"]`: a invalidação cobre as duas. */
+export function useInfiniteEquipmentModels(input: Omit<ListModelsInput, "page">) {
+  return useInfiniteQuery({
+    queryKey: [...keys.models, "infinite", input],
+    queryFn: ({ pageParam }) =>
+      service.listEquipmentModels({ ...input, page: pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (last) => (last.page + 1 < last.totalPages ? last.page + 1 : null),
     placeholderData: keepPreviousData,
   })
 }

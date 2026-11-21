@@ -21,15 +21,25 @@ export const equipmentTypeSchema = z.object({
   required: z.boolean(),
 })
 
+const amount = (optional: boolean) =>
+  z.string().superRefine((value, context) => {
+    if (optional && value === "") return
+
+    const parsed = parseAmount(value)
+
+    if (!parsed.ok) context.addIssue({ code: "custom", message: parsed.reason })
+  })
+
 export const equipmentModelSchema = z.object({
   manufacturerId: z.string().min(1, "escolha o fabricante"),
   typeId: z.string().min(1, "escolha o tipo"),
   name: name("o nome", 1, 80),
-  amount: z.string().superRefine((value, context) => {
-    const parsed = parseAmount(value)
+  amount: amount(false),
+})
 
-    if (!parsed.ok) context.addIssue({ code: "custom", message: parsed.reason })
-  }),
+/** O mesmo, para o tipo cuja característica não é obrigatória: o valor vazio vale. */
+export const optionalAmountModelSchema = equipmentModelSchema.extend({
+  amount: amount(true),
 })
 
 export type ManufacturerValues = z.infer<typeof manufacturerSchema>

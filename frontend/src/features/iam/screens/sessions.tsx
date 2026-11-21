@@ -3,8 +3,8 @@ import { Loader2Icon } from "lucide-react"
 import type { ApiError } from "@/shared/api/api-error"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
+import { MobileHeader } from "@/shared/ui/mobile-header"
 
-import { MobileHeader } from "../components/mobile-header"
 import { SessionItem } from "../components/session-item"
 import {
   useCurrentUser,

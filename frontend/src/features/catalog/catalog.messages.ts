@@ -1,3 +1,5 @@
+import { UNKNOWN_ERROR_MESSAGE, type ApiError } from "@/shared/api/api-error"
+
 import type { CatalogStatus, Unit } from "./catalog.service"
 
 /**
@@ -29,6 +31,13 @@ const MESSAGES: Record<string, string> = {
 
 export function messageFor(code: string | undefined, fallback: string): string {
   return (code !== undefined && MESSAGES[code]) || fallback
+}
+
+/** A mensagem de um erro da API para o aviso: pelo `code`, senão a da própria API; a frase começa com maiúscula. */
+export function errorMessage(error: Partial<ApiError>): string {
+  const text = messageFor(error.code, error.message || UNKNOWN_ERROR_MESSAGE)
+
+  return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
 export const LABELS: {

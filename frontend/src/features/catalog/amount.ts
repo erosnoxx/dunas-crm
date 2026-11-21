@@ -1,3 +1,6 @@
+import { LABELS } from "./catalog.messages"
+import type { EquipmentModelSummary } from "./catalog.service"
+
 const FORMAT = /^\d{1,9}(,\d{1,3})?$/
 
 export type ParsedAmount = { ok: true; value: string } | { ok: false; reason: string }
@@ -8,8 +11,8 @@ export function parseAmount(input: string): ParsedAmount {
   if (!FORMAT.test(input))
     return {
       ok: false,
-      reason:
-        "use só dígitos e uma vírgula, com até 9 inteiros e 3 decimais, sem ponto nem espaço",
+      // Texto do Review Focus 1 do plano: o ponto de milhar do pt-BR é recusado, não adivinhado.
+      reason: "use só números e vírgula, com até 9 inteiros e 3 decimais",
     }
 
   const value = input.replace(",", ".")
@@ -27,3 +30,7 @@ export function formatAmount(value: string | number): string {
 
   return trimmed.replace(".", ",")
 }
+
+/** O valor da característica com a unidade ("3 kW", "12000 BTU/h"). */
+export const amountText = (value: EquipmentModelSummary["values"][number]) =>
+  `${formatAmount(value.amount)} ${LABELS.unit[value.unit]}`

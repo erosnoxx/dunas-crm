@@ -7,6 +7,19 @@ import { Label } from "@/shared/ui/label"
 import { LABELS } from "../catalog.messages"
 import type { EquipmentTypeSummary } from "../catalog.service"
 
+/** Erro sob o campo, como no mockup 4: ícone e texto `body-sm` em `danger-text`, não só cor. */
+function FieldError({ id, children }: { id: string; children: React.ReactNode }) {
+  return (
+    <p id={id} className="flex items-start gap-1.5 text-body-sm text-danger-text">
+      <CircleAlertIcon
+        aria-hidden="true"
+        className="mt-0.5 size-4.5 shrink-0 text-danger"
+      />
+      {children}
+    </p>
+  )
+}
+
 type ModelValuesFieldsProps = {
   /** O tipo escolhido; sem ele não há o que preencher e nada é desenhado. */
   type: EquipmentTypeSummary | undefined
@@ -73,18 +86,7 @@ function ModelValuesFields({ type, value, onChange, error }: ModelValuesFieldsPr
             {LABELS.unit[characteristic.unit]}
           </span>
         </div>
-        {error && (
-          <p
-            id={errorId}
-            className="flex items-start gap-1.5 text-body-sm text-danger-text"
-          >
-            <CircleAlertIcon
-              aria-hidden="true"
-              className="mt-0.5 size-4.5 shrink-0 text-danger"
-            />
-            {error}
-          </p>
-        )}
+        {error && <FieldError id={errorId}>{error}</FieldError>}
         <p id={hintId} className="hidden text-caption text-text-muted md:block">
           O campo e a unidade vêm do tipo escolhido. Ao trocar o tipo, o campo muda.
         </p>
@@ -93,4 +95,4 @@ function ModelValuesFields({ type, value, onChange, error }: ModelValuesFieldsPr
   )
 }
 
-export { ModelValuesFields }
+export { FieldError, ModelValuesFields }

@@ -12,6 +12,10 @@ export default [
       route("convidar", "routes/usuarios.convidar.tsx"),
       route(":id", "routes/usuarios.$id.tsx"),
     ]),
+    route("catalogo", "routes/catalogo._index.tsx"),
+    // Estática antes de `:id`: `/catalogo/modelos/novo` não vira o modelo "novo".
+    route("catalogo/modelos/novo", "routes/catalogo.modelos.novo.tsx"),
+    route("catalogo/modelos/:id", "routes/catalogo.modelos.$id.tsx"),
     route("conta/sessoes", "routes/conta.sessoes.tsx"),
     route("conta/trocar-senha", "routes/conta.trocar-senha.tsx"),
   ]),
