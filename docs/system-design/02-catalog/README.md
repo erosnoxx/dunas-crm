@@ -44,8 +44,8 @@ Brainstorming com o usuário em 2026-11-20 e 2026-11-21 (decisões em [`decision
 
 ## Critério de aceite
 
-- [ ] `mvn test` passa, a partir de `backend/` (inclui os testes de arquitetura)
+- [x] `mvn test` passa, a partir de `backend/` (inclui os testes de arquitetura e o ponta a ponta do catálogo)
 - [ ] Artefato visual em `design/` gerado e aprovado antes de fechar `domain-model.md`/`usecases.md` (13 telas aprovadas em 2026-11-21)
 - [ ] Plano de implementação em `docs/plans/` e executado
 - [ ] Comparação mockup × resultado, tela a tela, com as divergências reportadas
-- [ ] Seeder aplicado uma vez e idempotente (reiniciar o app não recria nem sobrescreve)
+- [x] Seeder aplicado uma vez e idempotente (reiniciar o app não recria nem sobrescreve)
