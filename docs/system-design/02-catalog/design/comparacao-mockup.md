@@ -2,7 +2,7 @@
 
 Etapa de comparação da regra 7 ([`docs/CLAUDE.md`](../../../CLAUDE.md)): cada tela do catálogo, em 390 px (celular) e 1280 px (web), contra os 13 artboards aprovados do canvas ([`README.md`](README.md)), na cobertura do plano ([`2026-11-21-catalog-frontend.md`](../../../plans/2026-11-21-catalog-frontend.md), "Cobertura dos mockups"). Feita em 2026-11-21, com o frontend servido pelo servidor de desenvolvimento do Vite e ligado ao backend real do catálogo (Postgres, Redis e um coletor de e-mail locais, descartáveis).
 
-Nada aqui é aceito em silêncio: o que diverge está nas seções 4 a 7, **para o usuário decidir**. Esta etapa não mudou código de produto: os defeitos achados estão na seção 3, com a recomendação.
+Nada aqui é aceito em silêncio: o que diverge está nas seções 4 a 7, **para o usuário decidir**. Os defeitos achados estão na seção 3, corrigidos e medidos de novo no navegador, com o valor de antes e o de depois.
 
 ## 1. Como foi comparado
 
@@ -11,32 +11,33 @@ Nada aqui é aceito em silêncio: o que diverge está nas seções 4 a 7, **para
 - **Visual: as capturas do resultado foram olhadas**, e as do chip de situação foram ampliadas 6× lado a lado com o artboard. Nenhuma comparação pixel a pixel.
 - **Teclado:** em cada tela e tamanho, `Tab` até dar a volta, anotando a ordem, o anel de foco computado e a altura do alvo.
 - **Fluxos:** exercidos de verdade na tela (cliques e digitação reais), contra o backend, e conferidos pela API (seção 9).
+- **Nova medição, depois das correções da seção 3:** a mesma rotina (Chrome headless pelo DevTools protocol, `getComputedStyle` e `getBoundingClientRect`, capturas ampliadas do chip), com o backend de `develop` e Postgres, Redis e coletor de e-mail descartáveis, os dados com os nomes do mockup, em 390, 768, 1024 e 1280. Cada item foi medido duas vezes na mesma sessão, com o código antes e depois da correção; os valores estão na seção 3 e na seção 10.
 
 Dados de teste: criados pela API com os nomes do próprio mockup (Huawei, Fabricante B, Fabricante C desativado; Inversor com Potência em kW e Ar-condicionado com Capacidade em BTU/h; SUN2000-3KTL-L1, -5KTL-L1, -8KTL-M1 desativado, Split Inverter 12.000 e 18.000 BTU), para os textos coincidirem; os fluxos criaram outros (Sungrow, Painel solar, Bateria, SG5.0RS, ...). Usuários pelo fluxo do IAM: o Administrador semeado (troca a senha inicial) e um Técnico convidado, com o convite lido no coletor de e-mail e aceito. O avatar e o nome da conta diferem do mockup ("M", "Marina Costa").
 
 Onde o mockup 1 e o 2 mostram um modelo desativado com o filtro "Ativos", o resultado foi medido com "Todos" (com "Ativos" a lista real não traz o desativado).
 
-## 2. Corrigido durante a comparação
+## 2. Corrigido depois da comparação
 
-Nada: esta etapa não muda código de produto. Os defeitos estão na seção 3, as divergências nas seções 4 a 7.
+Os cinco defeitos da seção 3, o alvo de 18 px do "Editar" na tabela de tipos (seção 8) e as duas larguras de 768 px que rolavam a página inteira (seção 10). Todos foram medidos de novo no navegador; todos, menos o `relative` da lista de tipos (seção 10), têm teste de tela ou de componente. As divergências das seções 5 a 7 não mudaram.
 
-## 3. Defeitos encontrados
+## 3. Defeitos encontrados (corrigidos)
 
-Medidos no navegador; cada um tem a causa e a correção recomendada. Nenhum foi corrigido aqui.
+Medidos no navegador antes e depois da correção, na mesma sessão e com os mesmos dados.
 
-| # | Defeito | Onde | Evidência | Recomendação |
-|---|---|---|---|---|
-| D1 | O círculo **cheio** do chip "Ativo" sai como um **quadrado de cantos arredondados** | todo `StatusChip` de tom `ok` (catálogo **e** IAM: "Ativo" da lista de usuários) | captura ampliada 6×; o `Glyph` desenha `circle r=5` com traço de 1,6 numa caixa de 10×10: o traço sai da caixa e o SVG corta as bordas | raio 4 no cheio, como no vazado (ou `overflow="visible"`); teste que confira o raio |
-| D2 | Botões principais da **web** em peso **400**; o mockup é 600 | "Salvar modelo", "Salvar alterações" (modelo, fabricante, tipo), "Salvar fabricante", "Salvar tipo", "Reativar modelo", "Reativar fabricante" ("Reativar tipo" usa a mesma classe; não medido) | medido 14/20 **400** (mockup `font:600 14px`) | a classe `md:text-body-sm` (`WEB_BUTTON` em `panel-frame.tsx` e `model-form.tsx`) sai **depois** de `font-semibold` no CSS, por ser variante de mídia, e traz o peso 400 do token: somar `md:font-semibold`, como já faz o "Novo modelo" (`models.tsx`, medido 600) |
-| D3 | Nome na linha da **tabela web** em peso **400**; o mockup é 600 | lista de modelos (coluna Modelo) e de fabricantes (coluna Fabricante) | medido 14/20 **400** (mockup `font-weight:600`); no celular o nome do cartão sai 16/24 600, correto | a mesma causa de D2 (`md:text-body-sm` em `model-row.tsx` e `manufacturer-row.tsx`): `md:font-semibold`. A tabela de tipos (`<td>` com `font-semibold` sem variante) sai 600, correta |
-| D4 | Na tabela web de **fabricantes**, o chip de situação **estica** até a largura da coluna (159 px; o mockup tem 65 e 105) e o "Desativado" fica **quebrado**: a camada do contorno estica e o rótulo não, e sobra um bloco `line-strong` à direita | `/catalogo/fabricantes` na web | medido e visto na captura ampliada | o chip é item direto da grade e herda `justify-self: stretch`: envolver em `span` com `md:justify-self-start`, como a `ModelRow` já faz |
-| D5 | O **cabeçalho** das tabelas web de modelos e de fabricantes **não alinha** com as colunas das linhas | `/catalogo` e `/catalogo/fabricantes` na web | fabricantes: "Modelos" do cabeçalho em x=542, o número em 524; "Situação" em 680, o chip em 653. Modelos: desvios de 6 a 27 px ("Situação" 1072, chip 1045) | o cabeçalho e a linha usam a mesma `grid-cols-[...auto]`, mas a última coluna (`auto`) tem 0 px no cabeçalho (vazia) e a largura de "Editar"/"Abrir" na linha, e as frações mudam: dar à última coluna do cabeçalho o mesmo conteúdo invisível ou uma largura fixa nos dois |
+| # | Defeito | Onde | Antes (medido) | Correção | Depois (medido) |
+|---|---|---|---|---|---|
+| D1 | O círculo **cheio** do chip "Ativo" saía como um **quadrado de cantos arredondados** | todo `StatusChip` de tom `ok` (catálogo **e** IAM: "Ativo" da lista de usuários) | `circle r=5` com traço de 1,6 numa caixa de 10×10: o traço saía da caixa e o SVG cortava as bordas; captura ampliada 6×: quadrado | raio 4 em todas as formas (o vazado e o cortado já usavam 4); teste confere que raio e traço cabem na caixa | `r=4` em 390 e 1280 (modelos, fabricantes, tipos, modelo, usuários do IAM); capturas ampliadas: **círculo**, no catálogo e no IAM. O vazado e o cortado não mudaram |
+| D2 | Botões principais da **web** em peso **400**; o mockup é 600 | "Salvar modelo", "Salvar alterações" (modelo, fabricante, tipo), "Salvar fabricante", "Salvar tipo", "Reativar modelo", "Reativar fabricante", "Reativar tipo" | 14/20 **400** em todos os nove (o "Reativar tipo" medido agora: 400 também) | `md:font-semibold` no `WEB_BUTTON` de `panel-frame.tsx` e de `model-form.tsx`: o `md:text-body-sm` é variante de mídia, sai depois do `font-semibold` e trazia o peso 400 do token | 14/20 **600** nos nove; altura 44 mantida |
+| D3 | Nome na linha da **tabela web** em peso **400**; o mockup é 600 | lista de modelos (coluna Modelo) e de fabricantes (coluna Fabricante) | 14/20 **400** | a mesma causa de D2: `md:font-semibold` em `model-row.tsx` e `manufacturer-row.tsx` | 14/20 **600**; no celular o nome do cartão segue 16/24 600 |
+| D4 | Na tabela web de **fabricantes**, o chip de situação **esticava** até a largura da coluna e o "Desativado" ficava **quebrado** (bloco `line-strong` sobrando à direita) | `/catalogo/fabricantes` na web | chip de 158,8 px nos dois ("Ativo" e "Desativado") | o chip ganha um `span` com `md:justify-self-start`, como na `ModelRow` | "Ativo" **73** px, "Desativado" **111,4** px com o rótulo de 109,4 dentro (contorno de 1 px em volta, sem sobra); o mockup tem 65 e 105 (diferença do respiro do `StatusChip`, seção 5). Cartões do celular iguais (74 px, chip à direita) |
+| D5 | O **cabeçalho** das tabelas web de modelos e de fabricantes **não alinhava** com as colunas das linhas | `/catalogo` e `/catalogo/fabricantes` na web | fabricantes: desvios de 0, 17,7 e 26,6 px ("Modelos" 541,5 × número 523,8; "Situação" 679,8 × chip 653,2). Modelos: 0, 5,3, 11,2, 19,8 e 27,4 px ("Situação" 1072,4 × chip 1045) | o cabeçalho leva na última coluna (`auto`) o "Abrir"/"Editar" da linha, invisível e sem altura: a coluna e as frações ficam iguais nos dois (o Técnico, sem "Editar", fica com a coluna vazia nos dois) | **0 px** em todas as colunas das duas tabelas; as linhas também coincidem entre si (cinco modelos, três fabricantes); cabeçalho com os mesmos 43 px |
 
-D1 também afeta o IAM (componente compartilhado): a correção muda a lista de usuários, que a comparação do IAM deu como igual.
+D1 também afeta o IAM (componente compartilhado): a lista de usuários, que a comparação do IAM deu como igual, passa a ter o círculo.
 
 ## 4. Tela a tela
 
-Legenda do status: ✅ os valores medidos coincidem com os do artboard; ⚠️ coincidem, salvo divergências aprovadas, aproximações sem token ou divergências para o usuário decidir (seções 5 a 7); ❌ tem defeito da seção 3. "Derivada" = sem artboard no tamanho: comparada com o artboard mais próximo e listada na seção 7.
+Legenda do status: ✅ os valores medidos coincidem com os do artboard; ⚠️ coincidem, salvo divergências aprovadas, aproximações sem token ou divergências para o usuário decidir (seções 5 a 7); ❌ tem defeito da seção 3. "Derivada" = sem artboard no tamanho: comparada com o artboard mais próximo e listada na seção 7. As linhas que eram ❌ só por D1 a D5 passaram a ⚠️ com a nova medição; "(era ❌: D…)" diz qual defeito saiu.
 
 Valores comuns, medidos iguais ao mockup em todas as telas onde aparecem, e não repetidos nas linhas: título "Catálogo" 36/40 peso 700 (web); barra superior do celular 64 px `nav` com borda `line` e título 24/28; abas da web 14 peso 600 `text-muted`, ativa em `brand-text` com traço de 3 px, faixa de 47 px com linha `line`; controle segmentado do celular 3 × 44 px com contorno `line-strong`, ativa em `chip-ok`; rótulos 13/18 peso 600; busca e filtros 44 px `panel` com borda `line-strong` nas listas; campos dos formulários 44 px `ground` na web e 48 px `panel` no celular (variante `compact`, aprovada); cartões do celular `panel` com borda `line`, respiro 14/16, nome 16 peso 600, apoio 14/20 `text-muted`, característica 16 peso 600 Chakra Petch; botão principal da web 44 px corte 10, do celular 48 px corte 12 no rodapé; barra inferior `nav` com borda `line`, rótulo 12/16 peso 600, ativo em `brand-text`.
 
@@ -44,8 +45,8 @@ Valores comuns, medidos iguais ao mockup em todas as telas onde aparecem, e não
 
 | Tamanho | Artboard | Comparado | Status | Resultado |
 |---|---|---|---|---|
-| 1280 | 1 `Main` | filtros (busca, Tipo 200, Situação 180, "Novo modelo" 44 corte 10 peso 600); tabela `panel`, cabeçalho 13/18 600 `text-muted`, linhas com borda `line`, "Abrir" 14 peso 600 `brand-text` | ❌ | nome do modelo 400 (D3), círculo cheio quadrado (D1), cabeçalho desalinhado (D5); característica 16 (mockup 14), "12000" (mockup "12.000"), chip com corte, seta do lucide, linha 56 px (mockup 57 com a borda), rodapé de paginação no lugar da nota "5 modelos." (seção 5) |
-| 390 | 2 `Modelos-celular` | controle segmentado, busca 44, filtros 44 lado a lado em 14 px, cartões 112 px, "Novo modelo" 48 fixo acima da barra inferior, barra com 2 itens | ❌ | círculo quadrado (D1); chip com corte, "12000", rótulo acessível da barra "Principal no celular", item da barra 63 px (mockup 64), "Mostrando 5 de 5 modelos" e "Carregar mais" sob os cartões (seção 5) |
+| 1280 | 1 `Main` | filtros (busca, Tipo 200, Situação 180, "Novo modelo" 44 corte 10 peso 600); tabela `panel`, cabeçalho 13/18 600 `text-muted`, linhas com borda `line`, "Abrir" 14 peso 600 `brand-text` | ⚠️ (era ❌: D1, D3, D5) | nome do modelo 600, círculo, cabeçalho alinhado (0 px); característica 16 (mockup 14), "12000" (mockup "12.000"), chip com corte, seta do lucide, linha 56 px (mockup 57 com a borda), rodapé de paginação no lugar da nota "5 modelos." (seção 5) |
+| 390 | 2 `Modelos-celular` | controle segmentado, busca 44, filtros 44 lado a lado em 14 px, cartões 112 px, "Novo modelo" 48 fixo acima da barra inferior, barra com 2 itens | ⚠️ (era ❌: D1) | chip com corte, "12000", rótulo acessível da barra "Principal no celular", item da barra 63 px (mockup 64), "Mostrando 5 de 5 modelos" e "Carregar mais" sob os cartões (seção 5) |
 | 390 | 13 `Modelos-sem-resultado-celular` | busca "XPTO-9000"; painel `panel` com ícone, título, texto 14/20 `text-muted` com a busca entre aspas, "Limpar busca e filtros" 44 px `brand-text`; "Novo modelo"; barra inferior | ⚠️ | título 24/28 (mockup 20/24, sem token) |
 | 1280 | derivada (13) | sem resultado na web | ⚠️ | o painel do 13 centralizado na largura da lista, título 24/28 |
 | 390 e 1280 | derivada (13) | catálogo sem modelos | ⚠️ | "Nenhum modelo encontrado" e "O catálogo ainda não tem modelos ativos. Cadastre o primeiro.", sem "Limpar" (seção 6) |
@@ -54,50 +55,50 @@ Valores comuns, medidos iguais ao mockup em todas as telas onde aparecem, e não
 
 | Tamanho | Artboard | Comparado | Status | Resultado |
 |---|---|---|---|---|
-| 390 | 12 `Modelos-tecnico-celular` | aviso `chip-ok` 14/20 com ícone "Seu papel (Técnico) consulta o catálogo..."; cartões; sem "Novo modelo"; barra inferior com um item na largura toda (390 px) | ❌ | círculo quadrado (D1); os filtros Tipo e Situação aparecem (o 12 não os tem); avatar da casca (seção 5) |
-| 1280 | derivada (1, 12) | lista com o aviso, sem "Novo modelo" | ❌ | D1, D3, D5 como na lista do Administrador |
+| 390 | 12 `Modelos-tecnico-celular` | aviso `chip-ok` 14/20 com ícone "Seu papel (Técnico) consulta o catálogo..."; cartões; sem "Novo modelo"; barra inferior com um item na largura toda (390 px) | ⚠️ (era ❌: D1) | os filtros Tipo e Situação aparecem (o 12 não os tem); avatar da casca (seção 5) |
+| 1280 | derivada (1, 12) | lista com o aviso, sem "Novo modelo" | ⚠️ (era ❌: D1, D3, D5) | as divergências da lista do Administrador (seção 5) |
 
 ### Novo modelo
 
 | Tamanho | Artboard | Comparado | Status | Resultado |
 |---|---|---|---|---|
-| 1280 | 3 `Novo-modelo-web` | "Modelos" de volta 14 peso 600, 44 px; título 36/40; painel `panel` até 640, respiro 24, espaço 20; Fabricante, Tipo e Nome 44 `ground`; seção "Características do tipo Inversor" com linha `line` e título 13/18 `text-muted`; "Potência *" com sufixo "kW" `chip-ok` 14 peso 600; "Cancelar" `chip-ok` e "Salvar modelo" 44 corte 10 à direita | ❌ | "Salvar modelo" peso 400 (D2); dicas 12/16 peso 500 (mockup 400), seta do lucide |
+| 1280 | 3 `Novo-modelo-web` | "Modelos" de volta 14 peso 600, 44 px; título 36/40; painel `panel` até 640, respiro 24, espaço 20; Fabricante, Tipo e Nome 44 `ground`; seção "Características do tipo Inversor" com linha `line` e título 13/18 `text-muted`; "Potência *" com sufixo "kW" `chip-ok` 14 peso 600; "Cancelar" `chip-ok` e "Salvar modelo" 44 corte 10 à direita | ⚠️ (era ❌: D2) | "Salvar modelo" 600; dicas 12/16 peso 500 (mockup 400), seta do lucide |
 | 390 | 4 `Novo-modelo-celular` | Fabricante B, Ar-condicionado e nome repetido, enviado ao backend real: campo com borda 2 px `danger` e respiro 11, mensagem 14/20 `danger-text` com ícone; "Capacidade *" com "BTU/h"; "Salvar modelo" 48 no rodapé `nav` | ⚠️ | texto do erro: a frase da tabela de erros, minúscula e sem "Abra o existente ou use outro nome." (seção 5) |
 | 390 | derivada (4) | inversor: "Potência *" e "kW" | ⚠️ | valores do 4 |
-| 1280 | derivada (3, 4) | o erro do nome na web | ❌ | o erro do 4 no painel de 640; "Salvar modelo" peso 400 (D2) |
+| 1280 | derivada (3, 4) | o erro do nome na web | ⚠️ (era ❌: D2) | o erro do 4 no painel de 640 |
 
 ### Modelo ativo (editar, desativar)
 
 | Tamanho | Artboard | Comparado | Status | Resultado |
 |---|---|---|---|---|
-| 1280 | 5 `Modelo-web` | formulário 640 e situação 340 lado a lado (espaço 24); Fabricante e Tipo só leitura 44 `nav` com borda `line` e texto `text-muted`; dica "Fabricante e tipo não mudam..."; painel "Situação" com chip, texto 14/20 e "Desativar modelo" 14 peso 600 `danger-text` 44 px | ❌ | "Salvar alterações" peso 400 (D2), círculo quadrado (D1); a dica "O campo e a unidade vêm do tipo escolhido..." aparece sob a Potência (o 5 não a tem; formulário 22 px mais alto) |
-| 390 | derivada (4) | Fabricante e Tipo só leitura 48 px, painel de situação `panel` respiro 16 com "Desativar modelo", "Salvar alterações" no rodapé | ❌ | círculo quadrado (D1) |
-| 390 e 1280 | derivada (5, 6) | visão do Técnico: só leitura, sem "Salvar", "Cancelar" nem "Desativar" | ❌ | círculo quadrado (D1) |
+| 1280 | 5 `Modelo-web` | formulário 640 e situação 340 lado a lado (espaço 24); Fabricante e Tipo só leitura 44 `nav` com borda `line` e texto `text-muted`; dica "Fabricante e tipo não mudam..."; painel "Situação" com chip, texto 14/20 e "Desativar modelo" 14 peso 600 `danger-text` 44 px | ⚠️ (era ❌: D1, D2) | "Salvar alterações" 600, círculo; a dica "O campo e a unidade vêm do tipo escolhido..." aparece sob a Potência (o 5 não a tem; formulário 22 px mais alto) |
+| 390 | derivada (4) | Fabricante e Tipo só leitura 48 px, painel de situação `panel` respiro 16 com "Desativar modelo", "Salvar alterações" no rodapé | ⚠️ (era ❌: D1) | derivada (seção 7) |
+| 390 e 1280 | derivada (5, 6) | visão do Técnico: só leitura, sem "Salvar", "Cancelar" nem "Desativar" | ⚠️ (era ❌: D1) | derivada (seção 7) |
 
 ### Modelo desativado
 
 | Tamanho | Artboard | Comparado | Status | Resultado |
 |---|---|---|---|---|
 | 390 | 6 `Modelo-desativado-celular` | chip vazado; painel `panel` respiro 16 espaço 14, rótulos 13/18 `text-muted`, valores 16 (Potência em Chakra Petch 600); nota 14/20; "Reativar modelo" 48 no rodapé | ⚠️ | título 24/28 (mockup 22/28, sem token); chip com corte |
-| 1280 | derivada (5, 6) | dados em lista (rótulo `text-muted`, valor `text`), painel de situação com o chip, a nota e "Reativar modelo" | ❌ | "Reativar modelo" peso 400 (D2) |
+| 1280 | derivada (5, 6) | dados em lista (rótulo `text-muted`, valor `text`), painel de situação com o chip, a nota e "Reativar modelo" | ⚠️ (era ❌: D2) | "Reativar modelo" 600; derivada (seção 7) |
 
 ### Fabricantes
 
 | Tamanho | Artboard | Comparado | Status | Resultado |
 |---|---|---|---|---|
-| 1280 | 7 `Fabricantes-web` | lista + painel 340 "Novo fabricante" (título 20/24 Chakra Petch 600, "Nome *" 44 `ground`, dica, "Salvar fabricante" 44 corte 10 à esquerda); colunas Fabricante, Modelos, Situação | ❌ | nome 400 (D3), chip esticado e "Desativado" quebrado (D4), cabeçalho desalinhado (D5), "Salvar fabricante" 400 (D2); número 16 (mockup 14), dica peso 500, ordem alfabética (seção 5) |
-| 390 | 8 `Fabricantes-celular` | cartões 74 px (64 de mínimo) com nome, "3 modelos" / "Nenhum modelo" e chip à direita; "Novo fabricante" 48 | ❌ | círculo quadrado (D1); chip com corte |
+| 1280 | 7 `Fabricantes-web` | lista + painel 340 "Novo fabricante" (título 20/24 Chakra Petch 600, "Nome *" 44 `ground`, dica, "Salvar fabricante" 44 corte 10 à esquerda); colunas Fabricante, Modelos, Situação | ⚠️ (era ❌: D1 a D5) | nome 600, chip de 73 e 111,4 px sem esticar, cabeçalho alinhado (0 px), "Salvar fabricante" 600; número 16 (mockup 14), chip com corte e respiro do `StatusChip` (mockup 65 e 105), dica peso 500, ordem alfabética (seção 5) |
+| 390 | 8 `Fabricantes-celular` | cartões 74 px (64 de mínimo) com nome, "3 modelos" / "Nenhum modelo" e chip à direita; "Novo fabricante" 48 | ⚠️ (era ❌: D1) | chip com corte |
 | 390 | derivada (11) | "Novo fabricante" em tela cheia: campo 48, dica, "Salvar fabricante" no rodapé | ⚠️ | dica peso 500 |
-| 1280 | derivada (7) | "Editar fabricante" no painel, "Cancelar", seção "Situação" com "Desativar fabricante" `danger-text`; desativado: nome só leitura `nav`, nota e "Reativar fabricante" | ❌ | "Salvar alterações" e "Reativar fabricante" peso 400 (D2), D1, D3, D4, D5 na lista ao lado |
-| 390 | derivada (11) | editar e desativado em tela cheia | ❌ | círculo quadrado (D1) |
+| 1280 | derivada (7) | "Editar fabricante" no painel, "Cancelar", seção "Situação" com "Desativar fabricante" `danger-text`; desativado: nome só leitura `nav`, nota e "Reativar fabricante" | ⚠️ (era ❌: D1 a D5) | "Salvar alterações" e "Reativar fabricante" 600; a lista ao lado como a do 7 |
+| 390 | derivada (11) | editar e desativado em tela cheia | ⚠️ (era ❌: D1) | derivada (seção 7) |
 
 ### Tipos
 
 | Tamanho | Artboard | Comparado | Status | Resultado |
 |---|---|---|---|---|
-| 1280 | 9 `Tipos-web` (editar Inversor) | `table` de verdade, respiro 12/14, linhas 56; painel 360 "Editar tipo: Inversor"; seção "Característica"; Unidade desligada `nav` com borda `line` e aviso com cadeado 12/16; caixa 20 px; "Salvar alterações" e "Desativar tipo" `danger-text` | ❌ | "Salvar alterações" peso 400 (D2), círculo quadrado (D1); linha em edição sem o fundo `chip-ok`, caixa "Obrigatória" desligada, dicas peso 500, "Ar-condicionado" quebra em duas linhas (seção 5) |
-| 1280 | derivada (9) | `/catalogo/tipos`: painel "Novo tipo" vazio, "Escolha a unidade", caixa marcada | ❌ | "Salvar tipo" peso 400 (D2), D1 na tabela |
-| 390 | 10 `Tipos-celular` | cartões com tipo, "Característica: Potência (kW)", "3 modelos" em Chakra Petch e chip; "Novo tipo" 48 | ❌ | círculo quadrado (D1); chip com corte |
+| 1280 | 9 `Tipos-web` (editar Inversor) | `table` de verdade, respiro 12/14, linhas 56; painel 360 "Editar tipo: Inversor"; seção "Característica"; Unidade desligada `nav` com borda `line` e aviso com cadeado 12/16; caixa 20 px; "Salvar alterações" e "Desativar tipo" `danger-text` | ⚠️ (era ❌: D1, D2) | "Salvar alterações" 600, círculo, "Editando" com alvo de 44 px (seção 8); linha em edição sem o fundo `chip-ok`, caixa "Obrigatória" desligada, dicas peso 500, "Ar-condicionado" quebra em duas linhas (seção 5) |
+| 1280 | derivada (9) | `/catalogo/tipos`: painel "Novo tipo" vazio, "Escolha a unidade", caixa marcada | ⚠️ (era ❌: D1, D2) | "Salvar tipo" 600, círculo na tabela; "Reativar tipo" (tipo desativado) 600 |
+| 390 | 10 `Tipos-celular` | cartões com tipo, "Característica: Potência (kW)", "3 modelos" em Chakra Petch e chip; "Novo tipo" 48 | ⚠️ (era ❌: D1) | chip com corte |
 | 390 | 11 `Novo-tipo-celular` | Painel solar, Potência de pico, Wp: campos 48 `panel`, dicas, linha da seção, caixa 22 px com rótulo 16, "Salvar tipo" 48 no rodapé | ⚠️ | dicas peso 500, seta do lucide |
 | 390 | derivada (11) | tipo com modelos: Unidade desligada com o aviso, "Obrigatória" desligada, "Desativar tipo", "Salvar alterações" no rodapé | ⚠️ | "Obrigatória" travada (seção 5) |
 
@@ -109,7 +110,7 @@ Valores comuns, medidos iguais ao mockup em todas as telas onde aparecem, e não
 | 390 | 2, 8, 10, 12, 13 | barra inferior: Administrador com Catálogo e Usuários (195 px cada), Técnico só Catálogo (390 px); ícone 22; rótulo 12/16 **peso 600** (medido: o `font-semibold` vence o peso 500 do `text-caption`); some nas telas com cabeçalho próprio (formulários, modelo) | ⚠️ | rótulo acessível "Principal no celular"; item 63 px (seção 5) |
 | ambos | 1 a 13 | avatar e bloco da conta | ⚠️ | avatar da casca do IAM, não o redondo `chip-ok` do mockup do catálogo (seção 5) |
 
-Contagem: 29 linhas (13 artboards no tamanho deles, 13 estados derivados, 3 de navegação), a partir de 40 combinações tela × tamanho medidas no navegador: **1 ✅, 11 ⚠️, 17 ❌**. Os ❌ vêm só dos cinco defeitos da seção 3; sem eles, todas as linhas seriam ✅ ou ⚠️.
+Contagem: 29 linhas (13 artboards no tamanho deles, 13 estados derivados, 3 de navegação), a partir de 40 combinações tela × tamanho medidas no navegador: **1 ✅, 28 ⚠️, 0 ❌** (na comparação, antes das correções: 1 ✅, 11 ⚠️, 17 ❌, todos os ❌ por D1 a D5). Os ⚠️ ficam para a decisão do usuário (seções 5 a 7).
 
 ## 5. Divergências (decisão do usuário)
 
@@ -139,19 +140,19 @@ Aprovadas antes da implementação ([`README.md`](README.md), "Divergências do 
 
 | Valor do mockup | Onde | Usado |
 |---|---|---|
-| chip de situação sem corte, respiro 3/10, espaço 6, glifo de texto (● ○) | listas, modelo, fabricante | `StatusChip` do IAM: corte 10, respiro 0/12, espaço 8, glifo SVG (o cheio sai quadrado: D1); desativado em duas camadas (contorno `line-strong` + fundo `panel`, 28 px; o mockup 30 com borda e fundo transparente) |
+| chip de situação sem corte, respiro 3/10, espaço 6, glifo de texto (● ○) | listas, modelo, fabricante | `StatusChip` do IAM: corte 10, respiro 0/12, espaço 8, glifo SVG (círculo de raio 4 desde D1); desativado em duas camadas (contorno `line-strong` + fundo `panel`, 28 px; o mockup 30 com borda e fundo transparente). Larguras medidas na tabela de fabricantes: 73 e 111,4 px (mockup 65 e 105) |
 | característica e número 14 px Chakra Petch 600 | coluna Característica (modelos) e Modelos (fabricantes) | `text-number` 16/24 |
 | título do vazio 20/24 Chakra Petch 600 | sem resultado (13) | `text-title` 24/28 |
 | título 22/28 | modelo desativado no celular (6) | `text-title` 24/28 |
 | título do painel 20/24 Chakra Petch 600 | painéis de fabricante e tipo na web | `font-display text-xl leading-6 font-semibold` (fora da escala; pedir um token) |
-| texto 14 peso 600 | abas, controle segmentado, "Abrir", "Editar", sufixo da unidade, botões da web | `text-body-sm` + `font-semibold` (altura de linha 20, mockup 24 herdado; abas com respiro 12 para manter 47 px). Nos botões e no nome da tabela a combinação falha (D2, D3) |
+| texto 14 peso 600 | abas, controle segmentado, "Abrir", "Editar", sufixo da unidade, botões da web | `text-body-sm` + `font-semibold` (altura de linha 20, mockup 24 herdado; abas com respiro 12 para manter 47 px). Nos botões e no nome da tabela, `md:text-body-sm` com `md:font-semibold` (D2, D3) |
 | dicas 12/16 peso 400 | todos os formulários | `text-caption` 12/16 **peso 500** |
 | seta nativa da seleção | filtros e formulários | `ChevronDownIcon` do lucide, respiro direito 40 |
 | filtros do celular 14 px | Tipo e Situação no celular (2, 13) | `text-body-sm` 14/20 em campo de 44 (o mesmo valor do mockup, fora das alturas de campo) |
 | barra inferior de 64 px + 1 de borda | celular | 64 px com a borda: o item fica 63 |
 | linha da tabela 56 px + 1 de borda | tabelas de modelos e fabricantes | 56 px com a borda |
 | avatar redondo `chip-ok`, inicial 18 peso 600 IBM Plex Sans | barra superior e barra lateral | o da casca do IAM, aprovado lá: quadrado `brand` com corte, inicial 18 peso 700 Chakra Petch; links da conta todos de 44 px (o mockup tem 44, 34 e 34) |
-| larguras e frações sem origem no mockup | listas web de fabricantes e tipos | `md:min-w-120` no invólucro das duas listas, `gap-6` entre lista e painel, grade `2fr 1fr 1.4fr auto` (fabricantes) e `1fr 1.1fr 1.6fr 1.4fr 1fr auto` (modelos); o mockup usa `table` com colunas automáticas |
+| larguras e frações sem origem no mockup | listas web de fabricantes e tipos | `md:min-w-120` no invólucro das duas listas, `gap-6` entre lista e painel, grade `2fr 1fr 1.4fr auto` (fabricantes) e `1fr 1.1fr 1.6fr 1.4fr 1fr auto` (modelos), com o texto da última coluna invisível no cabeçalho (D5); o mockup usa `table` com colunas automáticas. Barra de filtros dos modelos: a busca tem mínimo de 240 px e a barra quebra linha abaixo disso (seção 10) |
 | ordem da lista | o mockup 7 põe Huawei primeiro | ordem alfabética do backend |
 
 ## 6. Estados sem mockup (decisão do usuário)
@@ -188,12 +189,13 @@ Cada linha foi decidida na implementação, sem mockup; nenhuma está aprovada.
 
 ## 8. Teclado e foco
 
-Medido nas listas, formulários, modelo ativo e desativado, fabricante e tipo em edição, nos dois tamanhos, e nas listas do Técnico. Em todas, o `Tab` passa pelos controles na ordem da tela, o anel de foco computado é o do tema (2 px sólido `highlight`, afastado 2 px; o mesmo valor do IAM) e todo alvo tem pelo menos 44 px de altura, com duas exceções:
+Medido nas listas, formulários, modelo ativo e desativado, fabricante e tipo em edição, nos dois tamanhos, e nas listas do Técnico. Em todas, o `Tab` passa pelos controles na ordem da tela, o anel de foco computado é o do tema (2 px sólido `highlight`, afastado 2 px; o mesmo valor do IAM) e todo alvo tem pelo menos 44 px de altura, com uma exceção:
 
 | Onde | O que |
 |---|---|
-| Tabela web de tipos | "Editar" e "Editando" são links de texto de **18 px** de altura (o mockup 9 desenha o mesmo link de texto); nas tabelas de modelos e fabricantes a linha inteira é o link (56 px) |
 | Caixa "Obrigatória" | 20 px na web e 22 no celular, como o mockup, dentro do rótulo clicável de 44 px |
+
+Corrigido: na tabela web de tipos, "Editar" e "Editando" eram links de texto de **18 px** de altura. Agora o alvo tem **44 px**, dentro da linha de 56; o texto fica no mesmo lugar (medido: x 809,9, y 221,5, 18 px de texto, antes e depois), como o link de texto do mockup 9. Nas tabelas de modelos e fabricantes a linha inteira é o link (56 px).
 
 Ordem: na lista de modelos do celular, "Novo modelo" (rodapé fixo) vem **antes** dos cartões, embora apareça depois deles (o mesmo caso do "Convidar usuário" do IAM); em fabricantes e tipos, "Novo fabricante" e "Novo tipo" vêm depois dos cartões, como aparecem. Campos desligados (unidade e caixa travadas) ficam fora do `Tab`. Linhas do Técnico em fabricantes e tipos não recebem foco (não há link).
 
@@ -224,16 +226,16 @@ Rodados num Chrome de verdade (headless), com cliques e digitação reais, contr
 
 ## 10. Larguras intermediárias (sem mockup)
 
-O plano compara em 390 e 1280; entre 768 e 1279 a web não tem artboard. Medido a 768 e 1024 (altura 800), com o painel de 340/360 px aberto ao lado das listas:
+O plano compara em 390 e 1280; entre 768 e 1279 a web não tem artboard. Medido a 768 e 1024 (altura 800), com o painel de 340/360 px aberto ao lado das listas, antes e depois das correções:
 
 | Tela | 768 | 1024 | 1280 |
 |---|---|---|---|
-| Modelos (sem painel) | **a página rola na horizontal** (largura do documento 876): a barra de filtros não quebra, a busca encolhe para ~45 px e "Novo modelo" fica fora da tela; a tabela (720) rola dentro de 457 px | cabe (tabela 726) | cabe |
-| Fabricantes + painel | a lista (mínimo 480, `md:min-w-120`) mostra **108 px** e rola dentro dela; "Situação" e "Editar" só rolando | **364 px** visíveis; "Editar" só rolando | cabe (618) |
-| Tipos + painel | **88 px** visíveis (73 com o tipo aberto) | **344 px** (329 com o tipo aberto, a página rola na vertical) | cabe (598; "Ar-condicionado" quebra em duas linhas) |
+| Modelos (sem painel) | **corrigido**: antes a página rolava na horizontal (documento 876 px; a barra de filtros não quebrava, a busca encolhia para 45 px e "Novo modelo" ficava fora da tela). Agora o documento tem 768: busca (260) e Tipo (200) na primeira linha, Situação (180) e "Novo modelo" na segunda; a tabela (720) rola dentro de 470 px | cabe. Antes, tudo numa linha com a busca de 161 px; agora a busca tem 324, com Tipo e Situação na mesma linha, e "Novo modelo" passa para a segunda (sem mockup nessa largura) | igual ao de antes: busca 417, Tipo 200, Situação 180, "Novo modelo" 151, tudo numa linha de 44 px |
+| Fabricantes + painel | a lista (mínimo 480, `md:min-w-120`) mostra **108 px** e rola dentro dela; "Situação" e "Editar" só rolando; documento 768 | **364 px** visíveis; "Editar" só rolando | cabe (618) |
+| Tipos + painel | **88 px** visíveis, com ou sem o tipo aberto. **Corrigido**: antes o documento tinha 802 px (a página rolava 34 px na horizontal): o "Ações" `sr-only` (absoluto) da última coluna escapava da rolagem da lista; com a seção da lista `relative`, o documento tem 768 | **344 px**; documento 1024 | cabe (598; "Ar-condicionado" quebra em duas linhas) |
 | Modelo (editar) | formulário 307 e situação ao lado | formulário 455 | 627 (o do mockup) |
 
-Nada se sobrepõe: as listas rolam dentro do próprio invólucro (`overflow-x-auto`), atrás do painel. A estimativa da revisão (~90 e ~344 px para os tipos) confere. Decisão do usuário: empilhar o painel abaixo da lista (ou escondê-la) abaixo de uma largura, e quebrar a barra de filtros em 768.
+Nada se sobrepõe (medido antes e depois): as listas rolam dentro do próprio invólucro (`overflow-x-auto`), atrás do painel, e em 768, 1024 e 1280 nenhuma das três listas alarga a página. Decisão do usuário: empilhar o painel abaixo da lista (ou escondê-la) abaixo de uma largura, já que fabricantes e tipos mostram só 108 e 88 px em 768.
 
 ## 11. Pendências menores
 
@@ -247,6 +249,7 @@ Nada se sobrepõe: as listas rolam dentro do próprio invólucro (`overflow-x-au
 ## 12. Não verificado
 
 - Nenhuma comparação pixel a pixel nem sobreposição de capturas; o logo do mockup não carrega fora do artefato.
+- A nova medição cobriu os itens corrigidos (seções 3, 8 e 10) e o que eles tocam (cartões do celular, chips, cabeçalhos, barra de filtros em 1280); as demais linhas da seção 4 mantêm os valores da comparação, em código que as correções não mudaram.
 - Estados que exigem falha do servidor: carregando, erro de rede, `concurrent_update`, `manufacturer_deactivated` e `type_deactivated` no meio do cadastro; cobertos só pelos testes de tela.
 - O papel Comercial (mesmas permissões do Administrador no catálogo); só Administrador e Técnico foram usados.
 - Tema claro, Safari, Firefox, aparelho físico, toque, leitor de tela real e o aplicativo (Capacitor). O celular foi emulado (390×844, `mobile: true`).
