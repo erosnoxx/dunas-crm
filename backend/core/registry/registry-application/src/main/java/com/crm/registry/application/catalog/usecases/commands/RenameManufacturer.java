@@ -43,10 +43,11 @@ public class RenameManufacturer {
 
         var name = ManufacturerName.of(params.name());
 
+        // o domínio recusa o desativado antes do conflito de nome (ordem do usecases.md); nada foi salvo ainda
+        manufacturer.rename(name);
+
         if (repository.existsByName(name, manufacturer.getId()))
             throw new ConflictException("manufacturer_name_taken", "já existe um fabricante com este nome");
-
-        manufacturer.rename(name);
 
         repository.save(manufacturer);
     }

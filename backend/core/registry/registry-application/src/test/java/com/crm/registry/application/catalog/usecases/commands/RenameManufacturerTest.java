@@ -2,6 +2,7 @@ package com.crm.registry.application.catalog.usecases.commands;
 
 import com.crm.common.application.exceptions.ConflictException;
 import com.crm.common.application.exceptions.ForbiddenException;
+import com.crm.common.domain.exceptions.DomainException;
 import com.crm.registry.application.catalog.contracts.repositories.ManufacturerRepository;
 import com.crm.registry.domain.catalog.entities.Manufacturer;
 import com.crm.registry.domain.catalog.vos.ManufacturerName;
@@ -89,6 +90,33 @@ class RenameManufacturerTest {
 
         verify(repository).existsByName(ManufacturerName.of("HUAWEI"), manufacturer.getId());
         verify(repository).save(manufacturer);
+    }
+
+    @Test
+    @DisplayName("fabricante desativado com nome livre é manufacturer_deactivated e nada é salvo")
+    void deactivatedManufacturerCannotBeRenamed() {
+        manufacturer.deactivate();
+
+        assertThatThrownBy(() -> renameManufacturer.execute(
+                new RenameManufacturer.Params(ADMINISTRATOR, manufacturer.getId(), "Novo")))
+                .isInstanceOf(DomainException.class)
+                .satisfies(e -> assertThat(((DomainException) e).getCode()).contains("manufacturer_deactivated"));
+
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("fabricante desativado com nome também repetido é manufacturer_deactivated, não o conflito")
+    void deactivatedIsReportedBeforeTheNameConflict() {
+        manufacturer.deactivate();
+        when(repository.existsByName(ManufacturerName.of("SOLIS"), manufacturer.getId())).thenReturn(true);
+
+        assertThatThrownBy(() -> renameManufacturer.execute(
+                new RenameManufacturer.Params(ADMINISTRATOR, manufacturer.getId(), "SOLIS")))
+                .isInstanceOf(DomainException.class)
+                .satisfies(e -> assertThat(((DomainException) e).getCode()).contains("manufacturer_deactivated"));
+
+        verify(repository, never()).save(any());
     }
 
     @Test
