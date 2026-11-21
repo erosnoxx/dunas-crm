@@ -1,6 +1,7 @@
 package com.crm.registry.application.catalog;
 
 import com.crm.common.application.exceptions.ApplicationException;
+import com.crm.common.domain.exceptions.DomainException;
 import com.crm.registry.application.catalog.schemas.CharacteristicInput;
 import com.crm.shared.application.Actor;
 import com.crm.shared.domain.enums.Role;
@@ -28,5 +29,10 @@ public final class CatalogFixtures {
 
     public static ThrowingConsumer<Throwable> applicationCode(String code) {
         return e -> assertThat(((ApplicationException) e).getCode()).contains(code);
+    }
+
+    /** Também serve a ValidationException, que é um DomainException com código. */
+    public static ThrowingConsumer<Throwable> domainCode(String code) {
+        return e -> assertThat(((DomainException) e).getCode()).contains(code);
     }
 }

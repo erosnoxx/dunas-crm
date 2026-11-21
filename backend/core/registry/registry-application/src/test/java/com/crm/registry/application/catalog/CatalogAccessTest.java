@@ -25,4 +25,14 @@ class CatalogAccessTest {
                 .isInstanceOf(ForbiddenException.class)
                 .satisfies(applicationCode("forbidden"));
     }
+
+    @Test
+    @DisplayName("os três papéis consultam, mas o ator nulo é erro de programação")
+    void everyRoleMayReadButANullActorIsAProgrammingError() {
+        assertThatCode(() -> CatalogAccess.requireReader(ADMINISTRATOR)).doesNotThrowAnyException();
+        assertThatCode(() -> CatalogAccess.requireReader(COMMERCIAL)).doesNotThrowAnyException();
+        assertThatCode(() -> CatalogAccess.requireReader(TECHNICIAN)).doesNotThrowAnyException();
+
+        assertThatThrownBy(() -> CatalogAccess.requireReader(null)).isInstanceOf(NullPointerException.class);
+    }
 }
