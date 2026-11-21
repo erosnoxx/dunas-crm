@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -77,6 +78,16 @@ class BoundedContextRulesTest {
         "com.rabbitmq..",
         "redis.clients.."
     };
+
+    /**
+     * Subdomínios de um mesmo BC (architecture.md §4.4) e, para cada um, os subdomínios dos quais
+     * ele pode depender. A chave é {@code <bc>.<subdomínio>}. Todo par do mesmo BC fora deste
+     * mapa é proibido.
+     */
+    private static final Map<String, Set<String>> SUBDOMAIN_DEPENDENCIES = Map.of(
+        "registry.catalog", Set.of(),
+        "registry.customers", Set.of("registry.catalog")
+    );
 
     private static JavaClasses classes;
 
@@ -267,6 +278,25 @@ class BoundedContextRulesTest {
     }
 
     @Test
+    @DisplayName("subdomínios do mesmo BC só dependem na direção declarada")
+    void subdomainsDependOnlyInDeclaredDirection() {
+        for (var from : SUBDOMAIN_DEPENDENCIES.keySet()) {
+            for (var to : SUBDOMAIN_DEPENDENCIES.keySet()) {
+                if (from.equals(to) || SUBDOMAIN_DEPENDENCIES.get(from).contains(to))
+                    continue;
+
+                if (!from.split("\\.")[0].equals(to.split("\\.")[0]))
+                    continue;
+
+                check(noClasses()
+                    .that().resideInAPackage(subdomain(from))
+                    .should().dependOnClassesThat().resideInAPackage(subdomain(to))
+                    .because("subdomínios do mesmo BC só dependem em mão única, na direção declarada (architecture.md 4.4)"));
+            }
+        }
+    }
+
+    @Test
     @DisplayName("não existe ciclo de dependência entre bounded contexts")
     void noCyclesBetweenBoundedContexts() {
         check(slices()
@@ -286,6 +316,13 @@ class BoundedContextRulesTest {
 
     private static String bc(String context) {
         return BASE + "." + context + "..";
+    }
+
+    /** {@code registry.catalog} vira {@code com.crm.registry.*.catalog..}: o subdomínio vem depois da camada. */
+    private static String subdomain(String qualified) {
+        var parts = qualified.split("\\.");
+
+        return BASE + "." + parts[0] + ".*." + parts[1] + "..";
     }
 
     private static String layer(String context, String layer) {
