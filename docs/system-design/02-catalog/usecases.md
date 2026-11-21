@@ -59,6 +59,7 @@ O painel "Editar tipo" salva nome e característica juntos.
 
 - **Entrada:** ator, `manufacturerId`, `typeId`, `name`, `values` (lista de `definitionId` + `amount`).
 - **Pré-condições:** papel; fabricante e tipo existem (`manufacturer_not_found`, `type_not_found`) e estão ativos (`manufacturer_deactivated`, `type_deactivated`); nome livre **para esse fabricante** (`model_name_taken`); valores conferem com o tipo (`characteristic_unknown`, `characteristic_required`); `amount` válido (`invalid_amount`, 400).
+- **Ordem das checagens:** o formato (nome e `amount`, 400) e as regras do aggregate (ativos e valores) vêm antes de `model_name_taken`, porque `EquipmentModel.register` as reúne numa só chamada.
 - **Fluxo:** 1. Carrega o fabricante e o tipo. 2. `EquipmentModel.register(manufacturer, type, name, values)`. 3. Salva.
 - **Retorno:** `UUIDResponse`.
 - **Endpoint:** `POST /catalog/equipment-models`.
@@ -67,6 +68,7 @@ O painel "Editar tipo" salva nome e característica juntos.
 
 - **Entrada:** ator, `modelId`, `name`, `values`. Fabricante e tipo **não** vêm: não mudam (ADR-4).
 - **Pré-condições:** papel; modelo existe (`model_not_found`) e está ativo (`model_deactivated`); nome livre para o fabricante dele (`model_name_taken`); valores conferem com o tipo.
+- **Ordem das checagens:** a mesma do cadastro: formato e regras do aggregate antes de `model_name_taken`.
 - **Fluxo:** carrega o modelo e o tipo dele, `edit(type, name, values)`, salva.
 - **Endpoint:** `PUT /catalog/equipment-models/{modelId}`.
 
