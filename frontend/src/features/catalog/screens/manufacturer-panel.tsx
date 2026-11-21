@@ -1,17 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2Icon } from "lucide-react"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { Link, Navigate, useNavigate, useParams } from "react-router"
 
 import type { ApiError } from "@/shared/api/api-error"
-import { cn } from "@/shared/lib/cn"
 import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
-import { MobileHeader } from "@/shared/ui/mobile-header"
 
 import {
   useDeactivateManufacturer,
@@ -24,7 +21,8 @@ import { errorMessage, messageFor } from "../catalog.messages"
 import { manufacturerSchema, type ManufacturerValues } from "../catalog.schemas"
 import type { ManufacturerSummary } from "../catalog.service"
 import { FieldError } from "../components/model-values-fields"
-import { ModelStatus } from "../components/model-row"
+import { CatalogStatusChip } from "../components/catalog-status"
+import { PanelFrame, SaveButton, Spinner, WEB_BUTTON } from "../components/panel-frame"
 
 const LIST_PATH = "/catalogo/fabricantes"
 const NAME_MAX = 80
@@ -40,59 +38,7 @@ const DEACTIVATE_HELP =
 const DEACTIVATED_TEXT =
   "Este fabricante não aparece na lista de escolha ao cadastrar modelo; os modelos dele continuam no catálogo. Para renomear, reative primeiro."
 
-// Botões da web (mockup 7): 44 px e 14 px; o do celular é o do rodapé fixo, 48 px e 16 px.
-const WEB_BUTTON = "self-start md:text-body-sm"
-
 type Failure = Partial<ApiError> | null
-
-function Spinner() {
-  return (
-    <div role="status" aria-busy="true" className="flex justify-center py-6">
-      <Loader2Icon aria-hidden="true" className="size-6 animate-spin text-text-muted" />
-    </div>
-  )
-}
-
-/**
- * A moldura do painel. Na web: o painel `panel` do mockup 7, com o título em h2. No celular
- * (derivado do mockup 11): o cabeçalho próprio com "Voltar" e a ação principal no rodapé fixo,
- * com a folga dela no fim do conteúdo (a casca não põe as barras em `/catalogo/fabricantes/`).
- */
-function Frame({
-  title,
-  mobileAction,
-  children,
-}: {
-  title: string
-  mobileAction?: React.ReactNode
-  children: React.ReactNode
-}) {
-  const isDesktop = useMediaQuery(MD_UP)
-
-  if (isDesktop)
-    return (
-      <section className="flex flex-col gap-4 border border-line bg-panel p-6">
-        <h2 className="font-display text-xl leading-6 font-semibold">{title}</h2>
-        {children}
-      </section>
-    )
-
-  return (
-    <>
-      <MobileHeader to={LIST_PATH} title={title} />
-      <div
-        className={cn("flex flex-col gap-4.5 px-4 pt-5", mobileAction ? "pb-24" : "pb-5")}
-      >
-        {children}
-      </div>
-      {mobileAction && (
-        <div className="fixed inset-x-0 bottom-0 border-t border-line bg-nav px-4 py-3">
-          {mobileAction}
-        </div>
-      )}
-    </>
-  )
-}
 
 /**
  * O formulário do nome (novo e edição). Os erros do servidor saem pelo `code`: o nome repetido sob
@@ -167,30 +113,6 @@ function NameField({
   )
 }
 
-function SaveButton({
-  formId,
-  label,
-  loading,
-}: {
-  formId: string
-  label: string
-  loading: boolean
-}) {
-  const isDesktop = useMediaQuery(MD_UP)
-
-  return (
-    <Button
-      type="submit"
-      form={formId}
-      size={isDesktop ? "md" : "lg"}
-      loading={loading}
-      className={isDesktop ? WEB_BUTTON : "min-h-12 w-full"}
-    >
-      {label}
-    </Button>
-  )
-}
-
 /** Novo fabricante (mockups 7 e 8, o do celular derivado do 11): só o nome. Salvar volta para a lista. */
 function NewManufacturer() {
   const isDesktop = useMediaQuery(MD_UP)
@@ -210,7 +132,7 @@ function NewManufacturer() {
   )
 
   return (
-    <Frame title="Novo fabricante" mobileAction={!isDesktop && save}>
+    <PanelFrame to={LIST_PATH} title="Novo fabricante" mobileAction={!isDesktop && save}>
       {model.failure && <Alert tone="danger">{errorMessage(model.failure)}</Alert>}
       <form
         id={formId}
@@ -221,7 +143,7 @@ function NewManufacturer() {
         <NameField form={model.form} placeholder="Ex.: nome do fabricante" />
         {isDesktop && save}
       </form>
-    </Frame>
+    </PanelFrame>
   )
 }
 
@@ -275,18 +197,22 @@ function EditManufacturer({
     const nameId = `${formId}-name`
 
     return (
-      <Frame title="Editar fabricante" mobileAction={!isDesktop && action}>
+      <PanelFrame
+        to={LIST_PATH}
+        title="Editar fabricante"
+        mobileAction={!isDesktop && action}
+      >
         {alert}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor={nameId}>Nome *</Label>
           <Input id={nameId} size="compact" disabled value={saved.name} readOnly />
         </div>
         <span className="self-start">
-          <ModelStatus status={saved.status} />
+          <CatalogStatusChip status={saved.status} />
         </span>
         <p className="text-body-sm text-text-muted">{DEACTIVATED_TEXT}</p>
         {isDesktop && action}
-      </Frame>
+      </PanelFrame>
     )
   }
 
@@ -299,7 +225,11 @@ function EditManufacturer({
   )
 
   return (
-    <Frame title="Editar fabricante" mobileAction={!isDesktop && save}>
+    <PanelFrame
+      to={LIST_PATH}
+      title="Editar fabricante"
+      mobileAction={!isDesktop && save}
+    >
       {alert}
       <form
         id={formId}
@@ -326,7 +256,7 @@ function EditManufacturer({
       >
         <h3 className="text-label text-text-muted">Situação</h3>
         <span className="self-start">
-          <ModelStatus status={saved.status} />
+          <CatalogStatusChip status={saved.status} />
         </span>
         <p className="text-body-sm text-text-muted">{DEACTIVATE_HELP}</p>
         <Button
@@ -338,7 +268,7 @@ function EditManufacturer({
           Desativar fabricante
         </Button>
       </section>
-    </Frame>
+    </PanelFrame>
   )
 }
 
@@ -351,7 +281,7 @@ function ManufacturerDetail() {
 
   if (!saved)
     return (
-      <Frame title="Editar fabricante">
+      <PanelFrame to={LIST_PATH} title="Editar fabricante">
         {failure ? (
           <Alert tone="danger">{errorMessage(failure)}</Alert>
         ) : list.isPending ? (
@@ -359,7 +289,7 @@ function ManufacturerDetail() {
         ) : (
           <Alert tone="danger">{errorMessage({ code: "manufacturer_not_found" })}</Alert>
         )}
-      </Frame>
+      </PanelFrame>
     )
 
   // A chave inclui a situação: ao desativar ou reativar o formulário nasce de novo, com o nome salvo.

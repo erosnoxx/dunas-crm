@@ -47,3 +47,7 @@ export const LABELS: {
   unit: { KILOWATT: "kW", WATT: "W", WATT_PEAK: "Wp", BTU_PER_HOUR: "BTU/h" },
   status: { ACTIVE: "Ativo", DEACTIVATED: "Desativado" },
 }
+
+/** "3 modelos", "1 modelo" ou "Nenhum modelo" (mockups 8 e 10). */
+export const countText = (count: number) =>
+  count === 0 ? "Nenhum modelo" : `${count} ${count === 1 ? "modelo" : "modelos"}`

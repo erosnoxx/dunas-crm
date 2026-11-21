@@ -2,8 +2,9 @@ import { Link } from "react-router"
 
 import { cn } from "@/shared/lib/cn"
 
+import { countText } from "../catalog.messages"
 import type { ManufacturerSummary } from "../catalog.service"
-import { ModelStatus } from "./model-row"
+import { CatalogStatusChip } from "./catalog-status"
 
 // As colunas da tabela na web (mockup 7): a linha e o cabeçalho usam a mesma grade.
 const COLUMNS = "md:grid-cols-[2fr_1fr_1.4fr_auto]"
@@ -25,10 +26,6 @@ function ManufacturerTableHeader() {
     </div>
   )
 }
-
-/** "3 modelos", "1 modelo" ou "Nenhum modelo" (mockup 8). */
-const countText = (count: number) =>
-  count === 0 ? "Nenhum modelo" : `${count} ${count === 1 ? "modelo" : "modelos"}`
 
 /**
  * Um fabricante da lista (mockups 7 e 8). O mesmo elemento é a linha da tabela na web (nome,
@@ -61,7 +58,7 @@ function ManufacturerRow({
           {manufacturer.modelCount}
         </span>
       </span>
-      <ModelStatus status={manufacturer.status} />
+      <CatalogStatusChip status={manufacturer.status} />
       {canEdit && (
         <span className="text-body-sm font-semibold text-brand-text max-md:hidden md:text-end">
           Editar

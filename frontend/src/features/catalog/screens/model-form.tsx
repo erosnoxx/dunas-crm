@@ -35,7 +35,7 @@ import type {
   EquipmentTypeSummary,
   ModelValuesInput,
 } from "../catalog.service"
-import { ModelStatus } from "../components/model-row"
+import { CatalogStatusChip } from "../components/catalog-status"
 import { FieldError, ModelValuesFields } from "../components/model-values-fields"
 
 const LIST_PATH = "/catalogo"
@@ -473,7 +473,7 @@ function EditModel({ model: saved }: { model: EquipmentModelSummary }) {
         <aside aria-label="Situação do modelo" className={cn(PANEL, "md:w-85")}>
           <h2 className="text-label text-text-muted">Situação</h2>
           <span className="self-start">
-            <ModelStatus status={saved.status} />
+            <CatalogStatusChip status={saved.status} />
           </span>
           <p className="text-body-sm text-text-muted">{DEACTIVATE_HELP}</p>
           <Button
@@ -515,7 +515,7 @@ function ReadOnlyModel({
 
   const status = (
     <span className="self-start">
-      <ModelStatus status={model.status} />
+      <CatalogStatusChip status={model.status} />
     </span>
   )
   const note = deactivated && (

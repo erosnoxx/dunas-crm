@@ -1,11 +1,10 @@
 import { Link } from "react-router"
 
 import { cn } from "@/shared/lib/cn"
-import { StatusChip } from "@/shared/ui/status-chip"
 
 import { amountText } from "../amount"
-import { LABELS } from "../catalog.messages"
-import type { CatalogStatus, EquipmentModelSummary } from "../catalog.service"
+import type { EquipmentModelSummary } from "../catalog.service"
+import { CatalogStatusChip } from "./catalog-status"
 
 // As colunas da tabela na web: a linha e o cabeçalho usam a mesma grade.
 const COLUMNS = "md:grid-cols-[1fr_1.1fr_1.6fr_1.4fr_1fr_auto]"
@@ -27,17 +26,6 @@ function ModelTableHeader() {
       <span>Situação</span>
       <span />
     </div>
-  )
-}
-
-/** Situação por forma (mockups 1 e 2): círculo cheio no ativo, vazado e apagado no desativado. */
-function ModelStatus({ status }: { status: CatalogStatus }) {
-  return status === "ACTIVE" ? (
-    <StatusChip tone="ok">{LABELS.status.ACTIVE}</StatusChip>
-  ) : (
-    <StatusChip tone="off" shape="ring">
-      {LABELS.status.DEACTIVATED}
-    </StatusChip>
   )
 }
 
@@ -71,7 +59,7 @@ function ModelRow({ model }: { model: EquipmentModelSummary }) {
             {value && `${value.name} ${amountText(value)}`}
           </span>
           <span className="mt-2 justify-self-end md:order-5 md:mt-0 md:justify-self-start">
-            <ModelStatus status={model.status} />
+            <CatalogStatusChip status={model.status} />
           </span>
           <span className="text-body-sm font-semibold text-brand-text max-md:hidden md:order-6">
             Abrir
@@ -82,4 +70,4 @@ function ModelRow({ model }: { model: EquipmentModelSummary }) {
   )
 }
 
-export { ModelRow, ModelStatus, ModelTableHeader }
+export { ModelRow, ModelTableHeader }

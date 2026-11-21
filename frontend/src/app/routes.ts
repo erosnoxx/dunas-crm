@@ -21,6 +21,11 @@ export default [
       route("novo", "routes/catalogo.fabricantes.novo.tsx"),
       route(":id", "routes/catalogo.fabricantes.$id.tsx"),
     ]),
+    route("catalogo/tipos", "routes/catalogo.tipos.tsx", [
+      // Estática, irmã de `:id`: `/catalogo/tipos/novo` não vira o tipo "novo".
+      route("novo", "routes/catalogo.tipos.novo.tsx"),
+      route(":id", "routes/catalogo.tipos.$id.tsx"),
+    ]),
     route("conta/sessoes", "routes/conta.sessoes.tsx"),
     route("conta/trocar-senha", "routes/conta.trocar-senha.tsx"),
   ]),
