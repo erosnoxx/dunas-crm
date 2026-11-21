@@ -219,6 +219,30 @@ class EquipmentModelsControllerTest {
     }
 
     @Test
+    @DisplayName("valor nulo na lista e amount longo demais respondem 400 com invalidParams")
+    void nullValueAndOversizedAmountAreA400() throws Exception {
+        mvc.perform(json(post("/catalog/equipment-models"), """
+                        {"manufacturerId": "%s", "typeId": "%s", "name": "X", "values": [null]}
+                        """.formatted(MANUFACTURER_ID, TYPE_ID)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.invalidParams[?(@.name =~ /values.*/)]").exists());
+
+        mvc.perform(json(put("/catalog/equipment-models/{id}", ID), """
+                        {"name": "X", "values": [null]}
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.invalidParams[?(@.name =~ /values.*/)]").exists());
+
+        mvc.perform(json(put("/catalog/equipment-models/{id}", ID), """
+                        {"name": "X", "values": [{"definitionId": "%s", "amount": "%s"}]}
+                        """.formatted(DEFINITION_ID, "1".repeat(33))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.invalidParams[?(@.name =~ /values.*amount/)]").exists());
+
+        verifyNoInteractions(registerEquipmentModel, updateEquipmentModel);
+    }
+
+    @Test
     @DisplayName("erro de domínio mantém o código")
     void domainErrorsKeepTheirCode() throws Exception {
         when(registerEquipmentModel.execute(any()))

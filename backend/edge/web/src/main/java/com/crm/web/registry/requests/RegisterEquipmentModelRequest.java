@@ -13,6 +13,6 @@ public record RegisterEquipmentModelRequest(
         @NotNull(message = "é obrigatório") UUID manufacturerId,
         @NotNull(message = "é obrigatório") UUID typeId,
         @NotBlank(message = "é obrigatório") @Size(min = 1, max = 80, message = "deve ter de 1 a 80 caracteres") String name,
-        @NotNull(message = "é obrigatório") List<@Valid ValueRequest> values
+        @NotNull(message = "é obrigatório") List<@NotNull @Valid ValueRequest> values
 ) {
 }

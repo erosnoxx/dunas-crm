@@ -171,6 +171,24 @@ class EquipmentTypesControllerTest {
     }
 
     @Test
+    @DisplayName("característica sem required responde 400 com invalidParams")
+    void missingRequiredIsA400WithInvalidParams() throws Exception {
+        mvc.perform(json(put("/catalog/equipment-types/{id}", ID), """
+                        {"name": "Inversor", "characteristic": {"name": "Potência", "unit": "KILOWATT"}}
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.invalidParams[?(@.name == 'characteristic.required')]").exists());
+
+        mvc.perform(json(put("/catalog/equipment-types/{id}", ID), """
+                        {"name": "Inversor", "characteristic": {"name": "Potência", "unit": "KILOWATT", "required": null}}
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.invalidParams[?(@.name == 'characteristic.required')]").exists());
+
+        verifyNoInteractions(updateEquipmentType);
+    }
+
+    @Test
     @DisplayName("erro de domínio mantém o código")
     void domainErrorsKeepTheirCode() throws Exception {
         when(registerEquipmentType.execute(any()))
