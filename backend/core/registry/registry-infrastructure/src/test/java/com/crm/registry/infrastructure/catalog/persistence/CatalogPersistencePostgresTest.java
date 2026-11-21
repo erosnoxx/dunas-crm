@@ -1,5 +1,6 @@
 package com.crm.registry.infrastructure.catalog.persistence;
 
+import com.crm.common.application.exceptions.ConcurrentUpdateException;
 import com.crm.common.application.exceptions.ConflictException;
 import com.crm.common.application.pages.Pageable;
 import com.crm.registry.application.catalog.schemas.EquipmentModelFilter;
@@ -251,6 +252,24 @@ class CatalogPersistencePostgresTest {
 
         assertThat(types.findById(inverter.getId()).orElseThrow().getCharacteristic().getName())
                 .isEqualTo(CharacteristicName.of("Potência de saída"));
+    }
+
+    @Test
+    @DisplayName("editar a característica a partir de uma cópia velha do tipo é ConflictException e não sobrescreve a edição já gravada")
+    void staleCharacteristicEditIsAConflict() {
+        var inverter = savedType("Inversor", MeasurementUnit.KILOWATT);
+        var first = types.findById(inverter.getId()).orElseThrow();
+        var second = types.findById(inverter.getId()).orElseThrow();
+
+        second.changeCharacteristic(CharacteristicName.of("Potência nominal"), MeasurementUnit.KILOWATT, false, false);
+        types.save(second);
+
+        first.changeCharacteristic(CharacteristicName.of("Potência de pico"), MeasurementUnit.KILOWATT, false, false);
+
+        assertThatThrownBy(() -> types.save(first))
+                .isInstanceOf(ConcurrentUpdateException.class);
+        assertThat(types.findById(inverter.getId()).orElseThrow().getCharacteristic().getName())
+                .isEqualTo(CharacteristicName.of("Potência nominal"));
     }
 
     @Test
