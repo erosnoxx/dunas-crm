@@ -31,7 +31,7 @@ As regras de uso desta estrutura estão em [`../CLAUDE.md`](../CLAUDE.md). O pas
 | Contexto | Responsabilidade |
 |---|---|
 | `iam` | identidade e acesso: usuários, credenciais, sessões e papéis |
-| `registry` | cadastro-base: catálogo (fabricante, tipo, modelo) e, depois, clientes, locais e equipamentos instalados. Cada área é um subdomínio, em pacote dentro do BC ([`02-catalog` ADR-1](02-catalog/decisions.md)) |
+| `registry` | cadastro-base: catálogo (fabricante, tipo, modelo) e clientes, locais e equipamentos instalados. Cada área é um subdomínio (`catalog`, `customers`), em pacote dentro do BC ([`02-catalog` ADR-1](02-catalog/decisions.md)) |
 
 A lista completa de aggregates de cada BC mora no `domain-model.md` da feature dona dele. A atribuição de cada feature a um BC é **hipótese** até a modelagem dela.
 
@@ -43,12 +43,12 @@ A lista completa de aggregates de cada BC mora no `domain-model.md` da feature d
 |---|---|---|---|---|
 | 01 | [`01-iam`](01-iam/) | conta de funcionário, entrar, sessões, papéis | | `iam` |
 | 02 | [`02-catalog`](02-catalog/) | fabricante, tipo, modelo e a característica de cada tipo | 01 (papéis) | `registry` (subdomínio `catalog`) |
+| 03 | [`03-customers`](03-customers/) | cliente (pessoa física ou jurídica), locais (endereços onde há instalação) e equipamentos instalados, cada um uma unidade de um modelo do catálogo. A usina das nuvens dos fabricantes se liga a um local quando o monitoramento existir | 01 (papéis), 02 (modelo) | `registry` (subdomínio `customers`) |
 
 ### Previstas, sem número nem pasta
 
 Ideias de produto, sem ordem decidida. Ganham número e pasta quando entrarem em modelagem.
 
-- `03-customers`: cadastro de clientes, locais (endereços onde há equipamento) e equipamentos instalados, no BC `registry`, depois do catálogo. A usina das nuvens dos fabricantes se liga a um local quando o monitoramento existir;
 - monitoramento de geração, com integração às nuvens dos fabricantes de inversor;
 - agenda de manutenção e portal de agendamento do cliente;
 - proposta e orçamento.

@@ -55,6 +55,6 @@ Nenhuma.
 
 ## Promovidas
 
-- **I1** (cadastro central de clientes e usinas), em duas features no BC `registry`: [`02-catalog`](../system-design/02-catalog/) (fabricante, tipo e modelo) e `03-customers` (cliente, local e equipamento instalado, ainda sem pasta). A "usina" das nuvens dos fabricantes se liga a um local quando o monitoramento existir.
+- **I1** (cadastro central de clientes e usinas), em duas features no BC `registry`: [`02-catalog`](../system-design/02-catalog/) (fabricante, tipo e modelo) e [`03-customers`](../system-design/03-customers/) (cliente, local e equipamento instalado). A "usina" das nuvens dos fabricantes se liga a um local quando o monitoramento existir.
 
 A primeira feature, `01-iam`, é de base e não vem desta lista.

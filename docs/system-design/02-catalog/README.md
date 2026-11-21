@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-O cadastro-base do que a DUNAS vende e instala: **fabricantes**, **tipos** de equipamento (inversor, ar-condicionado, o que vier) e **modelos**, cada modelo com a característica que o tipo pede (potência em kW no inversor, capacidade em BTU/h no ar-condicionado). É a base de que o cadastro de clientes e de equipamentos instalados ([03](../00-overview.md), ainda sem pasta) depende, e nenhum nome de produto fica fixo no código: a empresa trabalha com energia solar e com ar-condicionado, e o catálogo cresce por cadastro.
+O cadastro-base do que a DUNAS vende e instala: **fabricantes**, **tipos** de equipamento (inversor, ar-condicionado, o que vier) e **modelos**, cada modelo com a característica que o tipo pede (potência em kW no inversor, capacidade em BTU/h no ar-condicionado). É a base de que o cadastro de clientes e de equipamentos instalados ([`03-customers`](../03-customers/)) depende, e nenhum nome de produto fica fixo no código: a empresa trabalha com energia solar e com ar-condicionado, e o catálogo cresce por cadastro.
 
 ## Escopo desta feature
 
