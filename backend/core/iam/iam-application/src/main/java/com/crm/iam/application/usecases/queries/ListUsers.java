@@ -3,7 +3,7 @@ package com.crm.iam.application.usecases.queries;
 import com.crm.common.application.annotations.UseCase;
 import com.crm.common.application.pages.Page;
 import com.crm.common.application.pages.Pageable;
-import com.crm.iam.application.Actor;
+import com.crm.shared.application.Actor;
 import com.crm.iam.application.contracts.readers.UserReader;
 import com.crm.iam.application.schemas.UserFilter;
 import com.crm.iam.application.schemas.UserSummary;

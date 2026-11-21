@@ -1,6 +1,6 @@
 package com.crm.web.iam;
 
-import com.crm.iam.application.Actor;
+import com.crm.shared.application.Actor;
 import com.crm.iam.application.usecases.commands.RevokeSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

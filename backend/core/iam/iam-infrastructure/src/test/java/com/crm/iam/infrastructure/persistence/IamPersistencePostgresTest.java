@@ -8,7 +8,7 @@ import com.crm.iam.domain.entities.Session;
 import com.crm.iam.domain.entities.User;
 import com.crm.iam.domain.vos.DeviceLabel;
 import com.crm.iam.domain.vos.PasswordHash;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.iam.domain.vos.TokenPurpose;
 import com.crm.iam.domain.vos.TokenSecret;
 import com.crm.iam.domain.vos.UserName;

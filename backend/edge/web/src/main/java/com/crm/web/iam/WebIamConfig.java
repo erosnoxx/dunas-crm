@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
-/** Registra o resolvedor de {@link com.crm.iam.application.Actor} nos controllers de IAM. */
+/** Registra o resolvedor de {@link com.crm.shared.application.Actor} em todos os controllers (IAM e catálogo). */
 @Configuration
 public class WebIamConfig implements WebMvcConfigurer {
 

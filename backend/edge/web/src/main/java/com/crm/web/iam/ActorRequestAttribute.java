@@ -2,7 +2,7 @@ package com.crm.web.iam;
 
 /**
  * Nome do atributo de requisição onde a cadeia de segurança do {@code boot} deixa o
- * {@link com.crm.iam.application.Actor} da sessão autenticada.
+ * {@link com.crm.shared.application.Actor} da sessão autenticada.
  *
  * <p>É o único elo entre a autenticação e os controllers: o {@link ActorArgumentResolver} lê
  * daqui e nenhum controller toca em cookie, token ou cabeçalho de credencial.

@@ -4,7 +4,7 @@ import com.crm.common.domain.exceptions.DomainException;
 import com.crm.iam.domain.events.UserDeactivated;
 import com.crm.iam.domain.events.UserRoleChanged;
 import com.crm.iam.domain.vos.PasswordHash;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.iam.domain.vos.UserName;
 import com.crm.iam.domain.vos.UserStatus;
 import com.crm.shared.domain.vos.contact.Email;

@@ -2,13 +2,13 @@ package com.crm.iam.application.usecases.queries;
 
 import com.crm.common.application.exceptions.ApplicationException;
 import com.crm.common.application.exceptions.ForbiddenException;
-import com.crm.iam.application.Actor;
+import com.crm.shared.application.Actor;
 import com.crm.iam.application.contracts.readers.SessionReader;
 import com.crm.iam.application.contracts.readers.UserReader;
 import com.crm.iam.application.schemas.SessionSummary;
 import com.crm.iam.application.schemas.UserDetail;
 import com.crm.iam.application.schemas.UserSummary;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.iam.domain.vos.UserStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

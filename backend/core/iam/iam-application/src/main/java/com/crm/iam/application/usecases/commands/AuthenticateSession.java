@@ -4,7 +4,7 @@ import com.crm.common.application.annotations.UseCase;
 import com.crm.common.application.cache.Cache;
 import com.crm.common.application.exceptions.ConcurrentUpdateException;
 import com.crm.common.application.exceptions.UnauthorizedException;
-import com.crm.iam.application.Actor;
+import com.crm.shared.application.Actor;
 import com.crm.iam.application.IamSettings;
 import com.crm.iam.application.contracts.readers.SessionReader;
 import com.crm.iam.application.contracts.repositories.SessionRepository;

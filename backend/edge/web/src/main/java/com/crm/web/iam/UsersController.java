@@ -2,7 +2,7 @@ package com.crm.web.iam;
 
 import com.crm.common.application.pages.Page;
 import com.crm.common.application.pages.Pageable;
-import com.crm.iam.application.Actor;
+import com.crm.shared.application.Actor;
 import com.crm.iam.application.schemas.SessionSummary;
 import com.crm.iam.application.schemas.UserDetail;
 import com.crm.iam.application.schemas.UserFilter;

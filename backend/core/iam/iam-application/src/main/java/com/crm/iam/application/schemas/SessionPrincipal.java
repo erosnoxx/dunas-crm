@@ -1,6 +1,6 @@
 package com.crm.iam.application.schemas;
 
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.iam.domain.vos.UserStatus;
 
 import java.time.Instant;

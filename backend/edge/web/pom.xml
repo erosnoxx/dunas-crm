@@ -44,6 +44,18 @@
 
         <dependency>
             <groupId>com.crm</groupId>
+            <artifactId>registry-application</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.crm</groupId>
+            <artifactId>shared-application</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.crm</groupId>
             <artifactId>orchestration</artifactId>
             <version>${project.version}</version>
         </dependency>
