@@ -18,6 +18,7 @@ import com.crm.registry.infrastructure.catalog.persistence.JpaManufacturerReader
 import com.crm.registry.infrastructure.catalog.persistence.JpaManufacturerRepositoryImpl;
 import com.crm.registry.infrastructure.catalog.persistence.ManufacturerJpaRepository;
 import com.crm.registry.infrastructure.catalog.persistence.ManufacturerMapper;
+import com.crm.registry.infrastructure.catalog.seed.CatalogSeeder;
 import jakarta.persistence.EntityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -100,5 +101,20 @@ public class RegistryBeans {
     @Bean
     public EquipmentModelReader equipmentModelReader(EntityManager em) {
         return new JpaEquipmentModelReaderImpl(em);
+    }
+
+    // --- seed ---------------------------------------------------------------------------------
+
+    @Bean
+    public CatalogSeeder catalogSeeder(
+            ManufacturerRepository manufacturerRepository,
+            EquipmentTypeRepository equipmentTypeRepository,
+            EquipmentModelRepository equipmentModelRepository
+    ) {
+        return new CatalogSeeder(
+                manufacturerRepository,
+                equipmentTypeRepository,
+                equipmentModelRepository
+        );
     }
 }
