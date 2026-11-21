@@ -6,7 +6,7 @@ Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `querie
 
 ## Convenções desta feature
 
-**Quem age.** Todo use case autenticado recebe um `Actor` (`record Actor(UUID userId, Role role, UUID sessionId)`, em `iam-application`), montado pela `web` a partir da sessão. Endpoint "self" nunca aceita o id do próprio usuário no corpo: vem do `Actor`. A checagem de papel é **no use case**, nunca no controller (ADR-5).
+**Quem age.** Todo use case autenticado recebe um `Actor` (`record Actor(UUID userId, Role role, UUID sessionId)`, em `shared-application`: [`architecture.md`](../../rules/architecture.md) §3.1), montado pela `web` a partir da sessão. Endpoint "self" nunca aceita o id do próprio usuário no corpo: vem do `Actor`. A checagem de papel é **no use case**, nunca no controller (ADR-5).
 
 **Configuração** (`crm.iam.*`, `@ConfigurationProperties` com `@DefaultValue`, [`architecture.md`](../../rules/architecture.md) §9):
 

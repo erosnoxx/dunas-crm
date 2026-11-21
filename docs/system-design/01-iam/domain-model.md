@@ -127,11 +127,11 @@ Um aparelho conectado à conta (ADR-1).
 | `TokenSecret` | `StringValueObject` | segredo de 256 bits em base64 url-safe (43 caracteres). `generate()` usa `SecureRandom`; `hash()` devolve o `TokenHash`; `toString()` mascarado | `iam-domain` |
 | `TokenHash` | `StringValueObject` | SHA-256 em hexadecimal (64 caracteres) | `iam-domain` |
 | `DeviceLabel` | `StringValueObject` | de 1 a 80 caracteres | `iam-domain` |
-| `Role` | enum | `ADMINISTRATOR`, `COMMERCIAL`, `TECHNICIAN` | `iam-domain` |
+| `Role` | enum | `ADMINISTRATOR`, `COMMERCIAL`, `TECHNICIAN` | `shared-domain` (todo BC o usa para checar permissão: [`architecture.md`](../../rules/architecture.md) §3.1; [`02-catalog`](../02-catalog/README.md)) |
 | `UserStatus` | enum | `INVITED`, `ACTIVE`, `DEACTIVATED` | `iam-domain` |
 | `TokenPurpose` | enum | `INVITATION`, `PASSWORD_RESET` | `iam-domain` |
 
-Nenhum é promovido a `shared-domain`: só o IAM os usa. A tabela de mensagens de erro de cada VO vem na implementação, em pt-BR minúsculo ([`code-style.md`](../../rules/code-style.md) §5).
+Nenhum outro VO é promovido a `shared-domain`: só o IAM os usa. A exceção é o `Role`, que sobe porque todo BC checa o papel de quem age. A tabela de mensagens de erro de cada VO vem na implementação, em pt-BR minúsculo ([`code-style.md`](../../rules/code-style.md) §5).
 
 **Hash de senha e geração de segredo.** `Password` → `PasswordHash` exige Argon2id, que depende de biblioteca e portanto não cabe em `domain`: é um **contrato** em `iam-application` (`PasswordHasher`: `hash(Password)` e `matches(Password, PasswordHash)`), implementado em `iam-infrastructure`. É infraestrutura nossa, não terceiro: não passa por Translator. `TokenSecret` e `TokenHash` usam só o JDK (`SecureRandom`, `MessageDigest`) e ficam no domínio.
 

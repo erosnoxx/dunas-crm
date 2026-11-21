@@ -77,8 +77,8 @@ Confundir as duas é o erro mais fácil e mais caro: é assim que regra de negó
 
 **`shared`: negócio.** Conceitos de **domínio** que mais de um BC precisa (`Money`, `Email`, `Document`, `Address`...), e os schemas de resposta comuns (`UUIDResponse`). Herdam dos tipos base de `common`.
 
-- `shared-domain`: VOs de `address`, `contact`, `identity` (com os validadores de CPF e CNPJ, inclusive o alfanumérico) e `misc`, mais enums de negócio (`UF`).
-- `shared-application`: schemas de request/response compartilhados.
+- `shared-domain`: VOs de `address`, `contact`, `identity` (com os validadores de CPF e CNPJ, inclusive o alfanumérico) e `misc`, mais enums de negócio (`UF`, `Role`, o papel de quem trabalha na empresa).
+- `shared-application`: schemas de request/response compartilhados e o `Actor` (quem está agindo: usuário, papel e sessão), que todo use case autenticado de qualquer BC recebe. O `Actor` é do `shared` porque nenhum BC pode importá-lo de outro; quem **define** o papel de cada pessoa continua sendo o `iam`.
 - `shared-infrastructure`: vazio até existir algo que opere sobre os VOs compartilhados sem pertencer a nenhum BC. **Não forçar conteúdo**: módulo vazio é um estado legítimo.
 
 **Regras absolutas:**
@@ -120,7 +120,7 @@ boot           →  web + orchestration + common-infrastructure + <bc>-infrastru
 - **`web` injeta use cases e nada mais.** Não depende de `<bc>-domain` nem da infraestrutura, exceto `..infrastructure.integrations..` do BC que recebe um webhook (§4.3). **Travado:** `webDependsOnlyOnApplicationAndIntegrations`.
 - **Uma classe de `web` depende da `application` de no máximo um BC.** Se o fluxo precisa de mais, a composição mora em `orchestration` (§5.4). **Travado:** `webDependsOnAtMostOneBoundedContextPerClass`.
 - **`boot` recebe só configuração que enxerga mais de um BC**: a cadeia de segurança, o Flyway dos módulos, CORS global, Actuator, profiles, o filtro de correlação. Config de um BC só mora na `<bc>-infrastructure` dele (§9).
-- **A cadeia de segurança de `boot` usa um use case do `iam`** (`AuthenticateSession`, que devolve quem está agindo) e é a **única** classe de `boot` que depende de `iam-application`: é a exceção declarada. Ela também impõe a sessão restrita (conta que precisa trocar a senha só chama `ChangePassword`, `Logout` e `GetCurrentUser`). Nenhum outro BC enxerga o IAM: as demais features recebem o `Actor` já montado pela `web`. **Travado:** `bootDependsOnApplicationOnlyInTheSecurityChain` (só o pacote `com.crm.boot.security..` enxerga a application do `iam`, e de nenhum outro BC).
+- **A cadeia de segurança de `boot` usa um use case do `iam`** (`AuthenticateSession`, que devolve quem está agindo) e é a **única** classe de `boot` que depende de `iam-application`: é a exceção declarada. Ela também impõe a sessão restrita (conta que precisa trocar a senha só chama `ChangePassword`, `Logout` e `GetCurrentUser`). Nenhum outro BC enxerga o IAM: as demais features recebem o `Actor` (de `shared-application`, §3.1) já montado pela `web`, e checam o papel no próprio use case. **Travado:** `bootDependsOnApplicationOnlyInTheSecurityChain` (só o pacote `com.crm.boot.security..` enxerga a application do `iam`, e de nenhum outro BC).
 
 Os BCs são descobertos do classpath (todo `com.crm.<nome>` com camada `domain`, exceto `common` e `shared`): um BC novo entra nas regras sem editar nenhum teste.
 
@@ -156,6 +156,14 @@ Exemplo real: `common.infrastructure.integrations.smtp` (`SmtpClient`, `SmtpTran
 **Travado:** `AntiCorruptionLayerRulesTest`: só `..integrations..` fala com terceiro; DTO externo só é acessado pela própria integração; todo `*ServiceImpl` de integração depende do Translator dela; `*Translator` só existe em integração. **Ao adicionar uma integração que use SDK próprio, registre o pacote do SDK na lista `THIRD_PARTY_ACCESS` do teste**: com SDK, o modelo externo são as classes dele, e fora da lista nada impede que vazem.
 
 **Webhook de entrada.** O controller mora em `web` como todo endpoint: recebe o DTO do terceiro, entrega ao Translator e chama o use case com tipos nossos. Para isso `web` enxerga `..infrastructure.integrations..` do BC que recebe o webhook, e nada mais da infraestrutura dele: um controller que injetasse repository ou entidade JPA pularia o use case (transação, log, regras). Quando o `pom.xml` de `web` passa a depender de uma `<bc>-infrastructure`, a cerca contra repository e JPA deixa de ser do Maven e passa a ser só do ArchUnit.
+
+### 4.4 Subdomínios dentro de um BC
+
+Um BC pode conter mais de um **subdomínio** quando eles precisam de consistência imediata entre si: a mesma transação ACID e referência comum, sem projeção nem evento (§5.5). Subdomínios que toleram atraso entre si **não** são subdomínios do mesmo BC: são BCs separados. Critério: **um BC é o menor recorte que precisa ser consistente numa transação.**
+
+- **Layout.** O subdomínio é o **primeiro pacote dentro da camada**: `com.crm.<bc>.<camada>.<subdomínio>...` (ex. `com.crm.registry.domain.catalog.entities`, `com.crm.registry.application.catalog.usecases.commands`). São os mesmos três módulos Maven do BC (§4.2); não há módulo por subdomínio. BC de um subdomínio só **não** usa o nível extra (o `iam` fica como está).
+- **Mão única e declarada.** Um subdomínio só depende de outro se a direção estiver declarada, e nunca em ciclo: `customers` depende de `catalog`, nunca o contrário. A lista de direções permitidas mora no próprio teste. **Travado:** `subdomainsDependOnlyInDeclaredDirection` (em `BoundedContextRulesTest`).
+- **O resto vale como num BC comum:** as regras de camada olham o pacote da camada (`com.crm.<bc>.domain..`), que vem antes do subdomínio; as migrations continuam **por módulo** (`db/migration/<bc>/`); FK entre tabelas de subdomínios do mesmo BC é permitida, e a FK cross-BC continua proibida (§8).
 
 ---
 
@@ -390,7 +398,7 @@ O Maven barra o import não declarado, mas um `pom.xml` pode ser editado, e regr
 
 | Teste | Trava |
 |---|---|
-| `BoundedContextRulesTest` | isolamento entre BCs, direção das camadas, framework fora de `domain` e `application`, fronteiras de `common` e `shared`, `web` só com `application` (e integrações) de um BC por classe, `boot` só com a `application` do `iam` e só na cadeia de segurança (`com.crm.boot.security..`), sem ciclos |
+| `BoundedContextRulesTest` | isolamento entre BCs, direção das camadas, framework fora de `domain` e `application`, fronteiras de `common` e `shared`, `web` só com `application` (e integrações) de um BC por classe, `boot` só com a `application` do `iam` e só na cadeia de segurança (`com.crm.boot.security..`), sem ciclos, subdomínios de um mesmo BC só em mão única declarada (§4.4) |
 | `ClockRulesTest` | toda leitura de hora passa pelo `Clock` de `TimeConfig` |
 | `AntiCorruptionLayerRulesTest` | terceiro só em `integrations`, DTO externo contido, `ServiceImpl` usa o Translator |
 | `FlywayConfigTest` | a descoberta dos módulos de migration |

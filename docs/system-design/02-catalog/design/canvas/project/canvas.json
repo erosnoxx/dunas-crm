@@ -1,0 +1,25 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-11-20T12:00:00Z" },
+  "title": "Catálogo (02-catalog): mockup oficial",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 1280, "h": 820, "title": "1. Modelos, web" },
+    "Modelos-celular.dc.html": { "x": 1360, "y": 0, "w": 390, "h": 844, "title": "2. Modelos, celular" },
+    "Novo-modelo-web.dc.html": { "x": 0, "y": 964, "w": 1280, "h": 820, "title": "3. Novo modelo, web" },
+    "Novo-modelo-celular.dc.html": { "x": 1360, "y": 964, "w": 390, "h": 844, "title": "4. Novo modelo, celular, com erro" },
+    "Modelo-web.dc.html": { "x": 0, "y": 1928, "w": 1280, "h": 820, "title": "5. Modelo, web (editar e desativar)" },
+    "Modelo-desativado-celular.dc.html": { "x": 1360, "y": 1928, "w": 390, "h": 844, "title": "6. Modelo desativado, celular" },
+    "Fabricantes-web.dc.html": { "x": 0, "y": 2892, "w": 1280, "h": 820, "title": "7. Fabricantes, web" },
+    "Fabricantes-celular.dc.html": { "x": 1360, "y": 2892, "w": 390, "h": 844, "title": "8. Fabricantes, celular" },
+    "Tipos-web.dc.html": { "x": 0, "y": 3856, "w": 1280, "h": 820, "title": "9. Tipos, web (editar tipo)" },
+    "Tipos-celular.dc.html": { "x": 1360, "y": 3856, "w": 390, "h": 844, "title": "10. Tipos, celular" },
+    "Novo-tipo-celular.dc.html": { "x": 1830, "y": 3856, "w": 390, "h": 844, "title": "11. Novo tipo, celular" },
+    "Modelos-tecnico-celular.dc.html": { "x": 1830, "y": 0, "w": 390, "h": 844, "title": "12. Modelos, celular, Técnico (só consulta)" },
+    "Modelos-sem-resultado-celular.dc.html": { "x": 2300, "y": 0, "w": 390, "h": 844, "title": "13. Modelos, celular, sem resultado" }
+  },
+  "order": ["Main.dc.html", "Modelos-celular.dc.html", "Novo-modelo-web.dc.html", "Novo-modelo-celular.dc.html", "Modelo-web.dc.html", "Modelo-desativado-celular.dc.html", "Fabricantes-web.dc.html", "Fabricantes-celular.dc.html", "Tipos-web.dc.html", "Tipos-celular.dc.html", "Novo-tipo-celular.dc.html", "Modelos-tecnico-celular.dc.html", "Modelos-sem-resultado-celular.dc.html"],
+  "notes": {},
+  "designSystems": []
+}
