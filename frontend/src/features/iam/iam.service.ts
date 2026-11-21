@@ -1,5 +1,6 @@
 import { ensureCsrfCookie } from "@/shared/api/csrf"
 import { httpClient } from "@/shared/api/http-client"
+import type { Page } from "@/shared/api/page"
 
 export type Role = "ADMINISTRATOR" | "COMMERCIAL" | "TECHNICIAN"
 export type UserStatus = "INVITED" | "ACTIVE" | "DEACTIVATED"
@@ -33,14 +34,6 @@ export type SessionSummary = {
 }
 
 export type UserDetail = { user: UserSummary; sessions: SessionSummary[] }
-
-export type Page<T> = {
-  content: T[]
-  page: number
-  size: number
-  totalElements: number
-  totalPages: number
-}
 
 /** Só o que a tela precisa: nunca repassa um `token` que o corpo traga por engano. */
 function toSessionView(data: SessionView): SessionView {
