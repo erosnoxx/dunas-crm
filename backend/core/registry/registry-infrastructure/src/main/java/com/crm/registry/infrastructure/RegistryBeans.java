@@ -6,6 +6,22 @@ import com.crm.registry.application.catalog.contracts.readers.ManufacturerReader
 import com.crm.registry.application.catalog.contracts.repositories.EquipmentModelRepository;
 import com.crm.registry.application.catalog.contracts.repositories.EquipmentTypeRepository;
 import com.crm.registry.application.catalog.contracts.repositories.ManufacturerRepository;
+import com.crm.registry.application.catalog.usecases.commands.DeactivateEquipmentModel;
+import com.crm.registry.application.catalog.usecases.commands.DeactivateEquipmentType;
+import com.crm.registry.application.catalog.usecases.commands.DeactivateManufacturer;
+import com.crm.registry.application.catalog.usecases.commands.ReactivateEquipmentModel;
+import com.crm.registry.application.catalog.usecases.commands.ReactivateEquipmentType;
+import com.crm.registry.application.catalog.usecases.commands.ReactivateManufacturer;
+import com.crm.registry.application.catalog.usecases.commands.RegisterEquipmentModel;
+import com.crm.registry.application.catalog.usecases.commands.RegisterEquipmentType;
+import com.crm.registry.application.catalog.usecases.commands.RegisterManufacturer;
+import com.crm.registry.application.catalog.usecases.commands.RenameManufacturer;
+import com.crm.registry.application.catalog.usecases.commands.UpdateEquipmentModel;
+import com.crm.registry.application.catalog.usecases.commands.UpdateEquipmentType;
+import com.crm.registry.application.catalog.usecases.queries.GetEquipmentModel;
+import com.crm.registry.application.catalog.usecases.queries.ListEquipmentModels;
+import com.crm.registry.application.catalog.usecases.queries.ListEquipmentTypes;
+import com.crm.registry.application.catalog.usecases.queries.ListManufacturers;
 import com.crm.registry.infrastructure.catalog.persistence.EquipmentModelJpaRepository;
 import com.crm.registry.infrastructure.catalog.persistence.EquipmentModelMapper;
 import com.crm.registry.infrastructure.catalog.persistence.EquipmentTypeJpaRepository;
@@ -101,6 +117,104 @@ public class RegistryBeans {
     @Bean
     public EquipmentModelReader equipmentModelReader(EntityManager em) {
         return new JpaEquipmentModelReaderImpl(em);
+    }
+
+    // --- catálogo: commands -------------------------------------------------------------------
+
+    @Bean
+    public RegisterManufacturer registerManufacturer(ManufacturerRepository manufacturerRepository) {
+        return new RegisterManufacturer(manufacturerRepository);
+    }
+
+    @Bean
+    public RenameManufacturer renameManufacturer(ManufacturerRepository manufacturerRepository) {
+        return new RenameManufacturer(manufacturerRepository);
+    }
+
+    @Bean
+    public DeactivateManufacturer deactivateManufacturer(ManufacturerRepository manufacturerRepository) {
+        return new DeactivateManufacturer(manufacturerRepository);
+    }
+
+    @Bean
+    public ReactivateManufacturer reactivateManufacturer(ManufacturerRepository manufacturerRepository) {
+        return new ReactivateManufacturer(manufacturerRepository);
+    }
+
+    @Bean
+    public RegisterEquipmentType registerEquipmentType(EquipmentTypeRepository equipmentTypeRepository) {
+        return new RegisterEquipmentType(equipmentTypeRepository);
+    }
+
+    @Bean
+    public UpdateEquipmentType updateEquipmentType(
+            EquipmentTypeRepository equipmentTypeRepository,
+            EquipmentModelReader equipmentModelReader
+    ) {
+        return new UpdateEquipmentType(equipmentTypeRepository, equipmentModelReader);
+    }
+
+    @Bean
+    public DeactivateEquipmentType deactivateEquipmentType(EquipmentTypeRepository equipmentTypeRepository) {
+        return new DeactivateEquipmentType(equipmentTypeRepository);
+    }
+
+    @Bean
+    public ReactivateEquipmentType reactivateEquipmentType(EquipmentTypeRepository equipmentTypeRepository) {
+        return new ReactivateEquipmentType(equipmentTypeRepository);
+    }
+
+    @Bean
+    public RegisterEquipmentModel registerEquipmentModel(
+            EquipmentModelRepository equipmentModelRepository,
+            ManufacturerRepository manufacturerRepository,
+            EquipmentTypeRepository equipmentTypeRepository
+    ) {
+        return new RegisterEquipmentModel(
+                equipmentModelRepository,
+                manufacturerRepository,
+                equipmentTypeRepository
+        );
+    }
+
+    @Bean
+    public UpdateEquipmentModel updateEquipmentModel(
+            EquipmentModelRepository equipmentModelRepository,
+            EquipmentTypeRepository equipmentTypeRepository
+    ) {
+        return new UpdateEquipmentModel(equipmentModelRepository, equipmentTypeRepository);
+    }
+
+    @Bean
+    public DeactivateEquipmentModel deactivateEquipmentModel(EquipmentModelRepository equipmentModelRepository) {
+        return new DeactivateEquipmentModel(equipmentModelRepository);
+    }
+
+    @Bean
+    public ReactivateEquipmentModel reactivateEquipmentModel(EquipmentModelRepository equipmentModelRepository) {
+        return new ReactivateEquipmentModel(equipmentModelRepository);
+    }
+
+    // --- catálogo: queries --------------------------------------------------------------------
+
+    @Bean
+    public ListManufacturers listManufacturers(ManufacturerReader manufacturerReader) {
+        return new ListManufacturers(manufacturerReader);
+    }
+
+    @Bean
+    public ListEquipmentTypes listEquipmentTypes(EquipmentTypeReader equipmentTypeReader) {
+        return new ListEquipmentTypes(equipmentTypeReader);
+    }
+
+    @Bean
+    public ListEquipmentModels listEquipmentModels(EquipmentModelReader equipmentModelReader) {
+        return new ListEquipmentModels(equipmentModelReader);
+    }
+
+    @Bean
+    public GetEquipmentModel getEquipmentModel(EquipmentModelReader equipmentModelReader) {
+        return new GetEquipmentModel(equipmentModelReader);
     }
 
     // --- seed ---------------------------------------------------------------------------------
