@@ -109,6 +109,12 @@ function useTypeForm(
         form.setFocus("name")
       } else {
         setFailure(error)
+        if (error.code === "characteristic_locked") {
+          // A contagem de modelos estava velha: volta ao valor salvo e a consulta refeita trava os campos.
+          form.resetField("unit")
+          form.resetField("required")
+          onStale?.()
+        }
         if (error.code === "type_deactivated") onStale?.()
       }
     }

@@ -343,6 +343,32 @@ describe("Editar tipo", () => {
     )
   })
 
+  it("characteristic_locked refaz a consulta: a unidade e a caixa travam no valor salvo, e o aviso e o nome digitado ficam", async () => {
+    vi.mocked(service.updateEquipmentType).mockImplementation(async () => {
+      vi.mocked(service.listEquipmentTypes).mockResolvedValue(
+        page([INVERSOR, { ...PAINEL, modelCount: 1 }]),
+      )
+      throw { status: 422, code: "characteristic_locked", message: "x" }
+    })
+    const user = renderPanel("/catalogo/tipos/t-painel")
+    const name = await typeName()
+    await user.clear(name)
+    await user.type(name, "Módulo solar")
+    await user.selectOptions(unit(), "W")
+    await user.click(required())
+
+    await user.click(button("Salvar alterações"))
+
+    await waitFor(() => expect(unit()).toBeDisabled())
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "O tipo já tem modelos: a unidade e a obrigatoriedade não podem mudar",
+    )
+    expect(name).toHaveValue("Módulo solar")
+    expect(unit()).toHaveValue("WATT_PEAK")
+    expect(required()).toBeDisabled()
+    expect(required()).not.toBeChecked()
+  })
+
   it("type_name_taken ao editar mantém o texto digitado", async () => {
     vi.mocked(service.updateEquipmentType).mockRejectedValue({
       status: 409,
