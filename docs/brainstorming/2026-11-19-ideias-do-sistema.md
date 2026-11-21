@@ -19,7 +19,7 @@ Decisões globais em [`00-overview.md`](../system-design/00-overview.md). Espec�
 
 | ID | Ideia | Origem | Valor esperado | Custo | Risco principal | Status |
 |---|---|---|---|---|---|---|
-| I1 | Cadastro central de clientes e usinas, de qualquer marca, com vínculo usina-cliente | dono | uma visão única da carteira, que os apps dos fabricantes não dão | médio | depende do cadastro nas contas da empresa | ideia |
+| I1 | Cadastro central de clientes e usinas, de qualquer marca, com vínculo usina-cliente | dono | uma visão única da carteira, que os apps dos fabricantes não dão | médio | depende do cadastro nas contas da empresa | aceita: [`02-catalog`](../system-design/02-catalog/) |
 | I2 | Dashboard de geração por cliente e por usina, atualizado a cada intervalo | dono | acompanhar a carteira e perceber queda de geração | médio | limites de chamada e acesso à API de cada marca | ideia |
 | I3 | Relatório "no último período seu sistema gerou X, isso representa R$ Y no seu bolso" | irmão | o cliente enxerga o valor e a empresa retém o cliente | baixo | o valor depende da tarifa; sai como estimativa | ideia |
 | I4 | Portal em que o cliente agenda uma visita | irmão | menos telefone, agenda organizada | baixo | exige acesso de cliente no `iam` | ideia |
@@ -55,4 +55,6 @@ Nenhuma.
 
 ## Promovidas
 
-Nenhuma. A primeira feature, `01-iam`, é de base e não vem desta lista.
+- **I1** (cadastro central de clientes e usinas), em duas features no BC `registry`: [`02-catalog`](../system-design/02-catalog/) (fabricante, tipo e modelo) e `03-customers` (cliente, local e equipamento instalado, ainda sem pasta). A "usina" das nuvens dos fabricantes se liga a um local quando o monitoramento existir.
+
+A primeira feature, `01-iam`, é de base e não vem desta lista.
