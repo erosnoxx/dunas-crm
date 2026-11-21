@@ -1,7 +1,7 @@
 package com.crm.web.iam;
 
-import com.crm.iam.application.Actor;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.application.Actor;
+import com.crm.shared.domain.enums.Role;
 import com.crm.web.middlewares.RestExceptionHandler;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;

@@ -2,7 +2,7 @@ package com.crm.iam.application.usecases.queries;
 
 import com.crm.common.application.annotations.UseCase;
 import com.crm.common.application.exceptions.NotFoundException;
-import com.crm.iam.application.Actor;
+import com.crm.shared.application.Actor;
 import com.crm.iam.application.contracts.readers.SessionReader;
 import com.crm.iam.application.contracts.readers.UserReader;
 import com.crm.iam.application.schemas.UserDetail;
