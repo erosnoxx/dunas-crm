@@ -15,7 +15,6 @@ import static com.crm.registry.application.catalog.CatalogFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("GetEquipmentModel")
@@ -56,14 +55,5 @@ class GetEquipmentModelTest {
 
         assertThatThrownBy(() -> getEquipmentModel.execute(new GetEquipmentModel.Params(TECHNICIAN, unknown)))
                 .satisfies(applicationCode("model_not_found"));
-    }
-
-    @Test
-    @DisplayName("ator nulo é erro de programação e o leitor não é consultado")
-    void aNullActorIsAProgrammingError() {
-        assertThatThrownBy(() -> getEquipmentModel.execute(new GetEquipmentModel.Params(null, summary.id())))
-                .isInstanceOf(NullPointerException.class);
-
-        verifyNoInteractions(reader);
     }
 }

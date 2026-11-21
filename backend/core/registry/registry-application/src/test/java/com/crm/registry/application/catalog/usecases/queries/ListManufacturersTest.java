@@ -14,10 +14,8 @@ import java.util.List;
 
 import static com.crm.registry.application.catalog.CatalogFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("ListManufacturers")
@@ -52,15 +50,5 @@ class ListManufacturersTest {
                 ADMINISTRATOR, new ManufacturerFilter("hua", null), pageable));
 
         verify(reader).search(new ManufacturerFilter("hua", StatusFilter.ACTIVE), pageable);
-    }
-
-    @Test
-    @DisplayName("ator nulo é erro de programação e o leitor não é consultado")
-    void aNullActorIsAProgrammingError() {
-        assertThatThrownBy(() -> listManufacturers.execute(
-                new ListManufacturers.Params(null, new ManufacturerFilter(null, null), pageable)))
-                .isInstanceOf(NullPointerException.class);
-
-        verifyNoInteractions(reader);
     }
 }

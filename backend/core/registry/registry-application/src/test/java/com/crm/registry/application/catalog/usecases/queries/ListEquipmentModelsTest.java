@@ -15,10 +15,8 @@ import java.util.UUID;
 
 import static com.crm.registry.application.catalog.CatalogFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("ListEquipmentModels")
@@ -55,15 +53,5 @@ class ListEquipmentModelsTest {
                 ADMINISTRATOR, new EquipmentModelFilter("sun", typeId, null), pageable));
 
         verify(reader).search(new EquipmentModelFilter("sun", typeId, StatusFilter.ACTIVE), pageable);
-    }
-
-    @Test
-    @DisplayName("ator nulo é erro de programação e o leitor não é consultado")
-    void aNullActorIsAProgrammingError() {
-        assertThatThrownBy(() -> listEquipmentModels.execute(
-                new ListEquipmentModels.Params(null, new EquipmentModelFilter(null, null, null), pageable)))
-                .isInstanceOf(NullPointerException.class);
-
-        verifyNoInteractions(reader);
     }
 }

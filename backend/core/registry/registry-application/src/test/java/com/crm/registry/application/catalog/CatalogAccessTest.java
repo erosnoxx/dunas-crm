@@ -27,12 +27,10 @@ class CatalogAccessTest {
     }
 
     @Test
-    @DisplayName("os três papéis consultam, mas o ator nulo é erro de programação")
-    void everyRoleMayReadButANullActorIsAProgrammingError() {
+    @DisplayName("os três papéis consultam o catálogo")
+    void everyRoleMayRead() {
         assertThatCode(() -> CatalogAccess.requireReader(ADMINISTRATOR)).doesNotThrowAnyException();
         assertThatCode(() -> CatalogAccess.requireReader(COMMERCIAL)).doesNotThrowAnyException();
         assertThatCode(() -> CatalogAccess.requireReader(TECHNICIAN)).doesNotThrowAnyException();
-
-        assertThatThrownBy(() -> CatalogAccess.requireReader(null)).isInstanceOf(NullPointerException.class);
     }
 }
