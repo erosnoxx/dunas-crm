@@ -147,6 +147,28 @@ describe("novo modelo", () => {
     })
   })
 
+  it.each([
+    ["fabricantes", () => vi.mocked(service.listManufacturers)],
+    ["tipos", () => vi.mocked(service.listEquipmentTypes)],
+  ])(
+    "a consulta de %s com falha mostra o aviso, não culpa a pessoa",
+    async (_, query) => {
+      query().mockRejectedValue({ status: 403, code: "forbidden", message: "Forbidden" })
+      renderForm("/catalogo/modelos/novo")
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "Você não tem permissão para isto",
+      )
+    },
+  )
+
+  it("enquanto as escolhas carregam mostra o indicador de carregamento", async () => {
+    vi.mocked(service.listManufacturers).mockReturnValue(new Promise(() => undefined))
+    renderForm("/catalogo/modelos/novo")
+
+    expect(await screen.findByRole("status")).toHaveAttribute("aria-busy", "true")
+  })
+
   it("trocar o tipo troca o rótulo e a unidade, e zera o valor", async () => {
     const { user } = renderForm("/catalogo/modelos/novo")
     await screen.findByRole("option", { name: "Inversor" })
@@ -170,6 +192,7 @@ describe("novo modelo", () => {
 
     expect(await screen.findByText(/use só números e vírgula/)).toBeInTheDocument()
     expect(screen.getByLabelText("Capacidade *")).toHaveAttribute("aria-invalid", "true")
+    expect(screen.getByLabelText("Capacidade *")).toHaveFocus()
     expect(service.registerEquipmentModel).not.toHaveBeenCalled()
   })
 
@@ -275,6 +298,21 @@ describe("novo modelo", () => {
         /o valor precisa ser maior que zero, com até 3 casas decimais/,
       ),
     )
+    expect(screen.getByLabelText("Capacidade *")).toHaveFocus()
+  })
+
+  it("characteristic_required leva o foco ao valor", async () => {
+    vi.mocked(service.registerEquipmentModel).mockRejectedValue({
+      status: 422,
+      code: "characteristic_required",
+      message: "x",
+    })
+    const { user } = renderForm("/catalogo/modelos/novo")
+    await fillNew(user, "12000")
+
+    await user.click(save())
+
+    await waitFor(() => expect(screen.getByLabelText("Capacidade *")).toHaveFocus())
   })
 
   it.each([
@@ -397,6 +435,25 @@ describe("editar modelo", () => {
     await user.click(await screen.findByRole("button", { name: "Desativar modelo" }))
 
     expect(service.deactivateEquipmentModel).toHaveBeenCalledWith("m1", expect.anything())
+    expect(
+      await screen.findByRole("button", { name: "Reativar modelo" }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
+  })
+
+  it("model_deactivated refaz a consulta e a tela passa a só leitura, com Reativar modelo", async () => {
+    vi.mocked(service.updateEquipmentModel).mockImplementation(async () => {
+      vi.mocked(service.getEquipmentModel).mockResolvedValue({
+        ...SUN,
+        status: "DEACTIVATED",
+      })
+      throw { status: 422, code: "model_deactivated", message: "x" }
+    })
+    const { user } = renderForm("/catalogo/modelos/m1")
+    await screen.findByLabelText("Potência *")
+
+    await user.click(save("Salvar alterações"))
+
     expect(
       await screen.findByRole("button", { name: "Reativar modelo" }),
     ).toBeInTheDocument()

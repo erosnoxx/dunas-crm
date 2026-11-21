@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronLeftIcon, Loader2Icon } from "lucide-react"
+import { ChevronLeftIcon } from "lucide-react"
 import * as React from "react"
 import { useController, useForm, useWatch } from "react-hook-form"
 import { Link, Navigate, useNavigate, useParams } from "react-router"
@@ -37,6 +37,7 @@ import type {
 } from "../catalog.service"
 import { CatalogStatusChip } from "../components/catalog-status"
 import { FieldError, ModelValuesFields } from "../components/model-values-fields"
+import { Spinner } from "../components/panel-frame"
 
 const LIST_PATH = "/catalogo"
 const NAME_MAX = 80
@@ -66,14 +67,6 @@ const invalid = (id: string, error: string | undefined) => ({
   "aria-invalid": error ? true : undefined,
   "aria-describedby": error ? `${id}-error` : undefined,
 })
-
-function Spinner() {
-  return (
-    <div role="status" aria-busy="true" className="flex justify-center py-6">
-      <Loader2Icon aria-hidden="true" className="size-6 animate-spin text-text-muted" />
-    </div>
-  )
-}
 
 /**
  * A moldura das telas do modelo. Na web: o link "Modelos" e o título no h1 (`display-lg`). No
@@ -140,6 +133,7 @@ function useModelForm(
   defaults: EquipmentModelValues,
   findType: (typeId: string) => EquipmentTypeSummary | undefined,
   send: SendModel,
+  onStale?: () => void,
 ) {
   const [failure, setFailure] = React.useState<Failure>(null)
   const form = useForm<EquipmentModelValues>({
@@ -173,15 +167,20 @@ function useModelForm(
       if (error.code === "model_name_taken") {
         form.setError("name", { message: messageFor(error.code, "") })
         form.setFocus("name")
-      } else if (characteristic && error.code === "characteristic_required")
+      } else if (characteristic && error.code === "characteristic_required") {
         // A tabela de erros traz o nome da característica, que a tela conhece pelo tipo.
         form.setError("amount", {
           message: `informe a característica ${characteristic.name}`,
         })
-      else if (characteristic && error.code === "invalid_amount")
+        form.setFocus("amount")
+      } else if (characteristic && error.code === "invalid_amount") {
         form.setError("amount", { message: messageFor(error.code, "") })
-      // Sem o campo do valor na tela, o erro dele sai no aviso: nunca fica invisível.
-      else setFailure(error)
+        form.setFocus("amount")
+      } else {
+        // Sem o campo do valor na tela, o erro dele sai no aviso: nunca fica invisível.
+        setFailure(error)
+        if (error.code === "model_deactivated") onStale?.()
+      }
     }
   })
 
@@ -237,6 +236,7 @@ function ModelFields({
         type={model.type}
         value={model.amount.field.value}
         onChange={model.amount.field.onChange}
+        inputRef={model.amount.field.ref}
         error={model.form.formState.errors.amount?.message}
       />
       {valueState}
@@ -321,6 +321,7 @@ function NewModel() {
     },
   )
   const { errors } = model.form.formState
+  const optionsFailure = (manufacturers.error ?? types.error) as Failure
   const save = <SaveButton formId={formId} label="Salvar modelo" model={model} />
 
   return (
@@ -331,6 +332,11 @@ function NewModel() {
         className="md:max-w-160"
         head={
           <>
+            {optionsFailure ? (
+              <Alert tone="danger">{errorMessage(optionsFailure)}</Alert>
+            ) : (
+              (manufacturers.isPending || types.isPending) && <Spinner />
+            )}
             <div className="flex flex-col gap-1.5">
               <Label htmlFor={`${formId}-manufacturer`}>Fabricante *</Label>
               <NativeSelect
@@ -391,7 +397,13 @@ function NewModel() {
  * editáveis, e o painel de situação com "Desativar modelo", sem confirmação (ADR-5). O tipo vem
  * do `typeId` salvo e fica estável: a consulta que volta sem ele não apaga o que foi digitado.
  */
-function EditModel({ model: saved }: { model: EquipmentModelSummary }) {
+function EditModel({
+  model: saved,
+  onStale,
+}: {
+  model: EquipmentModelSummary
+  onStale: () => void
+}) {
   const isDesktop = useMediaQuery(MD_UP)
   const navigate = useNavigate()
   const formId = React.useId()
@@ -432,6 +444,7 @@ function EditModel({ model: saved }: { model: EquipmentModelSummary }) {
       })
       void navigate(LIST_PATH)
     },
+    onStale,
   )
   // Sem a característica não há como montar o valor: Salvar espera, em vez de apagar o salvo.
   const save = (
@@ -601,7 +614,7 @@ function ModelDetail({ canEdit }: { canEdit: boolean }) {
   if (!canEdit || model.status === "DEACTIVATED")
     return <ReadOnlyModel model={model} canEdit={canEdit} />
 
-  return <EditModel key={model.id} model={model} />
+  return <EditModel key={model.id} model={model} onStale={() => void query.refetch()} />
 }
 
 /**

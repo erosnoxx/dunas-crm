@@ -26,6 +26,8 @@ type ModelValuesFieldsProps = {
   value: string
   onChange: (value: string) => void
   error?: string
+  /** Chega ao campo, para o React Hook Form levar o foco a ele quando for o inválido. */
+  inputRef?: React.Ref<HTMLInputElement>
 }
 
 /**
@@ -34,7 +36,13 @@ type ModelValuesFieldsProps = {
  * desenhada. O valor é do pai; trocar o tipo chama `onChange("")` (efeito, que não roda na
  * montagem nem quando o tipo chega depois dela, para não apagar o valor de um modelo em edição), e nada digitado vaza para o tipo novo.
  */
-function ModelValuesFields({ type, value, onChange, error }: ModelValuesFieldsProps) {
+function ModelValuesFields({
+  type,
+  value,
+  onChange,
+  error,
+  inputRef,
+}: ModelValuesFieldsProps) {
   const id = React.useId()
   const typeId = type?.id
   const previousTypeId = React.useRef(typeId)
@@ -71,6 +79,7 @@ function ModelValuesFields({ type, value, onChange, error }: ModelValuesFieldsPr
         </Label>
         <div className="flex items-stretch">
           <Input
+            ref={inputRef}
             id={fieldId}
             size="compact"
             inputMode="decimal"
