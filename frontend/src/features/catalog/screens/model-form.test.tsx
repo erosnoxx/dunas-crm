@@ -455,6 +455,105 @@ describe("editar modelo", () => {
     expect(screen.getByLabelText("Potência *")).toHaveValue("4")
   })
 
+  it.each([
+    ["pendente", () => new Promise<never>(() => undefined)],
+    [
+      "com falha",
+      () => Promise.reject({ status: 403, code: "forbidden", message: "Forbidden" }),
+    ],
+  ])(
+    "consulta dos tipos %s: o campo vem do valor salvo e Salvar envia o valor",
+    async (_, types) => {
+      vi.mocked(service.listEquipmentTypes).mockImplementation(types)
+      vi.mocked(service.updateEquipmentModel).mockResolvedValue()
+      const { user } = renderForm("/catalogo/modelos/m1")
+      const amount = await screen.findByLabelText("Potência *")
+      expect(amount).toHaveValue("3")
+      await user.clear(amount)
+      await user.type(amount, "4")
+
+      await user.click(save("Salvar alterações"))
+
+      await waitFor(() =>
+        expect(service.updateEquipmentModel).toHaveBeenCalledWith("m1", {
+          name: "SUN2000-3KTL-L1",
+          values: [{ definitionId: "c-power", amount: "4" }],
+        }),
+      )
+    },
+  )
+
+  it("modelo sem valor salvo e tipos pendentes: Salvar fica desligado, sem enviar values vazio", async () => {
+    vi.mocked(service.getEquipmentModel).mockResolvedValue({ ...SUN, values: [] })
+    vi.mocked(service.listEquipmentTypes).mockReturnValue(new Promise(() => undefined))
+    renderForm("/catalogo/modelos/m1")
+
+    await screen.findByLabelText("Nome do modelo *")
+
+    expect(save("Salvar alterações")).toBeDisabled()
+    expect(screen.getByRole("status")).toHaveAttribute("aria-busy", "true")
+    expect(screen.queryByLabelText(/Potência/)).not.toBeInTheDocument()
+  })
+
+  it("modelo sem valor salvo e tipos com falha: o aviso aparece e Salvar fica desligado", async () => {
+    vi.mocked(service.getEquipmentModel).mockResolvedValue({ ...SUN, values: [] })
+    vi.mocked(service.listEquipmentTypes).mockRejectedValue({
+      status: 403,
+      code: "forbidden",
+      message: "Forbidden",
+    })
+    renderForm("/catalogo/modelos/m1")
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Você não tem permissão para isto",
+    )
+    expect(save("Salvar alterações")).toBeDisabled()
+  })
+
+  it("apagar de propósito o valor opcional envia values vazio", async () => {
+    vi.mocked(service.listEquipmentTypes).mockResolvedValue(
+      page([
+        {
+          ...INVERTER,
+          characteristics: [{ ...INVERTER.characteristics[0], required: false }],
+        },
+      ]),
+    )
+    vi.mocked(service.updateEquipmentModel).mockResolvedValue()
+    const { user } = renderForm("/catalogo/modelos/m1")
+    const amount = await screen.findByLabelText("Potência")
+
+    await user.clear(amount)
+    await user.click(save("Salvar alterações"))
+
+    await waitFor(() =>
+      expect(service.updateEquipmentModel).toHaveBeenCalledWith("m1", {
+        name: "SUN2000-3KTL-L1",
+        values: [],
+      }),
+    )
+  })
+
+  it("characteristic_required sem o campo na tela sai no aviso", async () => {
+    vi.mocked(service.getEquipmentModel).mockResolvedValue({ ...SUN, values: [] })
+    vi.mocked(service.listEquipmentTypes).mockResolvedValue(
+      page([{ ...INVERTER, characteristics: [] }]),
+    )
+    vi.mocked(service.updateEquipmentModel).mockRejectedValue({
+      status: 422,
+      code: "characteristic_required",
+      message: "informe a característica Potência",
+    })
+    const { user } = renderForm("/catalogo/modelos/m1")
+    await waitFor(() => expect(save("Salvar alterações")).toBeEnabled())
+
+    await user.click(save("Salvar alterações"))
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Informe a característica obrigatória",
+    )
+  })
+
   it("web: o nome do modelo é o título e o painel de situação fica ao lado", async () => {
     setDesktop(true)
     renderForm("/catalogo/modelos/m1")

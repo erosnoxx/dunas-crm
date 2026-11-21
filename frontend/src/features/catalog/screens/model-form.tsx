@@ -40,7 +40,8 @@ import { FieldError, ModelValuesFields } from "../components/model-values-fields
 
 const LIST_PATH = "/catalogo"
 const NAME_MAX = 80
-// shortcut: as escolhas listam só os 100 primeiros; paginar a escolha se o catálogo passar disso.
+// shortcut: as escolhas listam só os 100 primeiros; na edição isso só afeta a obrigatoriedade e o
+// modelo sem valor salvo (Salvar fica desligado). Paginar a escolha se o catálogo passar disso.
 const OPTIONS = { page: 0, size: 100 } as const
 
 // Textos aprovados dos mockups 3, 5 e 6.
@@ -144,7 +145,8 @@ function useModelForm(
   const form = useForm<EquipmentModelValues>({
     defaultValues: defaults,
     resolver: (values, context, options) => {
-      const optional = findType(values.typeId)?.characteristics[0]?.required === false
+      // Sem característica conhecida não há campo do valor, então não há valor a exigir.
+      const optional = findType(values.typeId)?.characteristics[0]?.required !== true
       const schema = optional ? optionalAmountModelSchema : equipmentModelSchema
 
       return zodResolver(schema)(values, context, options)
@@ -157,6 +159,7 @@ function useModelForm(
   const submit = form.handleSubmit(async (values) => {
     setFailure(null)
     const parsed = parseAmount(values.amount)
+    // A lista substitui a do modelo (usecases.md): vazia só quando a pessoa apagou o valor opcional.
     const input =
       characteristic && parsed.ok
         ? [{ definitionId: characteristic.id, amount: parsed.value }]
@@ -170,15 +173,14 @@ function useModelForm(
       if (error.code === "model_name_taken") {
         form.setError("name", { message: messageFor(error.code, "") })
         form.setFocus("name")
-      } else if (error.code === "characteristic_required")
+      } else if (characteristic && error.code === "characteristic_required")
         // A tabela de erros traz o nome da característica, que a tela conhece pelo tipo.
         form.setError("amount", {
-          message: characteristic
-            ? `informe a característica ${characteristic.name}`
-            : messageFor(error.code, ""),
+          message: `informe a característica ${characteristic.name}`,
         })
-      else if (error.code === "invalid_amount")
+      else if (characteristic && error.code === "invalid_amount")
         form.setError("amount", { message: messageFor(error.code, "") })
+      // Sem o campo do valor na tela, o erro dele sai no aviso: nunca fica invisível.
       else setFailure(error)
     }
   })
@@ -214,12 +216,15 @@ function ModelFields({
   model,
   id,
   head,
+  valueState,
   footer,
   className,
 }: {
   model: ModelForm
   id: string
   head: React.ReactNode
+  /** No lugar do valor, enquanto a característica não é conhecida (carregando ou erro). */
+  valueState?: React.ReactNode
   footer?: React.ReactNode
   className?: string
 }) {
@@ -234,6 +239,7 @@ function ModelFields({
         onChange={model.amount.field.onChange}
         error={model.form.formState.errors.amount?.message}
       />
+      {valueState}
       {footer}
     </form>
   )
@@ -258,10 +264,12 @@ function SaveButton({
   formId,
   label,
   model,
+  disabled,
 }: {
   formId: string
   label: string
   model: ModelForm
+  disabled?: boolean
 }) {
   const isDesktop = useMediaQuery(MD_UP)
 
@@ -270,6 +278,7 @@ function SaveButton({
       type="submit"
       form={formId}
       size={isDesktop ? "md" : "lg"}
+      disabled={disabled}
       loading={model.form.formState.isSubmitting}
       className={isDesktop ? WEB_BUTTON : "min-h-12 w-full"}
     >
@@ -394,8 +403,20 @@ function EditModel({ model: saved }: { model: EquipmentModelSummary }) {
 
   if (found && found !== lastType) setLastType(found)
 
-  const type = found ?? lastType
   const value = saved.values[0]
+  // A característica do valor salvo vem no próprio modelo; a lista de tipos só confirma se ela é
+  // obrigatória (até chegar, vale como obrigatória). Sem valor salvo, só a lista a conhece.
+  const type: EquipmentTypeSummary | undefined =
+    found ??
+    lastType ??
+    (value && {
+      ...saved.type,
+      status: "ACTIVE",
+      modelCount: 0,
+      characteristics: [
+        { id: value.definitionId, name: value.name, unit: value.unit, required: true },
+      ],
+    })
   const model = useModelForm(
     {
       manufacturerId: saved.manufacturer.id,
@@ -412,7 +433,23 @@ function EditModel({ model: saved }: { model: EquipmentModelSummary }) {
       void navigate(LIST_PATH)
     },
   )
-  const save = <SaveButton formId={formId} label="Salvar alterações" model={model} />
+  // Sem a característica não há como montar o valor: Salvar espera, em vez de apagar o salvo.
+  const save = (
+    <SaveButton
+      formId={formId}
+      label="Salvar alterações"
+      model={model}
+      disabled={!type}
+    />
+  )
+  const typesFailure = types.error as Failure
+  const valueState =
+    !type &&
+    (typesFailure ? (
+      <Alert tone="danger">{errorMessage(typesFailure)}</Alert>
+    ) : (
+      types.isPending && <Spinner />
+    ))
 
   return (
     <Frame title={saved.name} mobileAction={!isDesktop && save}>
@@ -430,6 +467,7 @@ function EditModel({ model: saved }: { model: EquipmentModelSummary }) {
               </div>
             </>
           }
+          valueState={valueState}
           footer={isDesktop && <WebButtons>{save}</WebButtons>}
         />
         <aside aria-label="Situação do modelo" className={cn(PANEL, "md:w-85")}>
