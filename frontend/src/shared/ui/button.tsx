@@ -28,6 +28,8 @@ const buttonVariants = cva(
       { variant: ["primary", "outline"], size: "md", className: "cut-sm" },
       { variant: ["primary", "outline"], size: "lg", className: "cut-md" },
       { variant: ["danger-text", "link"], className: "px-0" },
+      // O contorno é a folga de 1 px da camada de fora; o respiro lateral é do miolo.
+      { variant: "outline", className: "px-px" },
     ],
     defaultVariants: { variant: "primary", size: "md" },
   },
@@ -67,7 +69,7 @@ function Button({
       {variant === "outline" ? (
         <span
           className={cn(
-            "inline-flex min-h-[inherit] flex-1 items-center justify-center gap-2 bg-ground px-5",
+            "inline-flex flex-1 items-center self-stretch justify-center gap-2 bg-ground px-5",
             size === "lg" ? "cut-md" : "cut-sm",
           )}
         >

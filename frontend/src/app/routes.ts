@@ -1,3 +1,18 @@
-import { type RouteConfig, index } from "@react-router/dev/routes"
+import { type RouteConfig, index, layout, route } from "@react-router/dev/routes"
 
-export default [index("routes/home.tsx")] satisfies RouteConfig
+export default [
+  route("entrar", "routes/entrar.tsx"),
+  route("convite", "routes/convite.tsx"),
+  route("esqueci-senha", "routes/esqueci-senha.tsx"),
+  route("redefinir-senha", "routes/redefinir-senha.tsx"),
+  layout("routes/authenticated.tsx", [
+    index("routes/home.tsx"),
+    route("usuarios", "routes/usuarios.tsx", [
+      // Estática, irmã de `:id`: `/usuarios/convidar` não vira o detalhe de um usuário "convidar".
+      route("convidar", "routes/usuarios.convidar.tsx"),
+      route(":id", "routes/usuarios.$id.tsx"),
+    ]),
+    route("conta/sessoes", "routes/conta.sessoes.tsx"),
+    route("conta/trocar-senha", "routes/conta.trocar-senha.tsx"),
+  ]),
+] satisfies RouteConfig

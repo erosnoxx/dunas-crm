@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("EmailMessage")
 class EmailMessageTest {
@@ -25,5 +27,17 @@ class EmailMessageTest {
         assertThrows(InternalServerErrorException.class, () -> new EmailMessage(" ", "assunto", "<p>x</p>", "x"));
         assertThrows(InternalServerErrorException.class, () -> new EmailMessage("a@b.com", "", "<p>x</p>", "x"));
         assertThrows(InternalServerErrorException.class, () -> new EmailMessage("a@b.com", "assunto", null, "x"));
+    }
+
+    @Test
+    @DisplayName("o toString mostra destinatário e assunto e mascara o corpo, que pode ter um link secreto")
+    void toStringMasksTheBody() {
+        var message = new EmailMessage("a@b.com", "assunto", "<a href=\"http://x?token=segredo\">", "http://x?token=segredo");
+
+        var text = message.toString();
+
+        assertTrue(text.contains("a@b.com"));
+        assertTrue(text.contains("assunto"));
+        assertFalse(text.contains("segredo"));
     }
 }

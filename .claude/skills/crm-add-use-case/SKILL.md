@@ -46,9 +46,25 @@ public class CancelVisit {
 
 ## Query
 
-`@UseCase(transactional = false)`, em `queries`. **Não carrega aggregate**: devolve DTO/projeção. Listagem usa `Page`/`Pageable` e um `Criteria`.
+`@UseCase(transactional = false)`, em `queries`. **Não carrega aggregate**: devolve DTO/projeção. Listagem usa `Page`/`Pageable`.
 
-> Ainda não há query de referência no repositório, nem o contrato de leitura que ela usa. O primeiro caso real (IAM) fixa o padrão; combine com o usuário antes de repetir um desenho e depois registre-o aqui.
+**Contrato de leitura.** A query não usa o `Repository` do aggregate: lê por um `<Nome>Reader` em `application.contracts.readers`, interface que devolve **projeção** (record em `application.schemas`), nunca o aggregate. A implementação `Jpa<Nome>ReaderImpl` mora na persistência do BC e monta a projeção numa consulta só, com o `EntityManager`. Cada método atende uma tela, com nome do que devolve:
+
+```java
+public interface UserReader {
+
+    Page<UserSummary> search(UserFilter filter, Pageable pageable);
+
+    Optional<UserSummary> findSummary(UUID id);
+
+    /** Quem está logado, com a flag de troca de senha que o resumo não traz. */
+    Optional<CurrentUser> findCurrent(UUID id);
+}
+```
+
+A query só confere quem pode ler e repassa: `ListUsers` (`actor.requireAdministrator()` e `userReader.search(...)`), `GetCurrentUser` (`findCurrent(...)` ou `NotFoundException` com código). O filtro da tela é um record de `schemas` (`UserFilter`), não um `Criteria`: o `Criteria` é do repository.
+
+Referência viva: command `Login` (limite de tentativa, hasher, erro com código), queries `ListUsers` e `GetCurrentUser`, contratos `UserReader` e `SessionReader`, todos em `core/iam`.
 
 ## Erros
 
@@ -67,9 +83,17 @@ Nada de `@Component`. Instancie com `new` na `@Configuration` do BC, em `<bc>-in
 
 ## O endpoint (`web`)
 
-O controller **injeta use cases e nada mais**: nada de `domain`, repository nem infraestrutura. Uma classe de `web` fala com **um** BC; fluxo que precisa de dois é `orchestration` (§5.4). Erros saem pelo `RestExceptionHandler`, que só conhece tipos de application. Request com Bean Validation (`jakarta.validation`) é permitido nos schemas da application.
+O controller **injeta use cases e nada mais**: nada de `domain`, repository nem infraestrutura. Uma classe de `web` fala com **um** BC; fluxo que precisa de dois é `orchestration` (§5.4). Erros saem pelo `RestExceptionHandler`, que só conhece tipos de application.
 
-> Ainda não há controller de referência. Mostre o desenho do primeiro ao usuário e registre-o aqui.
+Referência viva: `AuthController`, `UsersController` e `SessionsController`, em `edge/web/src/main/java/com/crm/web/iam/`. O desenho deles (registrado aqui; a aprovação do usuário é a regra desta skill):
+
+- **Quem age chega como parâmetro `Actor`.** A cadeia de segurança de `boot` deixa o `Actor` no atributo `ActorRequestAttribute.NAME`; o `ActorArgumentResolver` (registrado em `WebIamConfig`) o entrega ao método, e sem ele responde 401 `session_invalid`. Nenhum controller lê cookie, token nem cabeçalho de credencial, e nenhum confere papel: a checagem é do use case.
+- **Corpo da requisição é um record de `web`** (`com.crm.web.<bc>.requests`), com Bean Validation e mensagem pt-BR (`@NotBlank(message = "é obrigatório")`). O record que carrega senha ou segredo de link sobrescreve o `toString()` sem eles. O controller monta o `Params` do use case a partir do record; papel e enum chegam como texto e o use case os interpreta.
+- **Sem `try/catch`.** O aspect de `@UseCase` traduz e o `RestExceptionHandler` responde.
+- **Criação devolve 201** com `UUIDResponse`; as demais mutações, 204 sem corpo; query devolve a projeção direto.
+- **Credencial do navegador** (só no `AuthController`): o token da sessão sai em `Set-Cookie` montado pelo `SessionCookie` (`HttpOnly`, `SameSite=Lax`, `Secure` fora do perfil `dev`); o corpo leva `SessionView`, nunca o token (architecture.md §14). `logout` limpa o cookie.
+- **Aparelho e origem** saem da requisição, nunca do corpo: o rótulo é `X-Device-Name` ou o `User-Agent`, cortado em 80 caracteres; a origem é `request.getRemoteAddr()`, que o Tomcat já resolve atrás do proxy (`server.forward-headers-strategy=native`).
+- **Paginação** por `page` e `size`, com teto de tamanho no controller; o filtro é ligado direto de parâmetros (`@ModelAttribute`).
 
 Tela nova só depois de mockup aprovado (regra 7 de [`docs/CLAUDE.md`](../../../docs/CLAUDE.md)).
 

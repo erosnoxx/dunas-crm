@@ -1,0 +1,7 @@
+[
+  {
+    "name": "${CRM_ADMIN_NAME}",
+    "email": "${CRM_ADMIN_EMAIL}",
+    "password": "${CRM_ADMIN_PASSWORD}"
+  }
+]

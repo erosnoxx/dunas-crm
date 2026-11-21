@@ -16,7 +16,7 @@
     <packaging>pom</packaging>
 
     <name>iam</name>
-    <description>Bounded context de identidade e acesso: tenants, usuários, sessões e autorização</description>
+    <description>Bounded context de identidade e acesso: usuários, sessões e autorização</description>
 
     <modules>
         <module>iam-domain</module>

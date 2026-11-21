@@ -25,7 +25,7 @@ type ProblemDetail = {
 }
 
 const NETWORK_ERROR_MESSAGE = "não foi possível conectar ao servidor"
-const UNKNOWN_ERROR_MESSAGE = "algo deu errado; tente de novo"
+export const UNKNOWN_ERROR_MESSAGE = "algo deu errado; tente de novo"
 
 export function toApiError(error: AxiosError<ProblemDetail>): ApiError {
   if (!error.response) return { status: 0, message: NETWORK_ERROR_MESSAGE }

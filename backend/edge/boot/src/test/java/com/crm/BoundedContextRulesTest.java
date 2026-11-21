@@ -245,6 +245,27 @@ class BoundedContextRulesTest {
             .because("composição entre BCs mora no módulo orchestration, nunca montada de improviso dentro de web (architecture.md §5.4)"));
     }
 
+    /**
+     * A única exceção em que {@code boot} enxerga a application de um BC: a cadeia de segurança
+     * ({@code com.crm.boot.security..}) chama {@code AuthenticateSession}, do IAM. Qualquer outra
+     * classe de {@code boot}, e qualquer outro BC dentro da cadeia, continua proibida
+     * (architecture.md §4.1).
+     */
+    @Test
+    @DisplayName("boot só depende da application do iam, e só na cadeia de segurança")
+    void bootDependsOnApplicationOnlyInTheSecurityChain() {
+        for (var context : BOUNDED_CONTEXTS) {
+            var scope = context.equals("iam")
+                ? resideInAPackage(BASE + ".boot..").and(not(resideInAPackage(BASE + ".boot.security..")))
+                : resideInAPackage(BASE + ".boot..");
+
+            check(noClasses()
+                .that(scope)
+                .should().dependOnClassesThat().resideInAPackage(layer(context, "application"))
+                .because("boot só configura; a única exceção é a cadeia de segurança, que autentica pelo iam (architecture.md 4.1)"));
+        }
+    }
+
     @Test
     @DisplayName("não existe ciclo de dependência entre bounded contexts")
     void noCyclesBetweenBoundedContexts() {

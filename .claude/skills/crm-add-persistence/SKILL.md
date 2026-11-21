@@ -48,7 +48,7 @@ Um aggregate = uma tabela raiz (mais as das entidades internas dele). Entidade i
 3. **Mapper** `EntityMapper<A, P>`:
    - `toDomain` chama o `reconstitute(id, version, ...)` do aggregate, reconstruindo cada VO com `Vo.of(...)`.
    - `toPersistence` copia o `id` e a versão (`aggregate.getVersion().orElse(null)`: nula significa linha nova) e os campos. **Nunca** leva `createdAt`/`updatedAt` ao domínio.
-4. **Contrato** em `<bc>-application`, `application.contracts.repositories`: `interface VisitRepository extends Repository<Visit, VisitCriteria>`. Nome limpo. Acrescente método só se o use case precisar (ex. `findByEmail`); transição que duas requisições disputam por natureza é um **update condicional** no contrato, não um `save` com 409.
+4. **Contrato** em `<bc>-application`, `application.contracts.repositories`: `interface VisitRepository extends Repository<Visit, VisitCriteria>`. Nome limpo. Acrescente método só se o use case precisar (ex. `findByEmail`); transição que duas requisições disputam por natureza é um **update condicional** no contrato, não um `save` com 409. Referência viva: `OneTimeTokenRepository.consume` (link de uso único): `@Modifying` com `where ... used_at is null`, sobe a `version` junto e devolve `boolean` (linhas afetadas = 1); quem perde recebe a resposta de negócio (`link_used`), e a instância não é salva depois.
 5. **Criteria**, em `application`: **`record`** que implementa `Criteria`, componentes anotados com `@CriteriaField("<atributo da entity>")` (aceita caminho `a.b` e `Operator`). Componente nulo ou coleção vazia é ignorado.
 6. **Spring Data** `interface VisitJpaRepository extends JpaRepository<VisitEntity, UUID>` e a **implementação** `JpaVisitRepositoryImpl extends RepositoryImpl<Visit, VisitCriteria, VisitEntity, VisitJpaRepository> implements VisitRepository` (tecnologia no início, `Impl` no fim, §10.1), passando `em`, o mapper e `VisitEntity.class` ao `super`.
 7. **Registro** do mapper e do repository na `<Bc>Beans` (`new`, sem `@Component`, §9). Entidade e `JpaRepository` sob `com.crm` são descobertos pela `CrmApplication`; nada a configurar.
@@ -62,7 +62,7 @@ Um aggregate = uma tabela raiz (mais as das entidades internas dele). Entidade i
 ## Teste
 
 - **Mapper:** ida e volta (`toPersistence` → `toDomain`) preserva todos os campos e a versão; versão nula ↔ linha nova.
-- **Repository:** unitário com Mockito, como o `RepositoryImplTest`. Um teste com Postgres real (Testcontainers) exige Docker; para rodar sem ele, `-Dtest='!IdempotencyGuardPostgresTest'` ([`crm-build-and-test`](../crm-build-and-test/SKILL.md)).
+- **Repository:** unitário com Mockito, como o `RepositoryImplTest`. Um teste com Postgres real (Testcontainers) exige Docker; para rodar sem ele, `-Dtest='!*PostgresTest,!IamEndToEndTest'` ([`crm-build-and-test`](../crm-build-and-test/SKILL.md)).
 - A migration só é validada contra a entity com o banco de pé (`ddl-auto=validate`): um erro de nome de coluna aparece no boot, não na compilação.
 
 ## Checklist

@@ -40,7 +40,7 @@ A lista completa de aggregates de cada BC mora no `domain-model.md` da feature d
 
 | # | Feature | Cobre | Depende de | BC (hipótese) |
 |---|---|---|---|---|
-| 01 | `01-iam` (a criar) | conta de funcionário, entrar, sessões, papéis | | `iam` |
+| 01 | [`01-iam`](01-iam/) | conta de funcionário, entrar, sessões, papéis | | `iam` |
 
 ### Previstas, sem número nem pasta
 
