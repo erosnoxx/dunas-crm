@@ -2,7 +2,7 @@ package com.crm.iam.application.usecases.commands;
 
 import com.crm.common.application.annotations.UseCase;
 import com.crm.common.application.exceptions.NotFoundException;
-import com.crm.iam.application.Actor;
+import com.crm.shared.application.Actor;
 import com.crm.iam.application.contracts.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 

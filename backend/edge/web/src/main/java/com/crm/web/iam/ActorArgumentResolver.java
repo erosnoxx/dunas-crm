@@ -1,7 +1,7 @@
 package com.crm.web.iam;
 
 import com.crm.common.application.exceptions.UnauthorizedException;
-import com.crm.iam.application.Actor;
+import com.crm.shared.application.Actor;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;

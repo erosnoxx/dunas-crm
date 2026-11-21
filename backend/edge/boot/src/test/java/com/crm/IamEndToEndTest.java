@@ -3,11 +3,7 @@ package com.crm;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.crm.common.application.email.EmailMessage;
-import com.crm.common.application.email.EmailSenderService;
-import com.crm.common.application.exceptions.ExternalServiceException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,28 +14,18 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import java.net.URI;
-import java.net.URLDecoder;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -48,12 +34,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BooleanSupplier;
-import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -79,7 +59,7 @@ import static org.assertj.core.api.Assertions.assertThat;
                 "crm.outbox.poll-delay=1h"
         }
 )
-@Import(IamEndToEndTest.TestBeans.class)
+@Import(EndToEndTestBeans.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("IAM ponta a ponta no servidor real")
 class IamEndToEndTest {
@@ -88,10 +68,6 @@ class IamEndToEndTest {
     static final String ADMIN_INITIAL_PASSWORD = "Inicial#2026";
     static final String ADMIN_PASSWORD = "Trocada#2026";
     static final String USER_PASSWORD = "Tecnico#2026";
-
-    private static final Instant START = Instant.parse("2026-11-20T12:00:00Z");
-    private static final Pattern LINK_TOKEN = Pattern.compile("token=([A-Za-z0-9_%\\-]+)");
-    private static final ObjectMapper JSON = new ObjectMapper();
 
     @ServiceConnection
     static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:16");
@@ -102,22 +78,6 @@ class IamEndToEndTest {
     static {
         POSTGRES.start();
         REDIS.start();
-    }
-
-    @TestConfiguration
-    static class TestBeans {
-
-        @Bean
-        @Primary
-        MutableClock testClock() {
-            return new MutableClock(START);
-        }
-
-        @Bean
-        @Primary
-        CapturingEmailSender capturingEmailSender() {
-            return new CapturingEmailSender();
-        }
     }
 
     @LocalServerPort
@@ -435,7 +395,7 @@ class IamEndToEndTest {
 
         assertThat(failing.status()).isEqualTo(201);
 
-        awaitUntil(() -> logged().stream().anyMatch(message -> message.startsWith("falha ao enviar o e-mail de INVITATION")));
+        Await.until(() -> logged().stream().anyMatch(message -> message.startsWith("falha ao enviar o e-mail de INVITATION")));
 
         assertThat(emails.attempts()).isEqualTo(2);
     }
@@ -531,14 +491,7 @@ class IamEndToEndTest {
     }
 
     private String linkTokenSentTo(String email) {
-        awaitUntil(() -> !emails.sentTo(email).isEmpty());
-
-        var message = emails.sentTo(email).getLast().message();
-        var matcher = LINK_TOKEN.matcher(message.text());
-
-        assertThat(matcher.find()).as("link com token no e-mail").isTrue();
-
-        var token = URLDecoder.decode(matcher.group(1), StandardCharsets.UTF_8);
+        var token = emails.linkTokenSentTo(email);
 
         secrets.add(token);
 
@@ -573,7 +526,7 @@ class IamEndToEndTest {
     }
 
     private Browser browser(String device) {
-        return new Browser(device);
+        return new Browser(http, port, secrets, device);
     }
 
     /** Mensagem e causa de cada log capturado; o appender recebe de várias threads, então a cópia é sincronizada. */
@@ -589,237 +542,5 @@ class IamEndToEndTest {
 
     private static Logger rootLogger() {
         return (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-    }
-
-    private static void awaitUntil(BooleanSupplier condition) {
-        var deadline = System.nanoTime() + Duration.ofSeconds(10).toNanos();
-
-        while (!condition.getAsBoolean()) {
-            if (System.nanoTime() > deadline)
-                throw new AssertionError("a condição não ficou verdadeira em 10 s");
-
-            try {
-                Thread.sleep(50);
-            }
-            catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-
-                throw new AssertionError("interrompido esperando a condição", e);
-            }
-        }
-    }
-
-    // --- cliente HTTP com cookies ---------------------------------------------------------------
-
-    /**
-     * Um navegador: guarda os cookies que o servidor manda, devolve-os em toda requisição e copia o
-     * {@code XSRF-TOKEN} para o cabeçalho {@code X-XSRF-TOKEN} nas escritas, como o frontend fará.
-     */
-    private final class Browser {
-
-        private final String device;
-        private final Map<String, String> cookies = new ConcurrentHashMap<>();
-
-        private Browser(String device) {
-            this.device = device;
-        }
-
-        Reply get(String path) {
-            return send(request("GET", path, null));
-        }
-
-        Reply post(
-                String path,
-                Object body
-        ) {
-            return send(withCsrf(request("POST", path, body)));
-        }
-
-        Reply put(
-                String path,
-                Object body
-        ) {
-            return send(withCsrf(request("PUT", path, body)));
-        }
-
-        Reply delete(String path) {
-            return send(withCsrf(request("DELETE", path, null)));
-        }
-
-        HttpRequest.Builder request(
-                String method,
-                String path,
-                Object body
-        ) {
-            var builder = HttpRequest.newBuilder(URI.create("http://localhost:" + port + path))
-                    .header("X-Device-Name", device)
-                    .header("Content-Type", "application/json")
-                    .method(method, bodyOf(body));
-
-            var cookieHeader = cookies.entrySet().stream()
-                    .map(cookie -> cookie.getKey() + "=" + cookie.getValue())
-                    .toList();
-
-            if (!cookieHeader.isEmpty())
-                builder.header("Cookie", String.join("; ", cookieHeader));
-
-            return builder;
-        }
-
-        Reply send(HttpRequest.Builder request) {
-            try {
-                var response = http.send(request.build(), HttpResponse.BodyHandlers.ofString());
-                var setCookies = response.headers().allValues("Set-Cookie");
-
-                for (var header : setCookies)
-                    keep(header);
-
-                return new Reply(response.statusCode(), response.body(), setCookies);
-            }
-            catch (Exception e) {
-                throw new AssertionError("falha na requisição HTTP", e);
-            }
-        }
-
-        private HttpRequest.Builder withCsrf(HttpRequest.Builder request) {
-            var token = cookies.get("XSRF-TOKEN");
-
-            if (token != null)
-                request.header("X-XSRF-TOKEN", token);
-
-            return request;
-        }
-
-        private void keep(String header) {
-            var pair = header.split(";", 2)[0];
-            var name = pair.substring(0, pair.indexOf('='));
-            var value = pair.substring(pair.indexOf('=') + 1);
-
-            if ("crm_session".equals(name) && !value.isEmpty())
-                secrets.add(value);
-
-            if (value.isEmpty() || header.contains("Max-Age=0")) {
-                cookies.remove(name);
-
-                return;
-            }
-
-            cookies.put(name, value);
-        }
-
-        private HttpRequest.BodyPublisher bodyOf(Object body) {
-            if (body == null)
-                return HttpRequest.BodyPublishers.noBody();
-
-            if (body instanceof Map<?, ?> map)
-                for (var value : map.values())
-                    if (value instanceof String text && text.contains("#"))
-                        secrets.add(text);
-
-            try {
-                return HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(body));
-            }
-            catch (Exception e) {
-                throw new AssertionError("corpo não serializável", e);
-            }
-        }
-    }
-
-    /** Resposta crua: status, corpo e os {@code Set-Cookie} exatamente como o Tomcat os mandou. */
-    private record Reply(
-            int status,
-            String raw,
-            List<String> setCookies
-    ) {
-
-        JsonNode body() {
-            try {
-                return JSON.readTree(raw);
-            }
-            catch (Exception e) {
-                throw new AssertionError("corpo não é JSON: " + raw, e);
-            }
-        }
-
-        String code() {
-            if (raw == null || raw.isBlank())
-                return null;
-
-            return Optional.ofNullable(body().get("code")).map(JsonNode::asText).orElse(null);
-        }
-
-        Optional<String> setCookie(String name) {
-            return setCookies.stream().filter(header -> header.startsWith(name + "=")).findFirst();
-        }
-    }
-
-    // --- dublês ----------------------------------------------------------------------------------
-
-    /** Relógio que o teste adianta; começa em {@link #START}. */
-    static final class MutableClock extends Clock {
-
-        private final AtomicReference<Instant> now;
-
-        MutableClock(Instant start) {
-            this.now = new AtomicReference<>(start);
-        }
-
-        void advance(Duration duration) {
-            now.updateAndGet(current -> current.plus(duration));
-        }
-
-        @Override
-        public ZoneId getZone() {
-            return ZoneId.of("America/Sao_Paulo");
-        }
-
-        @Override
-        public Clock withZone(ZoneId zone) {
-            return this;
-        }
-
-        @Override
-        public Instant instant() {
-            return now.get();
-        }
-    }
-
-    /** Guarda os e-mails em vez de enviá-los, com a thread que os enviou; pode ser posto para falhar. */
-    static final class CapturingEmailSender implements EmailSenderService {
-
-        record Sent(EmailMessage message, String thread) {
-        }
-
-        private final List<Sent> sent = new CopyOnWriteArrayList<>();
-        private final AtomicInteger attempts = new AtomicInteger();
-        private volatile boolean failing;
-
-        @Override
-        public void send(EmailMessage message) {
-            attempts.incrementAndGet();
-
-            if (failing)
-                throw new ExternalServiceException("servidor de e-mail fora do ar");
-
-            sent.add(new Sent(message, Thread.currentThread().getName()));
-        }
-
-        List<Sent> sentTo(String email) {
-            return sent.stream().filter(item -> item.message().to().equals(email)).toList();
-        }
-
-        int attempts() {
-            return attempts.get();
-        }
-
-        void failing(boolean value) {
-            failing = value;
-        }
-
-        void reset() {
-            sent.clear();
-            attempts.set(0);
-            failing = false;
-        }
     }
 }

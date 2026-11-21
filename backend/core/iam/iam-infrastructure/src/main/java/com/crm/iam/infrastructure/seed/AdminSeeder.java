@@ -8,7 +8,7 @@ import com.crm.iam.application.contracts.services.PasswordHasher;
 import com.crm.iam.domain.entities.User;
 import com.crm.iam.domain.vos.Password;
 import com.crm.iam.domain.vos.PasswordHash;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.iam.domain.vos.UserName;
 import com.crm.shared.domain.vos.contact.Email;
 import lombok.RequiredArgsConstructor;

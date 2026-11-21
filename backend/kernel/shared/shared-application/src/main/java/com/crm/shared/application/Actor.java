@@ -1,8 +1,9 @@
-package com.crm.iam.application;
+package com.crm.shared.application;
 
 import com.crm.common.application.exceptions.ForbiddenException;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -21,9 +22,14 @@ public record Actor(
         UUID sessionId
 ) {
 
-    /** Só o Administrador gerencia usuários (ADR-5): a checagem é do use case, nunca do controller. */
-    public void requireAdministrator() {
-        if (role != Role.ADMINISTRATOR)
+    /** Exige que o papel do ator esteja entre os permitidos: a checagem é do use case, nunca do controller. */
+    public void requireAnyRole(Role... allowed) {
+        if (!Arrays.asList(allowed).contains(role))
             throw new ForbiddenException("forbidden", "você não tem permissão para isto");
+    }
+
+    /** Só o Administrador gerencia usuários (ADR-5): atalho de {@code requireAnyRole(Role.ADMINISTRATOR)}. */
+    public void requireAdministrator() {
+        requireAnyRole(Role.ADMINISTRATOR);
     }
 }

@@ -26,7 +26,7 @@ import java.util.Set;
  * <p>Sem cookie, segue sem autenticação: a cadeia responde 401 nas rotas protegidas. Com cookie,
  * chama {@link AuthenticateSession}; token que não vale vira 401 {@code session_invalid} em JSON,
  * e o cookie não é apagado aqui (o cliente decide quando sair). Sucesso deixa o
- * {@link com.crm.iam.application.Actor} no atributo {@link ActorRequestAttribute#NAME}, para o
+ * {@link com.crm.shared.application.Actor} no atributo {@link ActorRequestAttribute#NAME}, para o
  * resolvedor dos controllers, e no {@code SecurityContext}.
  *
  * <p>Rota pública nem consulta a sessão: um cookie vencido no navegador não pode impedir o login.

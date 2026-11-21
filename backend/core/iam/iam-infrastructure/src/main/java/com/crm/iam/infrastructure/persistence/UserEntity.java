@@ -1,7 +1,7 @@
 package com.crm.iam.infrastructure.persistence;
 
 import com.crm.common.infrastructure.persistence.entities.JpaEntity;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.iam.domain.vos.UserStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

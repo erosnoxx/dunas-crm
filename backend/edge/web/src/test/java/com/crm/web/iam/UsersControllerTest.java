@@ -15,7 +15,7 @@ import com.crm.iam.application.usecases.commands.RevokeAllSessions;
 import com.crm.iam.application.usecases.queries.GetUser;
 import com.crm.iam.application.usecases.queries.ListSessions;
 import com.crm.iam.application.usecases.queries.ListUsers;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.iam.domain.vos.UserStatus;
 import com.crm.shared.application.schemas.response.UUIDResponse;
 import org.junit.jupiter.api.DisplayName;

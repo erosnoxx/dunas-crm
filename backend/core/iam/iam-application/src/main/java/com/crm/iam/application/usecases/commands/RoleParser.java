@@ -2,7 +2,7 @@ package com.crm.iam.application.usecases.commands;
 
 import com.crm.common.application.exceptions.BadRequestException;
 import com.crm.common.application.exceptions.InvalidParam;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 
 import java.util.Arrays;
 import java.util.List;

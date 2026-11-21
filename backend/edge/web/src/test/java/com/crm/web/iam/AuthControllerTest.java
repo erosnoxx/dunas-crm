@@ -10,7 +10,7 @@ import com.crm.iam.application.usecases.commands.Logout;
 import com.crm.iam.application.usecases.commands.RequestPasswordReset;
 import com.crm.iam.application.usecases.commands.ResetPassword;
 import com.crm.iam.application.usecases.queries.GetCurrentUser;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

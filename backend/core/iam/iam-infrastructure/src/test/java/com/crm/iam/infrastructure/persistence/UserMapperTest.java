@@ -2,7 +2,7 @@ package com.crm.iam.infrastructure.persistence;
 
 import com.crm.iam.domain.entities.User;
 import com.crm.iam.domain.vos.PasswordHash;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.iam.domain.vos.UserName;
 import com.crm.iam.domain.vos.UserStatus;
 import com.crm.shared.domain.vos.contact.Email;

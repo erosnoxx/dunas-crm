@@ -1,7 +1,7 @@
 package com.crm.boot.security;
 
 import com.crm.common.application.exceptions.UnauthorizedException;
-import com.crm.iam.application.Actor;
+import com.crm.shared.application.Actor;
 import com.crm.iam.application.schemas.CurrentUser;
 import com.crm.iam.application.schemas.SessionResponse;
 import com.crm.iam.application.usecases.commands.AcceptInvitation;
@@ -13,7 +13,7 @@ import com.crm.iam.application.usecases.commands.Logout;
 import com.crm.iam.application.usecases.commands.RequestPasswordReset;
 import com.crm.iam.application.usecases.commands.ResetPassword;
 import com.crm.iam.application.usecases.queries.GetCurrentUser;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.web.iam.AuthController;
 import com.crm.web.iam.SessionCookie;
 import jakarta.servlet.http.Cookie;

@@ -2,11 +2,11 @@ package com.crm.iam.application.usecases.commands;
 
 import com.crm.common.application.events.EventPublisher;
 import com.crm.common.application.exceptions.ForbiddenException;
-import com.crm.iam.application.Actor;
+import com.crm.shared.application.Actor;
 import com.crm.iam.application.contracts.repositories.UserRepository;
 import com.crm.iam.domain.entities.User;
 import com.crm.iam.domain.events.UserDeactivated;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.iam.domain.vos.UserStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

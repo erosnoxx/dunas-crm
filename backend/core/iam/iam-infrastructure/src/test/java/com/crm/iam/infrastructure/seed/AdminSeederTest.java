@@ -4,7 +4,7 @@ import com.crm.common.application.exceptions.InternalServerErrorException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.crm.iam.application.contracts.repositories.UserRepository;
 import com.crm.iam.domain.entities.User;
-import com.crm.iam.domain.vos.Role;
+import com.crm.shared.domain.enums.Role;
 import com.crm.iam.domain.vos.UserStatus;
 import com.crm.iam.infrastructure.security.Argon2PasswordHasherImpl;
 import org.junit.jupiter.api.BeforeEach;
