@@ -16,7 +16,7 @@
     <packaging>jar</packaging>
 
     <name>shared-application</name>
-    <description>Contratos de aplicação que operam sobre os VOs compartilhados, quando existirem</description>
+    <description>Ator (Actor) e contratos de caso de uso compartilhados por todos os bounded contexts</description>
 
     <dependencies>
 

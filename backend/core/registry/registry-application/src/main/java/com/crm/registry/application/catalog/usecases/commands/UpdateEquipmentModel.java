@@ -17,8 +17,9 @@ import java.util.UUID;
 /**
  * Edita nome e valores de um modelo; fabricante e tipo não mudam (ADR-4). Administrador e Comercial (ADR-6).
  *
- * <p>O domínio recusa o modelo desativado e confere os valores antes da checagem de nome (ordem do
- * usecases.md); nada foi salvo até lá. O tipo pode estar desativado.
+ * <p>O domínio recusa o modelo desativado e confere os valores antes da checagem de nome: a API do
+ * domínio reúne essas checagens, então a ordem é imposta por ela (o 400 do parse e as regras do domínio
+ * vêm antes de {@code model_name_taken}); nada foi salvo até lá. O tipo pode estar desativado.
  */
 @UseCase
 @RequiredArgsConstructor
