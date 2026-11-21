@@ -47,5 +47,6 @@ Brainstorming com o usuário em 2026-11-20 e 2026-11-21 (decisões em [`decision
 - [ ] `mvn test` passa, a partir de `backend/` (inclui os testes de arquitetura)
 - [ ] Artefato visual em `design/` gerado e aprovado antes de fechar `domain-model.md`/`usecases.md` (13 telas aprovadas em 2026-11-21)
 - [ ] Plano de implementação em `docs/plans/` e executado
-- [ ] Comparação mockup × resultado, tela a tela, com as divergências reportadas
+- [x] Frontend: as telas dos 13 mockups e as derivadas da cobertura do plano ([`2026-11-21-catalog-frontend.md`](../../plans/2026-11-21-catalog-frontend.md)); `npm run typecheck && npm run lint && npm test && npm run build && npm run format:check` passa, a partir de `frontend/`
+- [ ] Comparação mockup × resultado, tela a tela, com as divergências reportadas ([`design/comparacao-mockup.md`](design/comparacao-mockup.md)): fecha com a decisão do usuário sobre os defeitos e as divergências de lá
 - [ ] Seeder aplicado uma vez e idempotente (reiniciar o app não recria nem sobrescreve)
