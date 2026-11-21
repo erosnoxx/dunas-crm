@@ -19,7 +19,7 @@ type ModelValuesFieldsProps = {
  * A seção "Características do tipo ..." do formulário do modelo. O formulário guarda um único
  * valor (`amount`) porque cada tipo tem uma característica (domain-model.md), então só ela é
  * desenhada. O valor é do pai; trocar o tipo chama `onChange("")` (efeito, que não roda na
- * montagem para não apagar o valor de um modelo em edição), e nada digitado vaza para o tipo novo.
+ * montagem nem quando o tipo chega depois dela, para não apagar o valor de um modelo em edição), e nada digitado vaza para o tipo novo.
  */
 function ModelValuesFields({ type, value, onChange, error }: ModelValuesFieldsProps) {
   const id = React.useId()
@@ -29,8 +29,10 @@ function ModelValuesFields({ type, value, onChange, error }: ModelValuesFieldsPr
   React.useEffect(() => {
     if (previousTypeId.current === typeId) return
 
+    const wasUnset = previousTypeId.current === undefined
     previousTypeId.current = typeId
-    onChange("")
+    // Do "sem tipo" para o tipo que carregou não há o que limpar: o valor é o da edição.
+    if (!wasUnset) onChange("")
   }, [typeId, onChange])
 
   const characteristic = type?.characteristics[0]

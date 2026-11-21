@@ -94,6 +94,14 @@ describe("ModelValuesFields", () => {
     expect(screen.getByLabelText("Potência *")).toHaveValue("3")
   })
 
+  it("o tipo que chega depois da montagem (consulta carregando) não apaga o valor da edição", () => {
+    const { rerender } = render(<Harness type={undefined} initial="3" />)
+
+    rerender(<Harness type={INVERTER} initial="3" />)
+
+    expect(screen.getByLabelText("Potência *")).toHaveValue("3")
+  })
+
   it("trocar o tipo zera o valor digitado, que não vaza para o tipo novo", async () => {
     const { rerender } = render(<Harness type={INVERTER} />)
     await userEvent.setup().type(screen.getByLabelText("Potência *"), "3")
