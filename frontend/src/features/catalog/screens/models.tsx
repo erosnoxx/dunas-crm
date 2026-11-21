@@ -1,4 +1,4 @@
-import { InfoIcon, Loader2Icon, PlusIcon } from "lucide-react"
+import { InfoIcon, PlusIcon } from "lucide-react"
 import * as React from "react"
 import { Link } from "react-router"
 
@@ -21,6 +21,7 @@ import { errorMessage } from "../catalog.messages"
 import type { EquipmentModelSummary, StatusFilter } from "../catalog.service"
 import { CatalogTabs } from "../components/catalog-tabs"
 import { ModelRow, ModelTableHeader } from "../components/model-row"
+import { Spinner } from "../components/panel-frame"
 
 const PAGE_SIZE = 20
 // shortcut: o filtro lista só os 100 primeiros tipos; paginar a escolha se o catálogo passar disso.
@@ -112,14 +113,7 @@ function Body({ models, error, footer, empty }: BodyProps) {
         </div>
       )}
 
-      {!models && !failure && (
-        <div role="status" aria-busy="true" className="flex justify-center py-6">
-          <Loader2Icon
-            aria-hidden="true"
-            className="size-6 animate-spin text-text-muted"
-          />
-        </div>
-      )}
+      {!models && !failure && <Spinner />}
 
       {models && models.length === 0 && !failure && empty}
 

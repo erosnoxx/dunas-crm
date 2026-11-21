@@ -1,4 +1,4 @@
-import { Loader2Icon, PlusIcon } from "lucide-react"
+import { PlusIcon } from "lucide-react"
 import { Link, Outlet, useMatch, useParams } from "react-router"
 
 import type { ApiError } from "@/shared/api/api-error"
@@ -11,6 +11,7 @@ import { useManufacturers } from "../catalog.hooks"
 import { errorMessage } from "../catalog.messages"
 import { CatalogTabs } from "../components/catalog-tabs"
 import { ManufacturerRow, ManufacturerTableHeader } from "../components/manufacturer-row"
+import { Spinner } from "../components/panel-frame"
 import { MANUFACTURER_LIST, ManufacturerPanel } from "./manufacturer-panel"
 
 /** Vazio (derivado: o mockup 7 só desenha a lista com fabricantes). */
@@ -44,14 +45,7 @@ function List({ canEdit }: { canEdit: boolean }) {
         </div>
       )}
 
-      {!manufacturers && !failure && (
-        <div role="status" aria-busy="true" className="flex justify-center py-6">
-          <Loader2Icon
-            aria-hidden="true"
-            className="size-6 animate-spin text-text-muted"
-          />
-        </div>
-      )}
+      {!manufacturers && !failure && <Spinner />}
 
       {manufacturers && manufacturers.length === 0 && <Empty canEdit={canEdit} />}
 

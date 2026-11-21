@@ -1,4 +1,4 @@
-import { Loader2Icon, PlusIcon } from "lucide-react"
+import { PlusIcon } from "lucide-react"
 import { Link, Outlet, useMatch, useParams } from "react-router"
 
 import type { ApiError } from "@/shared/api/api-error"
@@ -10,6 +10,7 @@ import { Button } from "@/shared/ui/button"
 import { useEquipmentTypes } from "../catalog.hooks"
 import { errorMessage } from "../catalog.messages"
 import { CatalogTabs } from "../components/catalog-tabs"
+import { Spinner } from "../components/panel-frame"
 import { TypeCards, TypeTable } from "../components/type-row"
 import { TYPE_LIST, TypePanel } from "./type-panel"
 
@@ -46,14 +47,7 @@ function List({ canEdit }: { canEdit: boolean }) {
         </div>
       )}
 
-      {!types && !failure && (
-        <div role="status" aria-busy="true" className="flex justify-center py-6">
-          <Loader2Icon
-            aria-hidden="true"
-            className="size-6 animate-spin text-text-muted"
-          />
-        </div>
-      )}
+      {!types && !failure && <Spinner />}
 
       {types && types.length === 0 && <Empty canEdit={canEdit} />}
 
@@ -98,9 +92,11 @@ function TypesScreen({ canEdit }: { canEdit: boolean }) {
       <div className="flex items-start gap-6">
         <section
           aria-label="Lista de tipos"
-          className="min-w-0 flex-1 md:border md:border-line md:bg-panel"
+          className="min-w-0 flex-1 md:overflow-x-auto md:border md:border-line md:bg-panel"
         >
-          <List canEdit={canEdit} />
+          <div className="md:min-w-120">
+            <List canEdit={canEdit} />
+          </div>
         </section>
 
         {/* Quem não edita não tem painel; a rota filha dele só redireciona para esta lista. */}

@@ -91,7 +91,7 @@ function ModelValuesFields({
               .join(" ")}
             className="flex-1"
           />
-          <span className="flex items-center border border-l-0 border-line-strong bg-chip-ok px-3.5 text-body-sm font-semibold text-text">
+          <span className="flex items-center border border-l-0 border-line-strong bg-chip-ok px-3.5 text-body-sm font-semibold whitespace-nowrap text-text">
             {LABELS.unit[characteristic.unit]}
           </span>
         </div>
