@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Ficha do cliente desativado, web</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1220;color:#E8EDF5;font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:24px}
+h1,h2,h3,p{margin:0}
+.shell{display:flex;width:1280px;height:900px}
+.nav{width:232px;box-sizing:border-box;background:#0F1729;padding:24px 16px;display:flex;flex-direction:column;gap:32px;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px;font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;font-weight:600;letter-spacing:.04em}
+.brand img{width:40px;height:40px;border-radius:8px;display:block}
+.item{display:flex;align-items:center;gap:12px;height:44px;padding:0 14px;font-size:14px;font-weight:600;color:#9AA7BD;text-decoration:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.item.on{background:#1B2A44;color:#E8EDF5}
+.who{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.av{width:40px;height:40px;border-radius:50%;background:#1B2A44;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px}
+.acc{font-size:14px;color:#9AA7BD;padding:10px 8px;display:block}
+.main{flex:1;min-width:0;padding:32px;display:flex;flex-direction:column;gap:20px;overflow:hidden}
+.title{font-family:"Chakra Petch",system-ui,sans-serif;font-size:36px;line-height:40px;font-weight:700}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#9AA7BD;text-decoration:none;min-height:44px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px}
+.ro{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;background:#1B2A44;font-size:14px;line-height:20px}
+.ro svg{flex-shrink:0;margin-top:2px}
+.panel{background:#131C2E;border:1px solid #26324A;box-sizing:border-box}
+.data{padding:20px 24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.k{font-size:13px;line-height:18px;font-weight:600;color:#9AA7BD}
+.v{font-size:16px;margin-top:4px}
+.doc{font-variant-numeric:tabular-nums}
+.badge{font-size:12px;line-height:16px;font-weight:600;background:#1B2A44;padding:2px 8px;margin-right:8px}
+.lh{display:flex;align-items:center;gap:12px}
+.lh h2{font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;line-height:24px;font-weight:600}
+.lh .c{font-size:14px;color:#9AA7BD;flex:1}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:16px 20px;border-bottom:1px solid #26324A}
+.ch h3{font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;line-height:28px;font-weight:600;display:flex;align-items:center;gap:12px}
+.addr{font-size:14px;line-height:20px;color:#9AA7BD;margin-top:2px}
+.cnt{font-size:14px;line-height:20px;margin-top:2px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:13px;line-height:18px;font-weight:600;color:#9AA7BD;padding:12px 16px;border-bottom:1px solid #26324A}
+td{padding:0 16px;height:56px;border-bottom:1px solid #26324A;font-size:14px}
+tr:last-child td{border-bottom:0}
+.num{font-family:"Chakra Petch",system-ui,sans-serif;font-weight:600;font-variant-numeric:tabular-nums}
+.ser{font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:3px 10px;background:#1B2A44;white-space:nowrap;color:#E8EDF5}
+.st.off{background:transparent;border:1px solid #34476B;color:#9AA7BD;padding:2px 9px}
+.open{color:#FF7E00;font-weight:600;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+.btn{height:44px;border:0;background:#FF7E00;color:#0B1220;font:600 14px "IBM Plex Sans",system-ui,sans-serif;padding:0 20px;display:inline-flex;align-items:center;gap:8px;text-decoration:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.cap{font-size:12px;line-height:16px;color:#9AA7BD}
+</style>
+</helmet>
+<div class="shell">
+  <nav class="nav" aria-label="Principal">
+    <div class="brand"><img src="/_blob/92042a9ffee5d55ce807843f55fc291d" alt="">DUNAS</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <a class="item on" href="Main.dc.html" aria-current="page">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 2v2M8 2v2"/><rect x="3" y="4" width="18" height="18" rx="2"/><circle cx="12" cy="11" r="3"/><path d="M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
+        Clientes
+      </a>
+      <a class="item" href="#">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+        Catálogo
+      </a>
+      <a class="item" href="#">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+        Usuários
+      </a>
+    </div>
+    <div class="who">
+      <div style="display:flex;align-items:center;gap:12px;padding:0 8px">
+        <div class="av" aria-hidden="true">M</div>
+        <div style="display:flex;flex-direction:column;line-height:1.25"><span style="font-size:14px;font-weight:600">Marina Costa</span><span style="font-size:13px;color:#9AA7BD">Administrador</span></div>
+      </div>
+      <a class="acc" href="#">Minhas sessões</a>
+      <a class="acc" href="#" style="padding-top:0">Trocar senha</a>
+      <a class="acc" href="#" style="padding-top:0">Sair</a>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div>
+      <a class="back" href="Main.dc.html">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        Clientes
+      </a>
+      <div class="head">
+        <div>
+          <h1 class="title">Hotel Fazenda Serra Azul Ltda</h1>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:6px"><span style="color:#9AA7BD">Serra Azul</span><span class="st off"><span aria-hidden="true">○</span>Desativado</span></div>
+        </div>
+        <a class="btn" href="Main.dc.html">Reativar cliente</a>
+      </div>
+    </div>
+
+    <p class="ro">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 11v5M12 7.5v.5"/></svg>
+      Cliente desativado: os dados dele não se editam e ele não recebe local nem equipamento novo até ser reativado. Os locais e os equipamentos aparecem como estão.
+    </p>
+
+    <section class="panel data" aria-label="Dados do cliente">
+      <div><div class="k">Documento</div><div class="v doc"><span class="badge">CNPJ</span>51.903.648/0001-09</div></div>
+      <div><div class="k">E-mail</div><div class="v">reservas@serraazul.tur.br</div></div>
+      <div><div class="k">Telefone</div><div class="v doc">(62) 3331-7090</div></div>
+    </section>
+
+    <div class="lh">
+      <h2>Locais</h2>
+      <span class="c">1 ativo</span>
+    </div>
+
+    <section class="panel" aria-labelledby="l1">
+      <div class="ch">
+        <div>
+          <h3 id="l1">Pousada <span class="st"><span aria-hidden="true">●</span>Ativo</span></h3>
+          <p class="addr">Estrada do Abade, S/N, km 6 · Zona Rural · Pirenópolis/GO · CEP 72980-000</p>
+          <p class="cnt"><span class="num">4</span> equipamentos ativos</p>
+        </div>
+        <a class="open" href="Novo-local-web.dc.html">Editar local</a>
+      </div>
+      <table>
+        <thead><tr><th>Modelo</th><th>Fabricante</th><th>Tipo e característica</th><th>Número de série</th><th>Instalado em</th><th>Situação</th><th><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">Split Inverter 18.000 BTU</td><td>Fabricante B</td><td>Ar-condicionado · <span class="num">18.000 BTU/h</span></td><td class="ser">2301KX0921</td><td style="color:#9AA7BD">Sem data</td><td><span class="st"><span aria-hidden="true">●</span>Ativo</span></td><td style="text-align:right"><a class="open" href="#">Editar</a></td></tr>
+          <tr><td style="font-weight:600">S5-GR3P15K</td><td>Solis</td><td>Inversor · <span class="num">15 kW</span></td><td class="ser">1801150228810457</td><td class="num">10/01/2024</td><td><span class="st"><span aria-hidden="true">●</span>Ativo</span></td><td style="text-align:right"><a class="open" href="#">Editar</a></td></tr>
+          <tr><td style="font-weight:600">SUN2000-5KTL-L1</td><td>Huawei</td><td>Inversor · <span class="num">5 kW</span></td><td class="ser">HV2230099120</td><td class="num">10/01/2024</td><td><span class="st"><span aria-hidden="true">●</span>Ativo</span></td><td style="text-align:right"><a class="open" href="#">Editar</a></td></tr>
+          <tr><td style="font-weight:600">SUN2000-5KTL-L1</td><td>Huawei</td><td>Inversor · <span class="num">5 kW</span></td><td class="ser">HV2230099134</td><td class="num">10/01/2024</td><td><span class="st"><span aria-hidden="true">●</span>Ativo</span></td><td style="text-align:right"><a class="open" href="#">Editar</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+    <p class="cap">Dados de exemplo. Sem "Editar cliente", "Desativar cliente", "Novo local" e "Novo equipamento". Desativar o cliente não desativou o local nem os equipamentos (sem propagação, ADR-6), e eles continuam editáveis, como o domínio permite. Reativar não pede confirmação.</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

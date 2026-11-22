@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Ficha do cliente, web</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1220;color:#E8EDF5;font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:24px}
+h1,h2,h3,p{margin:0}
+.shell{display:flex;width:1280px;height:1320px}
+.nav{width:232px;box-sizing:border-box;background:#0F1729;padding:24px 16px;display:flex;flex-direction:column;gap:32px;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px;font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;font-weight:600;letter-spacing:.04em}
+.brand img{width:40px;height:40px;border-radius:8px;display:block}
+.item{display:flex;align-items:center;gap:12px;height:44px;padding:0 14px;font-size:14px;font-weight:600;color:#9AA7BD;text-decoration:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.item.on{background:#1B2A44;color:#E8EDF5}
+.who{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.av{width:40px;height:40px;border-radius:50%;background:#1B2A44;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px}
+.acc{font-size:14px;color:#9AA7BD;padding:10px 8px;display:block}
+.main{flex:1;min-width:0;padding:32px;display:flex;flex-direction:column;gap:20px;overflow:hidden}
+.title{font-family:"Chakra Petch",system-ui,sans-serif;font-size:36px;line-height:40px;font-weight:700}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#9AA7BD;text-decoration:none;min-height:44px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px}
+.acts{display:flex;gap:12px;align-items:center;flex-shrink:0}
+.panel{background:#131C2E;border:1px solid #26324A;box-sizing:border-box}
+.data{padding:20px 24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.k{font-size:13px;line-height:18px;font-weight:600;color:#9AA7BD}
+.v{font-size:16px;margin-top:4px}
+.doc{font-variant-numeric:tabular-nums}
+.badge{font-size:12px;line-height:16px;font-weight:600;background:#1B2A44;padding:2px 8px;margin-right:8px}
+.lock{display:flex;gap:6px;align-items:flex-start;font-size:12px;line-height:16px;color:#9AA7BD;margin-top:4px}
+.lock svg{flex-shrink:0}
+.lh{display:flex;align-items:center;gap:12px}
+.lh h2{font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;line-height:24px;font-weight:600}
+.lh .c{font-size:14px;color:#9AA7BD;flex:1}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:16px 20px;border-bottom:1px solid #26324A}
+.ch h3{font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;line-height:28px;font-weight:600;display:flex;align-items:center;gap:12px}
+.addr{font-size:14px;line-height:20px;color:#9AA7BD;margin-top:2px}
+.cnt{font-size:14px;line-height:20px;margin-top:2px}
+.cacts{display:flex;gap:16px;align-items:center;flex-shrink:0}
+.note{display:flex;gap:8px;align-items:flex-start;padding:10px 20px;background:#0F1729;border-bottom:1px solid #26324A;font-size:14px;line-height:20px;color:#9AA7BD}
+.note svg{flex-shrink:0;margin-top:2px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:13px;line-height:18px;font-weight:600;color:#9AA7BD;padding:12px 16px;border-bottom:1px solid #26324A}
+td{padding:0 16px;height:56px;border-bottom:1px solid #26324A;font-size:14px}
+tr:last-child td{border-bottom:0}
+tr.off td{color:#9AA7BD}
+.num{font-family:"Chakra Petch",system-ui,sans-serif;font-weight:600;font-variant-numeric:tabular-nums}
+.ser{font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:3px 10px;background:#1B2A44;white-space:nowrap;color:#E8EDF5}
+.st.off{background:transparent;border:1px solid #34476B;color:#9AA7BD;padding:2px 9px}
+.open{color:#FF7E00;font-weight:600;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+.btn{height:44px;border:0;background:#FF7E00;color:#0B1220;font:600 14px "IBM Plex Sans",system-ui,sans-serif;padding:0 20px;display:inline-flex;align-items:center;gap:8px;text-decoration:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.btn2{height:44px;background:#1B2A44;color:#E8EDF5;font:600 14px "IBM Plex Sans",system-ui,sans-serif;padding:0 20px;display:inline-flex;align-items:center;gap:8px;text-decoration:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.dng{display:inline-flex;align-items:center;min-height:44px;color:#FFA3A3;font-weight:600;font-size:14px;text-decoration:none}
+.cap{font-size:12px;line-height:16px;color:#9AA7BD}
+</style>
+</helmet>
+<div class="shell">
+  <nav class="nav" aria-label="Principal">
+    <div class="brand"><img src="/_blob/92042a9ffee5d55ce807843f55fc291d" alt="">DUNAS</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <a class="item on" href="Main.dc.html" aria-current="page">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 2v2M8 2v2"/><rect x="3" y="4" width="18" height="18" rx="2"/><circle cx="12" cy="11" r="3"/><path d="M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
+        Clientes
+      </a>
+      <a class="item" href="#">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+        Catálogo
+      </a>
+      <a class="item" href="#">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+        Usuários
+      </a>
+    </div>
+    <div class="who">
+      <div style="display:flex;align-items:center;gap:12px;padding:0 8px">
+        <div class="av" aria-hidden="true">M</div>
+        <div style="display:flex;flex-direction:column;line-height:1.25"><span style="font-size:14px;font-weight:600">Marina Costa</span><span style="font-size:13px;color:#9AA7BD">Administrador</span></div>
+      </div>
+      <a class="acc" href="#">Minhas sessões</a>
+      <a class="acc" href="#" style="padding-top:0">Trocar senha</a>
+      <a class="acc" href="#" style="padding-top:0">Sair</a>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div>
+      <a class="back" href="Main.dc.html">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        Clientes
+      </a>
+      <div class="head">
+        <div>
+          <h1 class="title">J. Silva Comércio de Alimentos Ltda</h1>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:6px"><span style="color:#9AA7BD">Padaria Boa Vista</span><span class="st"><span aria-hidden="true">●</span>Ativo</span></div>
+        </div>
+        <div class="acts">
+          <a class="dng" href="#">Desativar cliente</a>
+          <a class="btn2" href="Cliente-formulario-web.dc.html">Editar cliente</a>
+        </div>
+      </div>
+    </div>
+
+    <section class="panel data" aria-label="Dados do cliente">
+      <div>
+        <div class="k">Documento</div>
+        <div class="v doc"><span class="badge">CNPJ</span>34.218.765/0001-14</div>
+        <p class="lock"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Não pode ser alterado.</p>
+      </div>
+      <div><div class="k">E-mail</div><div class="v">compras@padariaboavista.com.br</div></div>
+      <div><div class="k">Telefone</div><div class="v doc">(34) 3212-4580</div></div>
+    </section>
+
+    <div class="lh">
+      <h2>Locais</h2>
+      <span class="c">2 ativos, 1 desativado</span>
+      <a class="btn" href="Novo-local-web.dc.html">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Novo local
+      </a>
+    </div>
+
+    <section class="panel" aria-labelledby="l1">
+      <div class="ch">
+        <div>
+          <h3 id="l1">Loja Centro <span class="st"><span aria-hidden="true">●</span>Ativo</span></h3>
+          <p class="addr">Av. João Pinheiro, 1450 · Centro · Uberlândia/MG · CEP 38400-128</p>
+          <p class="cnt"><span class="num">3</span> equipamentos ativos</p>
+        </div>
+        <div class="cacts">
+          <a class="open" href="Novo-local-web.dc.html">Editar local</a>
+          <a class="btn2" href="Novo-equipamento-web.dc.html">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Novo equipamento
+          </a>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Modelo</th><th>Fabricante</th><th>Tipo e característica</th><th>Número de série</th><th>Instalado em</th><th>Situação</th><th><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">Split Inverter 12.000 BTU</td><td>Fabricante B</td><td>Ar-condicionado · <span class="num">12.000 BTU/h</span></td><td class="ser">2207KX4410</td><td class="muted" style="color:#9AA7BD">Sem data</td><td><span class="st"><span aria-hidden="true">●</span>Ativo</span></td><td style="text-align:right"><a class="open" href="Equipamento-celular.dc.html">Editar</a></td></tr>
+          <tr><td style="font-weight:600">S6-GR1P5K</td><td>Solis</td><td>Inversor · <span class="num">5 kW</span></td><td class="ser">1031050223290123</td><td class="num">12/03/2025</td><td><span class="st"><span aria-hidden="true">●</span>Ativo</span></td><td style="text-align:right"><a class="open" href="Equipamento-celular.dc.html">Editar</a></td></tr>
+          <tr><td style="font-weight:600">SUN2000-5KTL-L1</td><td>Huawei</td><td>Inversor · <span class="num">5 kW</span></td><td class="ser">HV2240187563</td><td class="num">12/03/2025</td><td><span class="st"><span aria-hidden="true">●</span>Ativo</span></td><td style="text-align:right"><a class="open" href="Equipamento-celular.dc.html">Editar</a></td></tr>
+          <tr class="off"><td style="font-weight:600">SUN2000-3KTL-L1</td><td>Huawei</td><td>Inversor · <span class="num">3 kW</span></td><td class="ser">HV2130045219</td><td class="num">08/11/2022</td><td><span class="st off"><span aria-hidden="true">○</span>Desativado</span></td><td style="text-align:right"><a class="open" href="Equipamento-celular.dc.html">Abrir</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel" aria-labelledby="l2">
+      <div class="ch">
+        <div>
+          <h3 id="l2">Fábrica <span class="st"><span aria-hidden="true">●</span>Ativo</span></h3>
+          <p class="addr">Rua Tiradentes, 220, Galpão 2 · Distrito Industrial · Araguari/MG · CEP 38446-102</p>
+          <p class="cnt"><span class="num">2</span> equipamentos ativos</p>
+        </div>
+        <div class="cacts">
+          <a class="open" href="Novo-local-web.dc.html">Editar local</a>
+          <a class="btn2" href="Novo-equipamento-web.dc.html">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Novo equipamento
+          </a>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Modelo</th><th>Fabricante</th><th>Tipo e característica</th><th>Número de série</th><th>Instalado em</th><th>Situação</th><th><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">S5-GR3P15K</td><td>Solis</td><td>Inversor · <span class="num">15 kW</span></td><td class="ser">1801150231470036</td><td class="num">20/08/2024</td><td><span class="st"><span aria-hidden="true">●</span>Ativo</span></td><td style="text-align:right"><a class="open" href="Equipamento-celular.dc.html">Editar</a></td></tr>
+          <tr><td style="font-weight:600">SUN2000-8KTL-M1</td><td>Huawei</td><td>Inversor · <span class="num">8 kW</span></td><td class="ser">HV2190078214</td><td class="num">20/08/2024</td><td><span class="st"><span aria-hidden="true">●</span>Ativo</span></td><td style="text-align:right"><a class="open" href="Equipamento-celular.dc.html">Editar</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel" aria-labelledby="l3">
+      <div class="ch">
+        <div>
+          <h3 id="l3" style="color:#9AA7BD">Loja Santa Mônica <span class="st off"><span aria-hidden="true">○</span>Desativado</span></h3>
+          <p class="addr">Av. Segismundo Pereira, 880 · Santa Mônica · Uberlândia/MG · CEP 38408-170</p>
+          <p class="cnt"><span class="num">1</span> equipamento ativo</p>
+        </div>
+        <div class="cacts">
+          <a class="open" href="Local-desativado-celular.dc.html">Reativar local</a>
+        </div>
+      </div>
+      <p class="note">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 11v5M12 7.5v.5"/></svg>
+        Local desativado: não recebe equipamento novo e não se edita até ser reativado. Os equipamentos dele ficam como estão.
+      </p>
+      <table>
+        <thead><tr><th>Modelo</th><th>Fabricante</th><th>Tipo e característica</th><th>Número de série</th><th>Instalado em</th><th>Situação</th><th><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">SUN2000-3KTL-L1</td><td>Huawei</td><td>Inversor · <span class="num">3 kW</span></td><td class="ser">HV2130051877</td><td class="num">15/06/2023</td><td><span class="st"><span aria-hidden="true">●</span>Ativo</span></td><td style="text-align:right"><a class="open" href="Equipamento-celular.dc.html">Editar</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+    <p class="cap">Dados de exemplo. Uma página só, sem paginação: um cartão por local, todos abertos; locais ativos primeiro, depois por nome; em cada local, equipamentos ativos primeiro, depois por tipo, modelo e série. Desativar cliente, local ou equipamento não pede confirmação e não propaga: o equipamento do local desativado continua ativo. O número de equipamentos do cartão conta só os ativos.</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1320}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
