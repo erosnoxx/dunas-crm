@@ -215,3 +215,62 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 **Decisão:** decisão delegada pelo usuário (2026-11-22): item **"Clientes" primeiro** no menu da web e na barra inferior do celular, antes de Catálogo e Usuários.
 
 **Consequência:** a barra inferior do Técnico passa a ter dois itens, Clientes e Catálogo. O ícone e o rótulo fecham com o mockup.
+
+## ADR-27: a lista mostra a série que casou com a busca
+
+**Contexto:** a busca da lista casa o número de série de equipamento ativo (ADR-13), mas a linha não dizia qual equipamento casou: o técnico com a etiqueta na mão achava o cliente e tinha de abrir a ficha para achar a unidade (tela 5). Nome, nome fantasia, documento e cidades já aparecem na linha, então o motivo de um resultado por eles fica visível; o da série, não.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): o `CustomerSummary` ganha **`matchedSerials`**, até **três** pares `{serialNumber, modelName}` dos equipamentos **ativos** do cliente cuja série contém o texto buscado (o mesmo critério da busca: ADR-13), em ordem de série. A lista vem **vazia** quando não há texto ou quando o texto não casou nenhuma série. Na tela, cada par vira a linha "Série HV9910042 · SUN2000-5KTL-L1" abaixo do nome, na tabela da web e no cartão do celular.
+
+**Consequência:** a lista continua uma consulta paginada; as séries saem de uma segunda consulta restrita aos ids da página (no máximo `size` clientes), e só quando há texto, como as cidades já saem por consulta própria. Três bastam para mostrar o motivo sem que um cliente com dezenas de séries parecidas ocupe a tela; o resto está na ficha. A linha da série não tem artboard: é elemento **derivado** (ver [`design/`](design/README.md)) e vai à comparação final. O domínio não muda.
+
+## ADR-28: lista vazia distingue "nenhum cadastrado" de "todos desativados"
+
+**Contexto:** com a situação padrão (ativos) e sem texto, uma lista vazia não diz se não há cliente nenhum ou se todos estão desativados. A tela 4, aprovada, diz "Nenhum cliente cadastrado" com "Cadastrar o primeiro cliente", o que seria falso no segundo caso. Um texto que servisse aos dois contradiria a tela aprovada justamente no caso comum, o primeiro uso.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): **nenhuma mudança na API**. Só quando a lista padrão (sem texto, `status=ACTIVE`) volta vazia, o frontend pergunta `GET /customers?status=DEACTIVATED&size=1` e lê o `totalElements`:
+- **zero:** a tela 4 ("Nenhum cliente cadastrado", "Cadastrar o primeiro cliente" para quem edita);
+- **maior que zero:** o estado derivado "Nenhum cliente ativo", com o texto "Todos os clientes cadastrados estão desativados. Veja os desativados para reativar um deles." e as ações **"Ver desativados"** (aplica `status=DEACTIVATED`) e, para quem edita, "Novo cliente".
+
+Com texto ou com outro filtro, o vazio é o da tela 3 ("Nenhum cliente encontrado", "Limpar busca e filtros").
+
+**Consequência:** a segunda consulta só acontece no estado vazio, que não tem lista para carregar, e usa o endpoint que já existe; a lista com clientes nunca paga por ela. O estado "Nenhum cliente ativo" não tem artboard: é **derivado** da tela 4 e vai à comparação final.
+
+## ADR-29: o resumo da lista não traz e-mail nem telefone
+
+**Contexto:** o `ListCustomers` propunha `email` e `phone` no `CustomerSummary`, mas as telas 1, 2 e 5, aprovadas, não os mostram; a ficha (`GetCustomer`) mostra.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): o `CustomerSummary` **perde `email` e `phone`**. O retorno final está em [`usecases.md`](usecases.md#listcustomers).
+
+**Consequência:** a lista não carrega dado pessoal que não exibe. Se uma tela futura precisar do contato na lista, o campo volta com ela.
+
+## ADR-30: local e equipamento de cliente desativado continuam editáveis
+
+**Contexto:** o ADR-6 deixou a edição e a reativação olhando só o próprio aggregate. A tela 12, aprovada, mantém "Editar local" e "Editar" na ficha do cliente desativado, e a tela 9 mantém "Editar" no equipamento ativo de um local desativado.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): **confirmado como o ADR-6 já diz**. O local de cliente desativado se edita, se desativa e se reativa; o equipamento de local ou de cliente desativado se edita, se desativa e se reativa. O pai desativado bloqueia só o cadastro **novo** de filho.
+
+**Consequência:** na ficha do cliente desativado a tela esconde "Editar cliente", "Desativar cliente", "Novo local" e "Novo equipamento", e mantém "Editar local" nos locais ativos e "Editar" ou "Abrir" nos equipamentos. No local desativado a tela esconde "Editar local" (o domínio recusa com `location_deactivated`) e "Novo equipamento", e mostra "Reativar local". Nenhuma mudança no domínio nem nos use cases.
+
+## ADR-31: mensagens da tela e mensagens da API
+
+**Contexto:** o mockup escreveu textos que a spec não tinha ("CEP incompleto: informe os 8 dígitos.", "Informe o bairro.", "CPF inválido: confira os números digitados."). Os VOs de `shared-domain` produzem textos técnicos ("cep deve ter entre 8 e 8 caracteres", "bairro não pode ser vazio", "cpf inválido"), sem código, e o aspect de `@UseCase` os entrega como 400 só com a mensagem, sem `invalidParams`; o 400 do Bean Validation da `web` traz `invalidParams` com o nome do campo e o motivo ("é obrigatório"). Uma tela que mostrasse um texto que nenhuma das camadas produz enganaria quem testa.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): **duas camadas, cada uma com o próprio texto**.
+- **API:** não muda. Os códigos e as mensagens da tabela de erros (pt-BR, minúsculas, sem ponto final), as mensagens dos VOs como estão e o 400 do Bean Validation como está. Os VOs compartilhados **não** mudam de texto: servem a outros BCs.
+- **Tela:** o frontend confere **todo campo antes de enviar**, com as mensagens próprias da tabela [Mensagens da tela](usecases.md#mensagens-da-tela), escritas como frase (inicial maiúscula, ponto final), como nos mockups. Erro com `code` mostra a mensagem da tabela de erros como frase, **no campo que a tabela indica** quando o campo está na tela, senão no aviso do formulário. O 400 **sem** `code` (VO, Bean Validation) é rede de segurança: sai no aviso do formulário com o texto da API como frase, nunca ligado a um campo pelo texto.
+- **Campo opcional vazio** (nome fantasia, e-mail, telefone, complemento, data de instalação) vai à API como `null`; texto em branco na API é 400 do VO ("... não pode ser vazio").
+
+**Consequência:** os três textos do mockup são da tela e ficam definidos na spec. A mensagem do VO só chega à tela se a conferência do formulário deixar passar um caso, e o teste dessa conferência cobre os limites da tabela. Nenhum texto da API muda.
+
+## ADR-32: edição de local e de equipamento: página própria com o painel "Situação"
+
+**Contexto:** os mockups desenharam o novo local (telas 14 e 15), o novo equipamento (telas 17 e 18) e o equipamento no celular (tela 19), mas não a edição de local nem a de equipamento na web, e não diziam onde fica "Desativar local". As legendas das telas 14 e 17 descrevem a edição como a página preenchida, como a do modelo no catálogo.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): telas **derivadas**, sem artboard próprio:
+- **Editar local** (web e celular): a página das telas 14 e 15 preenchida, com o nome do local no título e "Salvar alterações". Na web, ao lado, o painel **"Situação"** com o selo, o texto de ajuda e **"Desativar local"**, sem confirmação (ADR-6), como a página do modelo no catálogo; no celular, o selo no topo e "Desativar local" abaixo do formulário, como na tela 19.
+- **Editar equipamento** (web): a página da tela 17 com modelo e local somente leitura, série e data editáveis, "Salvar alterações" e o painel "Situação" com **"Desativar equipamento"**; no celular é a tela 19.
+- **Desativado:** a página abre só leitura, com a ação única "Reativar local" ou "Reativar equipamento", como o estado desativado da tela 19.
+- **Onde fica cada ação:** "Desativar local" mora **só** na página de edição do local; "Reativar local", no bloco do local na ficha (telas 9 e 16) e na página do local desativado. "Desativar equipamento" e "Reativar equipamento" moram na página do equipamento, aberta por "Editar" (ativo) ou "Abrir" (desativado) na ficha.
+
+**Consequência:** as páginas de edição leem da ficha (ADR-22), sem `GET` próprio. As páginas derivadas vão à comparação mockup × resultado.

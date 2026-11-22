@@ -2,7 +2,7 @@
 
 **Este arquivo é a fonte de verdade do domínio desta feature.** Nenhum `CLAUDE.md`, skill ou código o duplica: todos o referenciam. Casos de uso e códigos de erro: [`usecases.md`](usecases.md). Decisões: [`decisions.md`](decisions.md). Telas: [`design/`](design/README.md).
 
-> Proposta para aprovação. Este modelo só fecha depois de os mockups de [`design/`](design/README.md) serem aprovados (regra 6 de [`docs/CLAUDE.md`](../../CLAUDE.md)).
+> Proposta para aprovação. Os mockups de [`design/`](design/README.md) foram aprovados em 2026-11-22 (regra 6 de [`docs/CLAUDE.md`](../../CLAUDE.md)) e não mudaram o domínio (ADR-27 a ADR-32); os pontos marcados *proposta* seguem para a aprovação do usuário.
 
 ## Nota de proveniência
 
@@ -81,7 +81,7 @@ Um endereço do cliente onde há (ou haverá) instalação. **Fronteira de consi
 | `deactivate()` | `ACTIVE` → `DEACTIVATED` | `location_deactivated` (já está) |
 | `reactivate()` | `DEACTIVATED` → `ACTIVE` | `location_not_deactivated` |
 
-`edit` e `reactivate` não olham o cliente: o cliente desativado só bloqueia local **novo** (ADR-6, como o tipo desativado no catálogo).
+`edit`, `deactivate` e `reactivate` não olham o cliente: o cliente desativado só bloqueia local **novo** (ADR-6, como o tipo desativado no catálogo; confirmado pelo ADR-30). O mesmo vale para o equipamento: local ou cliente desativado só bloqueia equipamento **novo**.
 
 ### `InstalledEquipment` (aggregate root)
 
@@ -177,3 +177,5 @@ Migration `V2__create_customers.sql` em `registry-infrastructure/src/main/resour
 - **Concorrência:** o use case confere a unicidade antes, para a resposta amigável; na corrida, o repository traduz a violação do índice pelo nome dele no mesmo código de erro (como o `UniqueConstraint` do catálogo). Edições simultâneas do mesmo aggregate caem no lock otimista (`concurrent_update`, 409).
 - O estado (`status`) e a UF (`state`) são texto com o nome do enum. O endereço são colunas de `locations`, não tabela própria: é VO do local.
 - **Busca da lista de clientes** (*proposta*): o texto casa, sem diferenciar maiúsculas, o nome do cliente, o nome fantasia (ADR-21), a cidade de algum local **ativo** dele, o número de série de algum equipamento **ativo** dele (subconsulta `exists` pelos locais; sem índice próprio, a lista é pequena: ADR-13), e o documento (o texto sem pontuação, contido no `document`, só quando sobra algum caractere depois de tirar a pontuação). Acento fica como no catálogo: a mudança é compartilhada (ADR-15).
+- **Projeção da lista:** as cidades e, com texto, as séries que casaram (`matchedSerials`, até três por cliente: ADR-27) saem de consultas restritas aos ids da página, nunca de uma junção que multiplique as linhas paginadas. Nenhum índice novo.
+- **Forma das tabelas e lock otimista:** cada aggregate é **uma tabela só**, sem tabela filha: o endereço são colunas de `locations`, e nenhuma linha tem versão fora do próprio aggregate. O save de um aggregate confere só a própria versão, e a edição a partir de uma cópia velha cai em `concurrent_update` (409).

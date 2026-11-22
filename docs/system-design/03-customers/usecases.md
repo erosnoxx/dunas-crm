@@ -2,7 +2,7 @@
 
 Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `queries`): [`architecture.md`](../../rules/architecture.md) §7. Domínio: [`domain-model.md`](domain-model.md). Telas: [`design/`](design/README.md).
 
-> Proposta para aprovação. Os pontos marcados *proposta* não foram decididos pelo usuário, e as rotas e as respostas fecham com o mockup.
+> Proposta para aprovação. Os mockups de [`design/`](design/README.md) foram aprovados em 2026-11-22, e as respostas das queries fecharam com eles (ADR-27 a ADR-29); os pontos marcados *proposta* seguem para a aprovação do usuário.
 
 ## Convenções desta feature
 
@@ -22,6 +22,8 @@ Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `querie
 **Listagens.** `page` e `size` como no catálogo (padrão 20, máximo 100, cortados pela `web`). Ordem padrão por nome. `status` padrão `ACTIVE`; `ALL` mostra os dois.
 
 **Relógio.** Só os commands de equipamento recebem o `Clock` (por construtor), para a regra "data de instalação não é depois de hoje" (`InstallationDate.of(valor, clock)`). Os demais não leem hora.
+
+**Campo opcional ausente.** Nome fantasia, e-mail, telefone, complemento e data de instalação ausentes são `null` (ou o campo omitido no JSON); texto em branco não é ausência, é 400 do VO ("... não pode ser vazio"). A tela envia `null` para o campo opcional vazio (ADR-31).
 
 ## Commands: cliente
 
@@ -95,13 +97,15 @@ Todas `@UseCase(transactional = false)`, abertas aos três papéis. Não carrega
 
 - **Entrada:** `text`, `status`, `page`, `size`; o filtro é o `CustomerFilter`.
 - **Busca:** `text` casa o nome, o nome fantasia (ADR-21), o documento (sem pontuação), a cidade de um local ativo ou o número de série de um equipamento ativo, sem diferenciar maiúsculas e sem normalizar acento, como o catálogo faz hoje (ADR-13, ADR-15; [`domain-model.md`](domain-model.md#persistência)). É também o destino de "Ver cliente com este documento" (ADR-23), com `status=ALL`.
-- **Retorno:** `Page<CustomerSummary>`: `id`, `name`, `tradeName`, `document`, `documentType` (`CPF` ou `CNPJ`), `email`, `phone`, `status`, `locationCount` (ativos), `equipmentCount` (ativos, em locais ativos), `cities` (cidade e UF distintas dos locais ativos). *Proposta*: as colunas da tela fecham com o mockup.
+- **Retorno:** `Page<CustomerSummary>`: `id`, `name`, `tradeName` (ou `null`), `document` (normalizado, como o `Document` guarda; a tela formata), `documentType` (`CPF` ou `CNPJ`), `status`, `locationCount` (locais ativos), `equipmentCount` (equipamentos ativos em locais ativos), `cities` (lista de `{city, state}` distintas dos locais ativos, por cidade), `matchedSerials` (até três `{serialNumber, modelName}` dos equipamentos ativos cuja série contém o `text`, por série; vazia sem `text` ou quando o texto não casou série: ADR-27). Sem `email` nem `phone` (ADR-29).
+- **Custo:** uma consulta paginada com as contagens por subconsulta, uma consulta das cidades dos ids da página e, só com `text`, uma das séries dos ids da página.
+- **Lista vazia:** a tela distingue "nenhum cadastrado" de "todos desativados" com `status=DEACTIVATED&size=1`, só quando a lista padrão volta vazia; a API não muda (ADR-28).
 - **Endpoint:** `GET /customers`.
 
 ### `GetCustomer`
 
 - **Entrada:** `customerId`. **Erro:** `customer_not_found`.
-- **Retorno:** `CustomerDetail`: os campos do cliente (com `tradeName`) e **todos** os locais (ativos e desativados), cada um com o endereço, a situação e **todos** os seus equipamentos: `id`, `serialNumber`, `installedOn`, `status`, modelo (`id`, `name`, `status`), fabricante (`id`, `name`), tipo (`id`, `name`) e o valor da característica com a unidade. **Sem paginação** (ADR-22). **Ordem:** locais ativos primeiro, depois por nome; em cada local, equipamentos ativos primeiro, depois por nome do tipo, nome do modelo e série.
+- **Retorno:** `CustomerDetail`: `id`, `document`, `documentType`, `name`, `tradeName`, `email`, `phone` (os três opcionais como `null`), `status` e **todos** os locais (ativos e desativados), cada um com `id`, `name`, `status`, o endereço (`zipCode`, `street`, `number`, `complement`, `neighborhood`, `city`, `state`) e **todos** os seus equipamentos: `id`, `serialNumber`, `installedOn` (ou `null`), `status`, modelo (`id`, `name`, `status`), fabricante (`id`, `name`), tipo (`id`, `name`) e a característica (`name`, `unit`, `amount`; `null` quando o modelo não tem valor). **Sem paginação** (ADR-22). **Ordem:** locais ativos primeiro, depois por nome; em cada local, equipamentos ativos primeiro, depois por nome do tipo, nome do modelo e série.
 - **Endpoint:** `GET /customers/{customerId}`. É a ficha do cliente; a edição de local e de equipamento lê dela, sem `GET` próprio.
 
 ## Erros
@@ -131,6 +135,47 @@ Contrato público ([`architecture.md`](../../rules/architecture.md) §7.3). Cód
 
 Sem código próprio, como 400 com a mensagem do VO: documento inválido (as mensagens do `Document`: "documento inválido: deve ser um cpf ou cnpj válido", "cpf inválido", "cnpj inválido"), e-mail, telefone ("formato de telefone inválido — use E.164 (ex: +5511999999999)"), cada campo do endereço, e os tamanhos de `CustomerName` (2 a 150), `LocationName` (2 a 60) e `SerialNumber` (1 a 60) (ADR-20). O frontend confere CPF e CNPJ (dígitos verificadores: ADR-24), e-mail, CEP (máscara `00000-000`: ADR-19) e telefone (DDD e número, convertido para `+55` em E.164: ADR-18) antes de enviar; o 400 do servidor é a rede de segurança.
 
+### Mensagens da tela
+
+Textos **do frontend** (ADR-31): frase com inicial maiúscula e ponto final, sob o campo, com ícone e texto. A API não produz estes textos e não muda por eles.
+
+**Conferência do formulário, antes de enviar:**
+
+| Campo | Quando | Mensagem |
+|---|---|---|
+| CPF ou CNPJ | vazio | Informe o CPF ou o CNPJ. |
+| CPF ou CNPJ | nem 11 nem 14 caracteres depois de tirar a pontuação | Documento incompleto: o CPF tem 11 dígitos e o CNPJ, 14 caracteres. |
+| CPF ou CNPJ | 11 dígitos com dígito verificador errado | CPF inválido: confira os números digitados. |
+| CPF ou CNPJ | 14 caracteres com dígito verificador errado | CNPJ inválido: confira os caracteres digitados. |
+| Nome (CPF) / Razão social (CNPJ) | vazio | Informe o nome. / Informe a razão social. |
+| Nome / Razão social / Nome fantasia | 1 caractere ou mais de 150 | O nome precisa ter de 2 a 150 caracteres. |
+| E-mail | formato que o `Email` recusa | E-mail inválido: confira o endereço. |
+| Telefone | sem DDD válido ou sem 8 dígitos (fixo) ou 9 começando por 9 (celular) | Telefone inválido: informe DDD e número. |
+| E-mail e telefone | os dois vazios | Informe pelo menos um contato: e-mail ou telefone. |
+| Nome do local | vazio / 1 caractere ou mais de 60 | Informe o nome do local. / O nome do local precisa ter de 2 a 60 caracteres. |
+| CEP | vazio / menos de 8 dígitos | Informe o CEP. / CEP incompleto: informe os 8 dígitos. |
+| Logradouro | vazio / 1 caractere ou mais de 150 | Informe o logradouro. / O logradouro precisa ter de 2 a 150 caracteres. |
+| Número | vazio | Informe o número (sem número, use S/N). |
+| Bairro | vazio / 1 caractere ou mais de 100 | Informe o bairro. / O bairro precisa ter de 2 a 100 caracteres. |
+| Cidade | vazio | Informe a cidade. |
+| UF | nenhuma escolhida | Escolha a UF. |
+| Modelo | nenhum escolhido | Escolha o modelo. |
+| Número de série | vazio | Informe o número de série. |
+| Data de instalação | depois de hoje | A data de instalação não pode ser depois de hoje. |
+
+Os limites que o campo já impede de passar (`maxLength` de número, complemento, cidade, série e e-mail) não têm mensagem: o campo não aceita o caractere a mais.
+
+**Erro da API com `code`:** a mensagem da tabela de erros, como frase, no lugar abaixo; quando o campo não está na tela, no aviso do formulário.
+
+| `code` | Onde aparece |
+|---|---|
+| `customer_document_taken` | sob o documento, com a ação "Ver cliente com este documento" (ADR-23) |
+| `contact_required` | no topo da seção "Contato", com e-mail e telefone marcados |
+| `trade_name_not_allowed` | sob o nome fantasia |
+| `serial_number_taken` | sob o número de série; no cadastro, seguido de "Confira a etiqueta ou busque a série na lista de clientes." (tela 18) |
+| `invalid_installation_date` | sob a data de instalação |
+| `customer_deactivated`, `location_deactivated`, `installed_equipment_deactivated`, `model_deactivated`, `model_not_found`, `*_not_found`, `concurrent_update`, `forbidden` e o 400 sem `code` | no aviso do formulário (ou da ficha) |
+
 ## Casos de teste
 
 Além do caminho feliz e de um teste por código de erro da tabela acima, por command e query:
@@ -143,6 +188,11 @@ Além do caminho feliz e de um teste por código de erro da tabela acima, por co
 - **Limites (ADR-20):** nome do cliente com 150 caracteres passa e com 151 é 400; nome do local com 60 passa e com 61 é 400; série com 60 passa e com 61 é 400.
 - **Série (ADR-5, ADR-13, ADR-17):** corrigir a série do próprio equipamento grava; trocar só a caixa da própria série grava; série de outro equipamento do mesmo modelo, ativo ou desativado, é 409; a mesma série em outro modelo grava. Busca: acha o cliente pelo trecho da série; não acha pela série de equipamento desativado; série igual em modelos de clientes diferentes devolve os dois; maiúsculas e minúsculas acham igual.
 - **Ficha (ADR-22):** traz locais e equipamentos desativados; locais ativos antes dos desativados, depois por nome; equipamentos ativos antes, depois por tipo, modelo e série.
+- **Série casada (ADR-27):** buscar "hv22" devolve em `matchedSerials` as séries ativas do cliente que contêm o trecho, com o nome do modelo, no máximo três, em ordem de série; buscar pelo nome devolve `matchedSerials` vazio; série de equipamento desativado não aparece.
+- **Lista vazia (ADR-28):** sem cliente nenhum, a tela mostra "Nenhum cliente cadastrado"; com todos desativados, "Nenhum cliente ativo" e "Ver desativados"; a segunda consulta só sai quando a lista padrão volta vazia.
+- **Pai desativado (ADR-6, ADR-30):** editar, desativar e reativar o local de cliente desativado grava; editar o equipamento de local desativado grava; cadastrar local em cliente desativado e equipamento em local desativado recusam.
+- **Campo opcional (ADR-31):** `tradeName`, `email` ou `phone` `null` é ausência; `"  "` é 400.
+- **Mensagens da tela (ADR-31):** cada linha da tabela "Mensagens da tela" tem um teste no frontend, e nenhum envio sai com campo que a tabela recusa.
 
 ## Consumo de integration event
 
