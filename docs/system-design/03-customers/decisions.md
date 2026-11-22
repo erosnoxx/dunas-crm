@@ -16,7 +16,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Decisão:** decisão do usuário: o cliente tem **um documento** (`Document`: CPF ou CNPJ, o tipo vem dele), **um nome** (nome da pessoa ou razão social, no mesmo campo) e **um e-mail e um telefone**, sem lista de contatos. Cada contato, sozinho, é opcional; a regra de que **pelo menos um** dos dois existe é o [ADR-16](#adr-16-pelo-menos-um-contato-por-cliente).
 
-**Consequência:** o formulário é curto e igual para física e jurídica, com o rótulo do nome mudando pelo tipo de documento digitado. Nome fantasia e pessoa de contato não existem nesta versão ([`open-questions.md`](open-questions.md)). A regra "pelo menos um contato" é o ADR-16.
+**Consequência:** o formulário é curto e igual para física e jurídica, com o rótulo do nome mudando pelo tipo de documento digitado. Pessoa de contato não existe nesta versão; o nome fantasia opcional da pessoa jurídica é o [ADR-21](#adr-21-nome-fantasia-opcional-para-pessoa-jurídica). A regra "pelo menos um contato" é o ADR-16.
 
 ## ADR-3: documento único, comparado normalizado, e imutável
 
@@ -38,7 +38,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Contexto:** a manutenção e o monitoramento olham a unidade física: o inversor de série X, no telhado Y. Quantidade como número ("3 splits") perde qual unidade é qual.
 
-**Decisão:** decisão do usuário: o equipamento instalado é **modelo do catálogo + local + número de série + data de instalação opcional**, **uma linha por unidade**. A série é **texto livre, única por modelo**. *Proposta:* a unicidade não diferencia maiúsculas e cobre os **desativados**; o **local e o modelo não mudam** depois do cadastro (errou? desativa e cadastra de novo, como o fabricante e o tipo do modelo em [`02-catalog` ADR-4](../02-catalog/decisions.md)); a **série e a data mudam**, para corrigir digitação (pendência em [`open-questions.md`](open-questions.md)). A data não pode ser depois de hoje.
+**Decisão:** decisão do usuário: o equipamento instalado é **modelo do catálogo + local + número de série + data de instalação opcional**, **uma linha por unidade**. A série é **texto livre, única por modelo**. *Proposta:* a unicidade não diferencia maiúsculas e cobre os **desativados**; o **local e o modelo não mudam** depois do cadastro (errou? desativa e cadastra de novo, como o fabricante e o tipo do modelo em [`02-catalog` ADR-4](../02-catalog/decisions.md)); a **série e a data mudam**, para corrigir digitação ([ADR-17](#adr-17-a-série-do-equipamento-muda-para-corrigir-digitação)). A data não pode ser depois de hoje.
 
 **Consequência:** a unicidade é `UNIQUE (model_id, lower(serial_number))`, sem corrida. Como cobre os desativados e o local não muda, uma unidade **retirada de um cliente e reinstalada em outro** não se cadastra de novo: é o caso "mover equipamento", fora desta versão (ADR-14).
 
@@ -76,7 +76,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 ## ADR-9: fora desta rodada
 
-**Decisão:** decisão do usuário: **sem garantia, sem foto e sem histórico** do equipamento; **sem contatos múltiplos**; **sem consulta de CEP**. Também fora: importação em lote e junção de clientes duplicados (pendências em [`open-questions.md`](open-questions.md)), mover equipamento de local (ADR-14), corrigir o documento (ADR-12), a busca sem acento própria do `customers` (ADR-15), e o histórico de alterações do cadastro (como no [`02-catalog` ADR-8](../02-catalog/decisions.md)).
+**Decisão:** decisão do usuário: **sem garantia, sem foto e sem histórico** do equipamento; **sem contatos múltiplos**; **sem consulta de CEP**. Também fora: importação em lote e junção de clientes duplicados (ADR-25), mover equipamento de local (ADR-14), corrigir o documento (ADR-12), a busca sem acento própria do `customers` (ADR-15), e o histórico de alterações do cadastro (como no [`02-catalog` ADR-8](../02-catalog/decisions.md)).
 
 **Consequência:** o `created_at` e o `updated_at` da persistência existem, mas não são histórico nem data de instalação.
 
@@ -102,7 +102,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Decisão:** decisão do usuário: o documento **não muda**, e **não haverá command de correção**, nem para o Administrador.
 
-**Consequência:** o `UpdateCustomer` não recebe o documento. Como a unicidade cobre os desativados, desativar o cadastro errado e cadastrar de novo **não** é saída para "digitei errado": o cadastro errado continua dono do documento errado, e o cliente certo pode ser cadastrado com o documento certo, mas como cliente novo, sem caminho para levar para ele os locais e os equipamentos do errado. Como o `Document` confere os dígitos verificadores, o erro de digitação que vira outro CPF ou CNPJ válido é raro. *Consequência aceita*; a saída fica como pergunta aberta curta em [`open-questions.md`](open-questions.md) ("Como corrigir um documento digitado errado"), com a recomendação de decidir quando o caso aparecer.
+**Consequência:** o `UpdateCustomer` não recebe o documento. Como a unicidade cobre os desativados, desativar o cadastro errado e cadastrar de novo **não** é saída para "digitei errado": o cadastro errado continua dono do documento errado, e o cliente certo pode ser cadastrado com o documento certo, mas como cliente novo, sem caminho para levar para ele os locais e os equipamentos do errado. Como o `Document` confere os dígitos verificadores, o erro de digitação que vira outro CPF ou CNPJ válido é raro. *Consequência aceita*; o caminho prático (prevenir no cadastro, sem correção) é o [ADR-24](#adr-24-documento-digitado-errado-prevenção-no-cadastro-sem-correção).
 
 ## ADR-13: a busca da lista de clientes também casa o número de série
 
@@ -135,3 +135,83 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 **Decisão:** decisão do usuário: o cliente precisa de **pelo menos um** dos dois, e-mail **ou** telefone. Cada um, sozinho, continua opcional.
 
 **Consequência:** a invariante está no aggregate `Customer` (`register` e `edit`), com o código `contact_required` (422: é regra do aggregate sobre dois campos já válidos, como `characteristic_required` no catálogo, e não formato de VO, que é 400). Editar um cliente não pode apagar o último contato. O formulário indica que um dos dois é obrigatório e mostra o erro correspondente.
+
+## ADR-17: a série do equipamento muda, para corrigir digitação
+
+**Contexto:** a série é copiada à mão da etiqueta, e errar um caractere é comum. Como a unicidade por modelo cobre os desativados (ADR-5), a alternativa "imutável: desativa e cadastra de novo" deixaria a série errada ocupada para sempre. Não há histórico de alterações (ADR-9).
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): a **série e a data de instalação mudam** pelo `UpdateInstalledEquipment`, só com o equipamento ativo, por Administrador ou Comercial, com a mesma checagem de unicidade por modelo (fora o próprio equipamento). O local e o modelo continuam imutáveis (ADR-5).
+
+**Consequência:** "uma série identifica uma unidade de um modelo" vale sempre, porque o índice `UNIQUE (model_id, lower(serial_number))` confere toda gravação. Sem histórico, a série anterior se perde: risco aceito, como em todo campo editável desta versão, até o histórico existir (ADR-9). Trocar a série não move equipamento: local e modelo não mudam (ADR-14).
+
+## ADR-18: telefone digitado com máscara brasileira, guardado em E.164
+
+**Contexto:** o `Phone` de `shared-domain` aceita só E.164 (`+5511999999999`), e a equipe digita "(11) 99999-9999". A clientela é brasileira, mas o VO compartilhado não deve ganhar regra de um país: o domínio é neutro e o VO serve a outros BCs.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): o formulário tem **máscara brasileira**, DDD e número (8 dígitos para fixo, 9 começando por 9 para celular), e o frontend envia `+55` + DDD + número. **Número estrangeiro não é digitável na tela** nesta versão; a API aceita qualquer E.164 válido, porque o domínio não muda. A exibição formata o `+55` de volta ("(11) 99999-9999") e mostra qualquer outro número como está guardado.
+
+**Consequência:** nenhuma mudança no `Phone` nem no backend; o formato brasileiro mora só no frontend (máscara, conferência e exibição). A tela mostra a própria mensagem ("telefone inválido: informe DDD e número"), e o 400 do servidor é rede de segurança. Gatilho para mudar: o primeiro cliente com telefone estrangeiro, que pede um seletor de país no campo, ainda só no frontend.
+
+## ADR-19: CEP conferido só no formato
+
+**Contexto:** o `ZipCode` remove o que não é dígito e exige 8, sem saber se o CEP existe: "00000-000" passa. A consulta automática de CEP ficou fora (ADR-4, ADR-9).
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): **só formato** nesta versão. O formulário tem máscara `00000-000` e exige 8 dígitos; o servidor confere o mesmo pelo `ZipCode`. Nenhuma lista de CEPs nem faixa por UF.
+
+**Consequência:** um CEP que não existe passa, e isso é aceito: quem digita tem o endereço na frente, e conferir a existência exigiria a base dos Correios, ou seja, integração com terceiro. Quando a consulta vier, ela fica atrás de contrato e Translator ([`architecture.md`](../../rules/architecture.md) §4.3) e só preenche o formulário; o domínio não muda.
+
+## ADR-20: limites do nome do cliente, do nome do local e da série
+
+**Contexto:** os VOs próprios do `customers` precisavam de limites. O leiaute público do CNPJ da Receita reserva 150 caracteres para a razão social, e uma razão social copiada do cartão CNPJ precisa caber. Série de inversor e de ar-condicionado costuma ter de 10 a 25 caracteres.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): `CustomerName` de **2 a 150** caracteres (sobe dos 120 propostos, para caber qualquer razão social); `LocationName` de **2 a 60** e `SerialNumber` de **1 a 60**, confirmados.
+
+**Consequência:** `customers.name` e `customers.trade_name` (ADR-21) são `varchar(150)`, o mesmo limite do `Street`. Sessenta caracteres no local cabem um rótulo como "Fazenda Boa Vista, galpão 2", e na série dão mais que o dobro da maior conhecida; se a lista do dono trouxer série maior, mudam o VO e a coluna.
+
+## ADR-21: nome fantasia opcional para pessoa jurídica
+
+**Contexto:** a equipe conhece a empresa pelo nome fantasia ("Padaria Boa Vista"), não pela razão social ("J. SILVA COMÉRCIO DE ALIMENTOS LTDA"), e procura por ele. O ADR-2 fixou um nome por cliente, no mesmo campo para física e jurídica, e deixou o fantasia em aberto.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): o cliente ganha **`tradeName` opcional, só para pessoa jurídica** (CNPJ), com o mesmo VO `CustomerName` (2 a 150). Cliente com CPF e nome fantasia é recusado pelo aggregate (`trade_name_not_allowed`, 422, no `register` e no `edit`). A busca da lista casa também o nome fantasia, e a lista e a ficha mostram os dois. Pessoa de contato continua fora (ADR-2).
+
+**Consequência:** o formulário mostra "Nome fantasia (opcional)" só quando o documento digitado é CNPJ. A lista continua ordenada pelo `name`, para não haver duas ordens; procurar pelo fantasia é papel da busca. Coluna `trade_name varchar(150)` nulável. Como o documento não muda (ADR-12), um cliente nunca passa de jurídica para física com o fantasia preenchido.
+
+## ADR-22: ficha sem paginação, um bloco por local
+
+**Contexto:** a ficha (`GetCustomer`) traz o cliente com todos os locais e todos os equipamentos. Contagem esperada: uma casa tem um local e de 1 a 5 equipamentos; uma empresa, alguns locais e dezenas de equipamentos; mesmo com placas cadastradas uma a uma (ADR-5), uma usina comercial fica em poucas centenas.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): **sem paginação**, numa resposta só. Locais com os **ativos primeiro**, depois por nome; os equipamentos de cada local com os ativos primeiro, depois por tipo, modelo e série. Na tela, **um bloco por local** (nome, endereço, situação e número de equipamentos ativos) com os equipamentos dentro: na web, um cartão com tabela, todos abertos; no celular, uma seção recolhível, aberta se o local está ativo e fechada se está desativado. Desativados aparecem marcados por forma e texto, nunca escondidos.
+
+**Consequência:** a edição de local e de equipamento continua lendo da ficha, sem `GET` próprio. Gatilho para paginar: um cliente com mais de 300 equipamentos, ou uma ficha que demore a abrir; os equipamentos de cada local passariam a vir de um `GET /locations/{id}/equipment` paginado, sem mudança no domínio.
+
+## ADR-23: documento repetido leva ao cliente que já existe
+
+**Contexto:** o cadastro com documento já usado é recusado (`customer_document_taken`), inclusive o de cliente desativado, e o caminho certo é abrir e, se for o caso, reativar o cadastro existente (ADR-3). A resposta do erro não traz o id dele.
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): o erro no formulário tem a ação **"Ver cliente com este documento"**, que abre a lista de clientes buscando o documento digitado, com a situação "todos". A resposta do 409 **não muda**.
+
+**Consequência:** nenhuma mudança no backend: a busca por documento já existe (ADR-11) e quem pode cadastrar pode consultar (ADR-7). A mensagem continua sem o documento (ADR-3).
+
+## ADR-24: documento digitado errado: prevenção no cadastro, sem correção
+
+**Contexto:** o documento é imutável e não há command de correção, nem para o Administrador (ADR-12). Faltava o caminho prático. Um command de correção, mesmo só do Administrador, reabriria o ADR-12. Desativar o errado e recadastrar deixa o documento errado ocupado (ADR-3) e, se já houver equipamentos, as séries deles presas ao cadastro errado (ADR-5).
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22), dentro do ADR-12: **nenhum command de correção**; o esforço vai para **evitar** o erro. O cadastro mostra, ao digitar, o tipo reconhecido (CPF ou CNPJ) e o documento formatado, confere os dígitos verificadores antes de enviar e avisa no campo que **o documento não pode ser alterado depois de salvo**. Na edição, o documento é somente leitura, com o mesmo aviso. Erro notado antes de cadastrar locais e equipamentos (o caso comum: é logo depois do cadastro) se resolve desativando o errado e cadastrando o certo.
+
+**Consequência:** o documento errado fica ocupado pelo cadastro desativado, o que só incomoda se for o documento real de outra pessoa que um dia vire cliente (dois acasos: dígitos verificadores válidos por engano e essa pessoa comprar). Erro notado depois de instalar equipamentos fica sem saída nesta versão. Gatilho: o primeiro caso real; a saída então é transferir locais e equipamentos entre clientes, decidida com o usuário junto do ADR-14, porque reabre o ADR-12 e a imutabilidade do local.
+
+## ADR-25: importação em lote e junção de duplicados ficam fora
+
+**Contexto:** a lista atual de clientes não está disponível ([`02-catalog` ADR-8](../02-catalog/decisions.md)). O documento único impede o duplicado pelo mesmo CPF ou CNPJ; sobra o duplicado por documento digitado errado (ADR-24).
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): as duas ficam **fora desta versão**; o cadastro é à mão.
+
+**Consequência:** gatilhos: a **importação** entra quando a lista aparecer, como carga única pelo domínio, com as mesmas regras de documento, contato e série (seeder ou planilha, decidido com o arquivo na mão, como o [`02-catalog` ADR-7](../02-catalog/decisions.md)); a **junção** entra com o primeiro cliente duplicado que já tenha locais ou equipamentos, junto da transferência do ADR-24.
+
+## ADR-26: "Clientes" é o primeiro item da navegação
+
+**Contexto:** o cliente é uma seção nova e vai ser a mais usada: o comercial abre a ficha para atender, e o técnico procura o cliente pela série em campo (ADR-13).
+
+**Decisão:** decisão delegada pelo usuário (2026-11-22): item **"Clientes" primeiro** no menu da web e na barra inferior do celular, antes de Catálogo e Usuários.
+
+**Consequência:** a barra inferior do Técnico passa a ter dois itens, Clientes e Catálogo. O ícone e o rótulo fecham com o mockup.

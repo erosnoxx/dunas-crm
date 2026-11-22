@@ -6,7 +6,7 @@
 
 ## Nota de proveniência
 
-Modelado a partir das decisões do usuário em [`decisions.md`](decisions.md), do padrão do [catálogo](../02-catalog/domain-model.md) e da leitura dos VOs de `shared-domain`. O que **eu** escolhi sem decisão prévia do usuário está marcado como *proposta* e tem ADR ou pendência.
+Modelado a partir das decisões do usuário em [`decisions.md`](decisions.md), do padrão do [catálogo](../02-catalog/domain-model.md) e da leitura dos VOs de `shared-domain`. O que **eu** escolhi sem decisão prévia do usuário está marcado como *proposta* e tem ADR; o que ele delegou cita o ADR da decisão (ADR-17 a ADR-26).
 
 ## BC e subdomínio
 
@@ -41,19 +41,20 @@ O cliente, pessoa física ou jurídica. **Fronteira de consistência:** o própr
 |---|---|---|
 | `id` | `UUID` | gerado pelo domínio |
 | `document` | `Document` (shared) | CPF ou CNPJ; o tipo (física ou jurídica) vem dele, nunca de um campo à parte (ADR-2) |
-| `name` | `CustomerName` | nome da pessoa ou razão social, de 2 a 120 caracteres (*proposta*) |
+| `name` | `CustomerName` | nome da pessoa ou razão social, de 2 a 150 caracteres (ADR-20) |
+| `tradeName` | `CustomerName`, opcional | nome fantasia, só de pessoa jurídica (ADR-21); ausência é `null` |
 | `email` | `Email` (shared), opcional | ausência é `null` no aggregate, nunca um VO vazio; ao menos um entre `email` e `phone` (ADR-16) |
 | `phone` | `Phone` (shared), opcional | idem |
 | `status` | `CustomerStatus` | `ACTIVE` ou `DEACTIVATED` |
 
-**Invariantes:** só um cliente `ACTIVE` pode ser editado. O documento não muda depois do cadastro (ADR-3, ADR-12). **Pelo menos um contato:** `email` ou `phone` precisa estar presente, no cadastro e em toda edição (ADR-16).
+**Invariantes:** só um cliente `ACTIVE` pode ser editado. O documento não muda depois do cadastro (ADR-3, ADR-12). **Pelo menos um contato:** `email` ou `phone` precisa estar presente, no cadastro e em toda edição (ADR-16). **Nome fantasia só de pessoa jurídica:** `tradeName` presente exige `document.isOrganization()` (ADR-21).
 
 **Métodos de domínio:**
 
 | Método | Efeito | Erros de domínio (`code`) |
 |---|---|---|
-| `register(document, name, email, phone)` | cria `ACTIVE` | `contact_required` (sem e-mail e sem telefone) |
-| `edit(name, email, phone)` | troca nome e contato (um dos dois pode ser apagado, não os dois) | `customer_deactivated`, `contact_required` |
+| `register(document, name, tradeName, email, phone)` | cria `ACTIVE` | `contact_required` (sem e-mail e sem telefone), `trade_name_not_allowed` (nome fantasia com CPF) |
+| `edit(name, tradeName, email, phone)` | troca nome, nome fantasia e contato (um contato pode ser apagado, não os dois) | `customer_deactivated`, `contact_required`, `trade_name_not_allowed` |
 | `deactivate()` | `ACTIVE` → `DEACTIVATED` | `customer_deactivated` (já está) |
 | `reactivate()` | `DEACTIVATED` → `ACTIVE` | `customer_not_deactivated` |
 
@@ -65,7 +66,7 @@ Um endereço do cliente onde há (ou haverá) instalação. **Fronteira de consi
 |---|---|---|
 | `id` | `UUID` | gerado pelo domínio |
 | `customerId` | `UUID` | do `Customer`; **não muda** depois de salvo |
-| `name` | `LocationName` | de 2 a 60 caracteres, ex. "Casa", "Filial Centro" (*proposta*) |
+| `name` | `LocationName` | de 2 a 60 caracteres, ex. "Casa", "Filial Centro" (ADR-20) |
 | `address` | `Address` (shared) | CEP, logradouro, número, complemento opcional, bairro, cidade, UF |
 | `status` | `CustomerStatus` | |
 
@@ -91,7 +92,7 @@ Uma unidade física de um modelo do catálogo, instalada num local. **Fronteira 
 | `id` | `UUID` | gerado pelo domínio |
 | `locationId` | `UUID` | do `Location`; **não muda** depois de salvo (ADR-5) |
 | `modelId` | `UUID` | do `EquipmentModel` do catálogo; **não muda** depois de salvo (ADR-5) |
-| `serialNumber` | `SerialNumber` | texto livre, de 1 a 60 caracteres (*proposta*) |
+| `serialNumber` | `SerialNumber` | texto livre, de 1 a 60 caracteres (ADR-20); muda para corrigir digitação (ADR-17) |
 | `installedOn` | `InstallationDate`, opcional | não pode ser depois de hoje |
 | `status` | `CustomerStatus` | |
 
@@ -107,7 +108,7 @@ O cliente não é campo: é o do local. Guardar os dois abriria espaço para dis
 | Método | Efeito | Erros (`code`) |
 |---|---|---|
 | `install(location, customer, model, serialNumber, installedOn)` | cria `ACTIVE` | `location_deactivated`, `customer_deactivated`, `model_deactivated` |
-| `edit(serialNumber, installedOn)` | troca série e data (*proposta*: a série muda para corrigir digitação; pendência em [`open-questions.md`](open-questions.md)) | `installed_equipment_deactivated` |
+| `edit(serialNumber, installedOn)` | troca série e data (a série muda para corrigir digitação: ADR-17; a unicidade por modelo é do banco) | `installed_equipment_deactivated` |
 | `deactivate()` | `ACTIVE` → `DEACTIVATED` | `installed_equipment_deactivated` (já está) |
 | `reactivate()` | `DEACTIVATED` → `ACTIVE` | `installed_equipment_not_deactivated` |
 
@@ -119,18 +120,18 @@ O cliente não é campo: é o do local. Guardar os dois abriria espaço para dis
 |---|---|---|---|
 | `Document` | `StringValueObject` | **já existe.** Remove tudo que não é letra ou dígito e põe em maiúsculas; 11 caracteres é CPF, 14 é CNPJ (inclusive o alfanumérico), com dígitos verificadores conferidos; outro tamanho recusa ("documento inválido: deve ser um cpf ou cnpj válido", "cpf inválido", "cnpj inválido"). Tem `getType()`, `isIndividual()`, `isOrganization()` e `maskedForDisplay()` | `shared-domain` |
 | `Email` | `StringValueObject` | **já existe.** Minúsculas, até 254 caracteres, formato `nome@dominio.tld` | `shared-domain` |
-| `Phone` | `StringValueObject` | **já existe.** E.164 estrito: `+`, código do país e de 7 a 15 dígitos, sem separador (`^\+[1-9]\d{6,14}$`); a formatação para leitura é da tela | `shared-domain` |
+| `Phone` | `StringValueObject` | **já existe.** E.164 estrito: `+`, código do país e de 7 a 15 dígitos, sem separador (`^\+[1-9]\d{6,14}$`); a máscara brasileira, o `+55` e a formatação para leitura são da tela, e o VO não muda (ADR-18) | `shared-domain` |
 | `Address` | record de VOs | **já existe.** Exige CEP, logradouro, número, bairro, cidade e UF; o complemento aceita ausência (`null`) | `shared-domain` |
-| `ZipCode` | `StringValueObject` | **já existe.** Remove o que não é dígito e exige 8; `formatted()` devolve `00000-000` | `shared-domain` |
+| `ZipCode` | `StringValueObject` | **já existe.** Remove o que não é dígito e exige 8; `formatted()` devolve `00000-000`. Só formato: um CEP que não existe passa (ADR-19) | `shared-domain` |
 | `Street` | `StringValueObject` | **já existe.** De 2 a 150 caracteres | `shared-domain` |
 | `AddressNumber` | `StringValueObject` | **já existe.** Texto ("S/N", "123A"), em maiúsculas, de 1 a 15 caracteres | `shared-domain` |
 | `AddressComplement` | `StringValueObject` | **já existe.** De 1 a 50 caracteres | `shared-domain` |
 | `Neighborhood` | `StringValueObject` | **já existe.** De 2 a 100 caracteres | `shared-domain` |
 | `CityName` | `StringValueObject` | **já existe.** De 1 a 100 caracteres | `shared-domain` |
 | `UF` | enum | **já existe.** As 27 siglas | `shared-domain` |
-| `CustomerName` | `StringValueObject` | de 2 a 120 caracteres (*proposta*) | `registry-domain` |
-| `LocationName` | `StringValueObject` | de 2 a 60 caracteres (*proposta*) | `registry-domain` |
-| `SerialNumber` | `StringValueObject` | de 1 a 60 caracteres, guardado como digitado (sem trocar caixa) (*proposta*) | `registry-domain` |
+| `CustomerName` | `StringValueObject` | de 2 a 150 caracteres (ADR-20); serve ao nome e ao nome fantasia (ADR-21) | `registry-domain` |
+| `LocationName` | `StringValueObject` | de 2 a 60 caracteres (ADR-20) | `registry-domain` |
+| `SerialNumber` | `StringValueObject` | de 1 a 60 caracteres, guardado como digitado (sem trocar caixa) (ADR-20) | `registry-domain` |
 | `InstallationDate` | `LocalDateValueObject` | não pode ser depois de hoje; "hoje" vem de um `Clock` recebido, como o `BirthDate` (`of(valor, clock)`) | `registry-domain` |
 | `CustomerStatus` | enum | `ACTIVE`, `DEACTIVATED` | `registry-domain` |
 
@@ -167,7 +168,7 @@ Migration `V2__create_customers.sql` em `registry-infrastructure/src/main/resour
 
 | Tabela | Colunas | Restrições e índices |
 |---|---|---|
-| `customers` | `document varchar(14)`, `name varchar(120)`, `email varchar(254)` nulável, `phone varchar(16)` nulável, `status varchar(20)` | `UNIQUE (document)` (`uk_customers_document`) |
+| `customers` | `document varchar(14)`, `name varchar(150)`, `trade_name varchar(150)` nulável, `email varchar(254)` nulável, `phone varchar(16)` nulável, `status varchar(20)` | `UNIQUE (document)` (`uk_customers_document`) |
 | `locations` | `customer_id`, `name varchar(60)`, `zip_code char(8)`, `street varchar(150)`, `number varchar(15)`, `complement varchar(50)` nulável, `neighborhood varchar(100)`, `city varchar(100)`, `state char(2)`, `status varchar(20)` | `FK customer_id → customers`; índice em `(customer_id)` |
 | `installed_equipment` | `location_id`, `model_id`, `serial_number varchar(60)`, `installed_on date` nulável, `status varchar(20)` | `FK location_id → locations`; `FK model_id → equipment_models`; `UNIQUE (model_id, lower(serial_number))` (`uk_installed_equipment_model_serial`); índice em `(location_id)` |
 
@@ -175,4 +176,4 @@ Migration `V2__create_customers.sql` em `registry-infrastructure/src/main/resour
 - **Unicidade da série:** sem diferenciar maiúsculas, como os nomes do catálogo, e também sobre os desativados (ADR-5).
 - **Concorrência:** o use case confere a unicidade antes, para a resposta amigável; na corrida, o repository traduz a violação do índice pelo nome dele no mesmo código de erro (como o `UniqueConstraint` do catálogo). Edições simultâneas do mesmo aggregate caem no lock otimista (`concurrent_update`, 409).
 - O estado (`status`) e a UF (`state`) são texto com o nome do enum. O endereço são colunas de `locations`, não tabela própria: é VO do local.
-- **Busca da lista de clientes** (*proposta*): o texto casa, sem diferenciar maiúsculas, o nome do cliente, a cidade de algum local **ativo** dele, o número de série de algum equipamento **ativo** dele (subconsulta `exists` pelos locais; sem índice próprio, a lista é pequena: ADR-13), e o documento (o texto sem pontuação, contido no `document`, só quando sobra algum caractere depois de tirar a pontuação). Acento fica como no catálogo: a mudança é compartilhada (ADR-15).
+- **Busca da lista de clientes** (*proposta*): o texto casa, sem diferenciar maiúsculas, o nome do cliente, o nome fantasia (ADR-21), a cidade de algum local **ativo** dele, o número de série de algum equipamento **ativo** dele (subconsulta `exists` pelos locais; sem índice próprio, a lista é pequena: ADR-13), e o documento (o texto sem pontuação, contido no `document`, só quando sobra algum caractere depois de tirar a pontuação). Acento fica como no catálogo: a mudança é compartilhada (ADR-15).

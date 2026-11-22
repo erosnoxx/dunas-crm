@@ -7,10 +7,11 @@ O cadastro de **quem** a DUNAS atende e **do que** está instalado em cada lugar
 ## Escopo desta feature
 
 **Dentro:**
-- Cliente: cadastrar, editar, desativar e reativar. Pessoa física ou jurídica, pelo CPF ou CNPJ (o tipo vem do documento), com nome ou razão social, um e-mail e um telefone, **pelo menos um dos dois** (ADR-16). Documento único no cadastro e imutável (ADR-3, ADR-12).
-- Local: cadastrar no cliente, editar, desativar e reativar. Um nome curto ("Casa", "Fazenda Boa Vista") e o endereço em campos, digitado à mão (ADR-4).
-- Equipamento instalado: cadastrar no local, editar, desativar e reativar. Um modelo do catálogo, o número de série (único por modelo) e a data de instalação opcional; uma linha por unidade (ADR-5).
-- Lista de clientes com busca por texto (nome, documento, cidade de um local, número de série de um equipamento: ADR-13) e filtro de situação, paginada como o catálogo; ficha do cliente com os locais e os equipamentos de cada um.
+- Cliente: cadastrar, editar, desativar e reativar. Pessoa física ou jurídica, pelo CPF ou CNPJ (o tipo vem do documento), com nome ou razão social (até 150 caracteres: ADR-20), nome fantasia opcional só para pessoa jurídica (ADR-21), um e-mail e um telefone, **pelo menos um dos dois** (ADR-16). Telefone digitado com máscara brasileira e guardado em E.164 (ADR-18). Documento único no cadastro e imutável (ADR-3, ADR-12), com o erro de digitação prevenido no formulário (ADR-24); o documento repetido leva ao cliente existente (ADR-23).
+- Local: cadastrar no cliente, editar, desativar e reativar. Um nome curto ("Casa", "Fazenda Boa Vista") e o endereço em campos, digitado à mão, com o CEP conferido só no formato (ADR-4, ADR-19).
+- Equipamento instalado: cadastrar no local, editar, desativar e reativar. Um modelo do catálogo, o número de série (único por modelo, editável para corrigir digitação: ADR-17) e a data de instalação opcional; uma linha por unidade (ADR-5).
+- Lista de clientes com busca por texto (nome, nome fantasia, documento, cidade de um local, número de série de um equipamento: ADR-13, ADR-21) e filtro de situação, paginada como o catálogo; ficha do cliente com um bloco por local e os equipamentos dentro, sem paginação (ADR-22).
+- "Clientes" como primeiro item do menu e da barra inferior (ADR-26).
 - Permissões: Administrador e Comercial escrevem; os três papéis consultam (ADR-7).
 - As telas listadas em [`design/`](design/README.md), **pendentes de mockup e aprovação**.
 
@@ -19,11 +20,14 @@ O cadastro de **quem** a DUNAS atende e **do que** está instalado em cada lugar
 - **Consulta automática de CEP** (preencher o endereço a partir do CEP): seria integração com terceiro, com Translator ([`architecture.md`](../../rules/architecture.md) §4.3); fica para quando houver demanda (ADR-4).
 - **Garantia, foto, nota fiscal e histórico do equipamento** (troca, manutenção feita): decisão do usuário (ADR-9).
 - **Mover um equipamento de local ou trocar o modelo dele:** o local e o modelo não mudam depois do cadastro (ADR-5); mover fica para quando o caso aparecer (ADR-14), sem `MoveInstalledEquipment` nesta versão.
-- **Corrigir o documento de um cliente:** o documento é imutável, nem o Administrador o corrige (ADR-12).
+- **Corrigir o documento de um cliente:** o documento é imutável, nem o Administrador o corrige (ADR-12); o erro se previne no cadastro (ADR-24). Gatilho: o primeiro erro notado depois de instalar equipamentos, que pede transferir locais e equipamentos entre clientes, decidido com o ADR-14.
+- **Telefone estrangeiro digitável na tela:** a máscara é brasileira (ADR-18). Gatilho: o primeiro cliente com telefone de fora.
+- **Paginação da ficha:** gatilho, um cliente com mais de 300 equipamentos ou uma ficha lenta (ADR-22).
 - **Busca sem acento:** esta versão busca como o catálogo faz hoje; a mudança é compartilhada com o catálogo, em feature própria (ADR-15).
 - **Apagar** cliente, local ou equipamento: só desativa (ADR-6).
 - **Usina e integração com as nuvens dos fabricantes:** nascem com o monitoramento, que vai apontar para o local.
-- **Importação em lote, junção de clientes duplicados e histórico de alterações** ([`open-questions.md`](open-questions.md), ADR-9).
+- **Importação em lote** (gatilho: a lista atual de clientes aparecer) e **junção de clientes duplicados** (gatilho: o primeiro duplicado com locais ou equipamentos), ADR-25.
+- **Histórico de alterações** (ADR-9).
 - **Tema claro** ([`design-system`](../../design-system/README.md)): segue a confirmar, como no catálogo.
 
 ## Bounded contexts envolvidos
@@ -43,7 +47,7 @@ Nenhuma de domínio do `customers`. A feature reaproveita, de `shared-domain`, o
 
 ## Como este documento foi produzido
 
-Decisões do usuário em 2026-11-21 (registradas em [`decisions.md`](decisions.md)); o restante é **proposta para aprovação**, marcada *proposta* onde aparece. Pela regra 6 de [`docs/CLAUDE.md`](../../CLAUDE.md), `domain-model.md` e `usecases.md` só fecham depois de as telas de [`design/`](design/README.md) serem desenhadas e aprovadas.
+Decisões do usuário em 2026-11-21 e as que ele delegou em 2026-11-22 (ADR-17 a ADR-26), registradas em [`decisions.md`](decisions.md); o restante é **proposta para aprovação**, marcada *proposta* onde aparece. Pela regra 6 de [`docs/CLAUDE.md`](../../CLAUDE.md), `domain-model.md` e `usecases.md` só fecham depois de as telas de [`design/`](design/README.md) serem desenhadas e aprovadas.
 
 ## Critério de aceite
 

@@ -15,7 +15,7 @@ Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `querie
 | Consultar cliente, local e equipamento | ✔ | ✔ | ✔ |
 | Cadastrar, editar, desativar e reativar | ✔ | ✔ | recusado (`forbidden`, 403) |
 
-**Ordem das pré-condições**, em todos os commands: **papel** (403) → **formato** dos campos, ao montar os VOs (400) → **existe** (404) → **ativo** (422) → **unicidade** (409). A ordem é contrato: um Técnico com dado inválido recebe 403, e um documento repetido de cliente com formato inválido recebe 400. Onde a regra de "ativo" está num método de fábrica do aggregate (`register`, `install`), ela roda nessa chamada, que vem antes da checagem de unicidade.
+**Ordem das pré-condições**, em todos os commands: **papel** (403) → **formato** dos campos, ao montar os VOs (400) → **existe** (404) → **ativo** (422) → **regra do aggregate** sobre campos já válidos (`contact_required`, `trade_name_not_allowed`: 422) → **unicidade** (409). A ordem é contrato: um Técnico com dado inválido recebe 403, e um documento repetido de cliente com formato inválido recebe 400. As regras de "ativo" e do aggregate rodam na chamada do método de domínio (`register`, `install`, `edit`), que vem antes da checagem de unicidade.
 
 **Pacotes.** `com.crm.registry.application.customers.usecases.commands` e `.queries`; contratos em `com.crm.registry.application.customers.contracts.{repositories,readers}`. Do catálogo, os commands de equipamento usam o `EquipmentModelRepository` (ADR-8).
 
@@ -27,15 +27,15 @@ Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `querie
 
 ### `RegisterCustomer`
 
-- **Entrada:** ator, `document`, `name`, `email` (opcional), `phone` (opcional, E.164); **ao menos um dos dois** (ADR-16).
-- **Pré-condições:** papel Administrador ou Comercial (`forbidden`). Formato: `Document`, `CustomerName`, `Email`, `Phone` (400). Ao menos um contato (`contact_required`, 422). Documento ainda não usado, entre ativos e desativados (`ConflictException`, `customer_document_taken`).
-- **Fluxo:** monta os VOs, confere o documento no repository, `Customer.register`, salva.
+- **Entrada:** ator, `document`, `name`, `tradeName` (opcional, só CNPJ: ADR-21), `email` (opcional), `phone` (opcional, E.164; a tela envia `+55` + DDD + número: ADR-18); **ao menos um contato** (ADR-16).
+- **Pré-condições:** 1. papel Administrador ou Comercial (`forbidden`). 2. Formato: `Document`, `CustomerName` (nome e nome fantasia), `Email`, `Phone` (400). 3. Ao menos um contato (`contact_required`, 422) e nome fantasia só com CNPJ (`trade_name_not_allowed`, 422). 4. Documento ainda não usado, entre ativos e desativados (`ConflictException`, `customer_document_taken`).
+- **Fluxo:** monta os VOs, `Customer.register`, confere o documento no repository, salva.
 - **Retorno:** `UUIDResponse`. **Endpoint:** `POST /customers` (201).
 
 ### `UpdateCustomer`
 
-- **Entrada:** ator, `customerId`, `name`, `email`, `phone`. O documento **não** vem: não muda, e não há command de correção (ADR-3, ADR-12). E-mail ou telefone ausente apaga o valor, mas não os dois.
-- **Pré-condições:** papel; formato (400); cliente existe (`NotFoundException`, `customer_not_found`) e está ativo (`customer_deactivated`); ao menos um contato (`contact_required`, 422).
+- **Entrada:** ator, `customerId`, `name`, `tradeName`, `email`, `phone`. O documento **não** vem: não muda, e não há command de correção (ADR-3, ADR-12, ADR-24). Nome fantasia, e-mail ou telefone ausente apaga o valor, mas não os dois contatos.
+- **Pré-condições:** 1. papel; 2. formato (400); 3. cliente existe (`NotFoundException`, `customer_not_found`); 4. está ativo (`customer_deactivated`); 5. ao menos um contato (`contact_required`, 422) e nome fantasia só com CNPJ (`trade_name_not_allowed`, 422).
 - **Fluxo:** carrega, `edit`, salva (lock otimista: `concurrent_update`, 409).
 - **Endpoint:** `PUT /customers/{customerId}`.
 
@@ -44,7 +44,7 @@ Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `querie
 ### `RegisterLocation`
 
 - **Entrada:** ator, `customerId`, `name`, `address` (`zipCode`, `street`, `number`, `complement` opcional, `neighborhood`, `city`, `state`).
-- **Pré-condições:** papel; formato de `LocationName` e de cada campo do `Address` (400; `state` fora das 27 siglas também é 400); cliente existe (`customer_not_found`) e está ativo (`customer_deactivated`).
+- **Pré-condições:** papel; formato de `LocationName` e de cada campo do `Address` (400; o CEP só no formato, 8 dígitos: ADR-19; `state` fora das 27 siglas também é 400); cliente existe (`customer_not_found`) e está ativo (`customer_deactivated`).
 - **Fluxo:** carrega o cliente, `Location.register(customer, name, address)`, salva.
 - **Retorno:** `UUIDResponse`. **Endpoint:** `POST /customers/{customerId}/locations` (201).
 
@@ -67,8 +67,8 @@ Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `querie
 
 ### `UpdateInstalledEquipment`
 
-- **Entrada:** ator, `equipmentId`, `serialNumber`, `installedOn`. Local e modelo **não** vêm: não mudam (ADR-5).
-- **Pré-condições:** papel; formato (400, `invalid_installation_date`); equipamento existe (`installed_equipment_not_found`) e está ativo (`installed_equipment_deactivated`); série livre para o modelo dele, fora ele mesmo (`serial_number_taken`). Local, cliente e modelo **não** são conferidos.
+- **Entrada:** ator, `equipmentId`, `serialNumber`, `installedOn`. A série muda para corrigir digitação (ADR-17). Local e modelo **não** vêm: não mudam (ADR-5).
+- **Pré-condições:** 1. papel; 2. formato (400, `invalid_installation_date`); 3. equipamento existe (`installed_equipment_not_found`); 4. está ativo (`installed_equipment_deactivated`); 5. série livre para o modelo dele, entre ativos e desativados, fora ele mesmo (`serial_number_taken`). Local, cliente e modelo **não** são conferidos.
 - **Fluxo:** carrega, `edit`, confere a série, salva.
 - **Endpoint:** `PUT /installed-equipment/{equipmentId}`.
 
@@ -94,14 +94,14 @@ Todas `@UseCase(transactional = false)`, abertas aos três papéis. Não carrega
 ### `ListCustomers`
 
 - **Entrada:** `text`, `status`, `page`, `size`; o filtro é o `CustomerFilter`.
-- **Busca:** `text` casa o nome, o documento (sem pontuação), a cidade de um local ativo ou o número de série de um equipamento ativo, sem diferenciar maiúsculas e sem normalizar acento, como o catálogo faz hoje (ADR-13, ADR-15; [`domain-model.md`](domain-model.md#persistência)). Casos de teste previstos: achar o cliente pelo trecho da série; não achar pela série de equipamento desativado; série igual em modelos de clientes diferentes devolve os dois; série digitada em maiúsculas ou minúsculas acha igual.
-- **Retorno:** `Page<CustomerSummary>`: `id`, `name`, `document`, `documentType` (`CPF` ou `CNPJ`), `email`, `phone`, `status`, `locationCount` (ativos), `equipmentCount` (ativos, em locais ativos), `cities` (cidade e UF distintas dos locais ativos). *Proposta*: as colunas da tela fecham com o mockup.
+- **Busca:** `text` casa o nome, o nome fantasia (ADR-21), o documento (sem pontuação), a cidade de um local ativo ou o número de série de um equipamento ativo, sem diferenciar maiúsculas e sem normalizar acento, como o catálogo faz hoje (ADR-13, ADR-15; [`domain-model.md`](domain-model.md#persistência)). É também o destino de "Ver cliente com este documento" (ADR-23), com `status=ALL`.
+- **Retorno:** `Page<CustomerSummary>`: `id`, `name`, `tradeName`, `document`, `documentType` (`CPF` ou `CNPJ`), `email`, `phone`, `status`, `locationCount` (ativos), `equipmentCount` (ativos, em locais ativos), `cities` (cidade e UF distintas dos locais ativos). *Proposta*: as colunas da tela fecham com o mockup.
 - **Endpoint:** `GET /customers`.
 
 ### `GetCustomer`
 
 - **Entrada:** `customerId`. **Erro:** `customer_not_found`.
-- **Retorno:** `CustomerDetail`: os campos do cliente e **todos** os locais (ativos e desativados), cada um com o endereço, a situação e **todos** os seus equipamentos: `id`, `serialNumber`, `installedOn`, `status`, modelo (`id`, `name`, `status`), fabricante (`id`, `name`), tipo (`id`, `name`) e o valor da característica com a unidade. Sem paginação interna (*proposta*; tamanho em [`open-questions.md`](open-questions.md)).
+- **Retorno:** `CustomerDetail`: os campos do cliente (com `tradeName`) e **todos** os locais (ativos e desativados), cada um com o endereço, a situação e **todos** os seus equipamentos: `id`, `serialNumber`, `installedOn`, `status`, modelo (`id`, `name`, `status`), fabricante (`id`, `name`), tipo (`id`, `name`) e o valor da característica com a unidade. **Sem paginação** (ADR-22). **Ordem:** locais ativos primeiro, depois por nome; em cada local, equipamentos ativos primeiro, depois por nome do tipo, nome do modelo e série.
 - **Endpoint:** `GET /customers/{customerId}`. É a ficha do cliente; a edição de local e de equipamento lê dela, sem `GET` próprio.
 
 ## Erros
@@ -125,10 +125,24 @@ Contrato público ([`architecture.md`](../../rules/architecture.md) §7.3). Cód
 | `installed_equipment_not_deactivated` | 422 | este equipamento não está desativado | reativar quem está ativo |
 | `model_deactivated` | 422 | este modelo está desativado | instalar modelo desativado (código do catálogo) |
 | `contact_required` | 422 | informe pelo menos um contato: e-mail ou telefone | cadastrar ou editar cliente sem e-mail e sem telefone |
+| `trade_name_not_allowed` | 422 | nome fantasia só vale para pessoa jurídica | cadastrar ou editar cliente com CPF e nome fantasia (ADR-21) |
 | `invalid_installation_date` | 400 | a data de instalação não pode ser depois de hoje | `InstallationDate` no futuro |
 | `concurrent_update` | 409 | o registro foi alterado ao mesmo tempo por outra operação; tente de novo | lock otimista (código e mensagem do kernel) |
 
-Sem código próprio, como 400 com a mensagem do VO: documento inválido (as mensagens do `Document`: "documento inválido: deve ser um cpf ou cnpj válido", "cpf inválido", "cnpj inválido"), e-mail, telefone ("formato de telefone inválido — use E.164 (ex: +5511999999999)"), cada campo do endereço, e os tamanhos de `CustomerName`, `LocationName` e `SerialNumber`. O frontend confere CPF, CNPJ, e-mail e CEP antes de enviar, e converte o telefone para E.164; o 400 do servidor é a rede de segurança.
+Sem código próprio, como 400 com a mensagem do VO: documento inválido (as mensagens do `Document`: "documento inválido: deve ser um cpf ou cnpj válido", "cpf inválido", "cnpj inválido"), e-mail, telefone ("formato de telefone inválido — use E.164 (ex: +5511999999999)"), cada campo do endereço, e os tamanhos de `CustomerName` (2 a 150), `LocationName` (2 a 60) e `SerialNumber` (1 a 60) (ADR-20). O frontend confere CPF e CNPJ (dígitos verificadores: ADR-24), e-mail, CEP (máscara `00000-000`: ADR-19) e telefone (DDD e número, convertido para `+55` em E.164: ADR-18) antes de enviar; o 400 do servidor é a rede de segurança.
+
+## Casos de teste
+
+Além do caminho feliz e de um teste por código de erro da tabela acima, por command e query:
+
+- **Ordem das pré-condições:** Técnico com campo inválido recebe 403; documento repetido com nome inválido recebe 400; documento repetido sem contato recebe 422 (`contact_required`), não 409; cliente desativado editado sem contato recebe `customer_deactivated`.
+- **Documento (ADR-3, ADR-12, ADR-24):** "123.456.789-09" e "12345678909" colidem (409); documento de cliente desativado colide; o 409 não traz o documento na mensagem; `PUT /customers/{id}` ignora qualquer documento no corpo e não o altera.
+- **Nome fantasia (ADR-21):** CNPJ com nome fantasia cadastra; CPF com nome fantasia recebe `trade_name_not_allowed` no cadastro e na edição; a edição apaga o nome fantasia ausente; a busca acha o cliente pelo trecho do nome fantasia.
+- **Telefone (ADR-18):** `+5511999999999` e um E.164 estrangeiro (`+14155552671`) são aceitos pela API; "(11) 99999-9999" é 400. No frontend: máscara de fixo e de celular, envio em `+55`, exibição de volta formatada, número estrangeiro guardado exibido como está.
+- **CEP (ADR-19):** "01310-100" e "01310100" gravam `01310100`; "00000-000" é aceito; 7 dígitos é 400.
+- **Limites (ADR-20):** nome do cliente com 150 caracteres passa e com 151 é 400; nome do local com 60 passa e com 61 é 400; série com 60 passa e com 61 é 400.
+- **Série (ADR-5, ADR-13, ADR-17):** corrigir a série do próprio equipamento grava; trocar só a caixa da própria série grava; série de outro equipamento do mesmo modelo, ativo ou desativado, é 409; a mesma série em outro modelo grava. Busca: acha o cliente pelo trecho da série; não acha pela série de equipamento desativado; série igual em modelos de clientes diferentes devolve os dois; maiúsculas e minúsculas acham igual.
+- **Ficha (ADR-22):** traz locais e equipamentos desativados; locais ativos antes dos desativados, depois por nome; equipamentos ativos antes, depois por tipo, modelo e série.
 
 ## Consumo de integration event
 
@@ -137,6 +151,7 @@ Nenhum (ver [`domain-model.md`](domain-model.md#domain-events-e-integration-even
 ## Fora de escopo
 
 - **Apagar** cliente, local ou equipamento: só desativa (ADR-6).
-- **Trocar o documento** de um cliente (ADR-3, ADR-12), **mover um equipamento** de local (ADR-14) ou **trocar o modelo** dele (ADR-5).
+- **Corrigir o documento** de um cliente, nem pelo Administrador (ADR-3, ADR-12); o caminho é prevenir no cadastro (ADR-24). **Mover um equipamento** de local (ADR-14) ou **trocar o modelo** dele (ADR-5).
 - **Lista geral de equipamentos** (todos os clientes, por modelo ou por série): a série acha o **cliente**, na busca da lista de clientes (ADR-13).
-- **Contatos múltiplos, consulta de CEP, garantia, foto, histórico, importação em lote, junção de duplicados** (README da feature).
+- **Paginação da ficha** (ADR-22) e **telefone estrangeiro digitável** na tela (ADR-18), com os gatilhos registrados nos ADRs.
+- **Contatos múltiplos, consulta de CEP, garantia, foto, histórico, importação em lote, junção de duplicados** (README da feature, ADR-25).
