@@ -6,11 +6,14 @@ import { countText } from "../catalog.messages"
 import type { ManufacturerSummary } from "../catalog.service"
 import { CatalogStatusChip } from "./catalog-status"
 
-// As colunas da tabela na web (mockup 7): a linha e o cabeçalho usam a mesma grade.
+// As colunas da tabela na web (mockup 7): a linha e o cabeçalho usam a mesma grade, e o cabeçalho
+// leva o "Editar" da linha invisível (sem altura, para não mudar a dele), para a coluna `auto` (e
+// as frações) terem a mesma largura nos dois.
 const COLUMNS = "md:grid-cols-[2fr_1fr_1.4fr_auto]"
+const EDIT = "text-body-sm font-semibold"
 
 /** O cabeçalho da tabela (só na web): `th` do mockup 7, `label` em `text-muted`. */
-function ManufacturerTableHeader() {
+function ManufacturerTableHeader({ canEdit }: { canEdit: boolean }) {
   return (
     <div
       aria-hidden="true"
@@ -22,7 +25,7 @@ function ManufacturerTableHeader() {
       <span>Fabricante</span>
       <span>Modelos</span>
       <span>Situação</span>
-      <span />
+      <span className={cn(EDIT, "invisible h-0")}>{canEdit && "Editar"}</span>
     </div>
   )
 }
@@ -48,7 +51,7 @@ function ManufacturerRow({
       )}
     >
       <span className="flex flex-col md:contents">
-        <span className="text-body font-semibold md:text-body-sm">
+        <span className="text-body font-semibold md:text-body-sm md:font-semibold">
           {manufacturer.name}
         </span>
         <span className="text-body-sm text-text-muted md:hidden">
@@ -58,9 +61,12 @@ function ManufacturerRow({
           {manufacturer.modelCount}
         </span>
       </span>
-      <CatalogStatusChip status={manufacturer.status} />
+      {/* Item da grade: sem o invólucro, o chip estica até a largura da coluna. */}
+      <span className="md:justify-self-start">
+        <CatalogStatusChip status={manufacturer.status} />
+      </span>
       {canEdit && (
-        <span className="text-body-sm font-semibold text-brand-text max-md:hidden md:text-end">
+        <span className={cn(EDIT, "text-brand-text max-md:hidden md:text-end")}>
           Editar
         </span>
       )}

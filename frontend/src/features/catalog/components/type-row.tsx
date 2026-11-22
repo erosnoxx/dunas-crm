@@ -70,7 +70,7 @@ function TypeTable({
                   <Link
                     to={`/catalogo/tipos/${type.id}`}
                     aria-current={selected ? "true" : undefined}
-                    className="font-semibold text-brand-text"
+                    className="inline-flex min-h-11 items-center font-semibold text-brand-text"
                   >
                     {selected ? "Editando" : "Editar"}
                   </Link>

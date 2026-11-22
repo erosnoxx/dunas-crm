@@ -240,6 +240,15 @@ describe("web", () => {
     )
   })
 
+  it("Editar tem alvo de 44 px de altura, dentro da linha de 56", async () => {
+    renderScreen()
+    await screen.findByText("Inversor")
+
+    expect(within(row("Inversor")).getByRole("link", { name: "Editar" })).toHaveClass(
+      "min-h-11",
+    )
+  })
+
   it("a lista e o painel Novo tipo ficam lado a lado, sem botão de abrir", async () => {
     renderScreen()
 

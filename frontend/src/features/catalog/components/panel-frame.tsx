@@ -6,8 +6,9 @@ import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Button } from "@/shared/ui/button"
 import { MobileHeader } from "@/shared/ui/mobile-header"
 
-// Botões da web (mockups 7 e 9): 44 px e 14 px; o do celular é o do rodapé fixo, 48 px e 16 px.
-const WEB_BUTTON = "self-start md:text-body-sm"
+// Botões da web (mockups 7 e 9): 44 px e 14 px peso 600; o do celular é o do rodapé fixo, 48 px e
+// 16 px. `md:font-semibold` porque o `md:text-body-sm` traz o peso 400 do token.
+const WEB_BUTTON = "self-start md:text-body-sm md:font-semibold"
 
 function Spinner() {
   return (

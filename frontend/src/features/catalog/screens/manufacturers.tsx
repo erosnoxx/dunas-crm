@@ -51,7 +51,7 @@ function List({ canEdit }: { canEdit: boolean }) {
 
       {manufacturers && manufacturers.length > 0 && (
         <>
-          <ManufacturerTableHeader />
+          <ManufacturerTableHeader canEdit={canEdit} />
           <ul className="flex flex-col gap-3 md:gap-0">
             {manufacturers.map((manufacturer) => (
               <ManufacturerRow
