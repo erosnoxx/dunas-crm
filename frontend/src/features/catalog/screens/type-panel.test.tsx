@@ -493,6 +493,25 @@ describe("web", () => {
     expect(button("Salvar tipo").parentElement).not.toHaveClass("fixed")
   })
 
+  it("Salvar tipo fica em peso 600 (o `md:text-body-sm` traz o 400 do token)", async () => {
+    renderPanel("/catalogo/tipos/novo")
+
+    expect(await screen.findByRole("button", { name: "Salvar tipo" })).toHaveClass(
+      "md:font-semibold",
+    )
+  })
+
+  it("Reativar tipo fica em peso 600", async () => {
+    vi.mocked(service.listEquipmentTypes).mockResolvedValue(
+      page([{ ...INVERSOR, status: "DEACTIVATED" }]),
+    )
+    renderPanel("/catalogo/tipos/t-inv")
+
+    expect(await screen.findByRole("button", { name: "Reativar tipo" })).toHaveClass(
+      "md:font-semibold",
+    )
+  })
+
   it("a edição leva o nome do tipo no título, com Salvar alterações e Desativar tipo dentro do painel", async () => {
     renderPanel("/catalogo/tipos/t-inv")
 

@@ -27,7 +27,8 @@ function Glyph({ shape }: { shape: Shape }) {
       aria-hidden="true"
       data-shape={shape}
     >
-      <circle cx="5" cy="5" r={shape === "filled" ? 5 : 4} />
+      {/* Raio 4 com traço 1,6 cabe nos 10 px; com raio 5 o traço era cortado e o cheio virava quadrado. */}
+      <circle cx="5" cy="5" r="4" />
       {shape === "slashed" && <path d="M2 8l6-6" />}
     </svg>
   )

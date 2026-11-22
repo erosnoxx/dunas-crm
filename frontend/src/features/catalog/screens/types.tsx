@@ -90,9 +90,11 @@ function TypesScreen({ canEdit }: { canEdit: boolean }) {
       <CatalogTabs active="types" />
 
       <div className="flex items-start gap-6">
+        {/* `relative`: o "Ações" `sr-only` (absoluto) da tabela fica preso à rolagem da lista; sem
+            ele, a 768 px escapava e rolava a página inteira na horizontal. */}
         <section
           aria-label="Lista de tipos"
-          className="min-w-0 flex-1 md:overflow-x-auto md:border md:border-line md:bg-panel"
+          className="relative min-w-0 flex-1 md:overflow-x-auto md:border md:border-line md:bg-panel"
         >
           <div className="md:min-w-120">
             <List canEdit={canEdit} />

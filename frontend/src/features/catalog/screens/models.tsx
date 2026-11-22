@@ -245,8 +245,9 @@ function FilterBar({
   const label = "text-text-muted max-md:sr-only"
 
   return (
-    <div className="flex flex-col gap-3 md:flex-row md:items-end">
-      <div className="flex flex-col gap-1.5 md:flex-1">
+    // Quebra linha quando a busca ficaria abaixo de 240 px (768 a 1023, sem mockup); em 1280 cabe.
+    <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
+      <div className="flex flex-col gap-1.5 md:min-w-60 md:flex-1">
         <Label htmlFor={`${id}-text`} className={label}>
           Buscar modelo
         </Label>

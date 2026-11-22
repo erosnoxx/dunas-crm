@@ -57,8 +57,9 @@ const DEACTIVATED_TEXT =
 const FORM = "flex flex-col gap-4.5 md:gap-5 md:border md:border-line md:bg-panel md:p-6"
 const PANEL = "flex flex-col gap-3 border border-line bg-panel p-4 md:gap-5 md:p-6"
 const HELP = "text-caption text-text-muted"
-// Botões da web (mockups 3 e 5): 44 px e 14 px; o do celular é o do rodapé fixo, 48 px e 16 px.
-const WEB_BUTTON = "md:text-body-sm"
+// Botões da web (mockups 3 e 5): 44 px e 14 px peso 600; o do celular é o do rodapé fixo, 48 px e
+// 16 px. `md:font-semibold` porque o `md:text-body-sm` traz o peso 400 do token.
+const WEB_BUTTON = "md:text-body-sm md:font-semibold"
 
 type Failure = Partial<ApiError> | null
 
