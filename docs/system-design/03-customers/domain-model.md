@@ -42,18 +42,18 @@ O cliente, pessoa física ou jurídica. **Fronteira de consistência:** o própr
 | `id` | `UUID` | gerado pelo domínio |
 | `document` | `Document` (shared) | CPF ou CNPJ; o tipo (física ou jurídica) vem dele, nunca de um campo à parte (ADR-2) |
 | `name` | `CustomerName` | nome da pessoa ou razão social, de 2 a 120 caracteres (*proposta*) |
-| `email` | `Email` (shared), opcional | ausência é `null` no aggregate, nunca um VO vazio |
+| `email` | `Email` (shared), opcional | ausência é `null` no aggregate, nunca um VO vazio; ao menos um entre `email` e `phone` (ADR-16) |
 | `phone` | `Phone` (shared), opcional | idem |
 | `status` | `CustomerStatus` | `ACTIVE` ou `DEACTIVATED` |
 
-**Invariantes:** só um cliente `ACTIVE` pode ser editado. O documento não muda depois do cadastro (*proposta*, ADR-3; pendência em [`open-questions.md`](open-questions.md)).
+**Invariantes:** só um cliente `ACTIVE` pode ser editado. O documento não muda depois do cadastro (ADR-3, ADR-12). **Pelo menos um contato:** `email` ou `phone` precisa estar presente, no cadastro e em toda edição (ADR-16).
 
 **Métodos de domínio:**
 
 | Método | Efeito | Erros de domínio (`code`) |
 |---|---|---|
-| `register(document, name, email, phone)` | cria `ACTIVE` | — |
-| `edit(name, email, phone)` | troca nome e contato (e-mail e telefone podem ser apagados) | `customer_deactivated` |
+| `register(document, name, email, phone)` | cria `ACTIVE` | `contact_required` (sem e-mail e sem telefone) |
+| `edit(name, email, phone)` | troca nome e contato (um dos dois pode ser apagado, não os dois) | `customer_deactivated`, `contact_required` |
 | `deactivate()` | `ACTIVE` → `DEACTIVATED` | `customer_deactivated` (já está) |
 | `reactivate()` | `DEACTIVATED` → `ACTIVE` | `customer_not_deactivated` |
 
@@ -175,4 +175,4 @@ Migration `V2__create_customers.sql` em `registry-infrastructure/src/main/resour
 - **Unicidade da série:** sem diferenciar maiúsculas, como os nomes do catálogo, e também sobre os desativados (ADR-5).
 - **Concorrência:** o use case confere a unicidade antes, para a resposta amigável; na corrida, o repository traduz a violação do índice pelo nome dele no mesmo código de erro (como o `UniqueConstraint` do catálogo). Edições simultâneas do mesmo aggregate caem no lock otimista (`concurrent_update`, 409).
 - O estado (`status`) e a UF (`state`) são texto com o nome do enum. O endereço são colunas de `locations`, não tabela própria: é VO do local.
-- **Busca da lista de clientes** (*proposta*): o texto casa, sem diferenciar maiúsculas, o nome do cliente, a cidade de algum local **ativo** dele, e o documento (o texto sem pontuação, contido no `document`, só quando sobra algum caractere depois de tirar a pontuação). Acento fica como no catálogo: ver [`open-questions.md`](open-questions.md).
+- **Busca da lista de clientes** (*proposta*): o texto casa, sem diferenciar maiúsculas, o nome do cliente, a cidade de algum local **ativo** dele, o número de série de algum equipamento **ativo** dele (subconsulta `exists` pelos locais; sem índice próprio, a lista é pequena: ADR-13), e o documento (o texto sem pontuação, contido no `document`, só quando sobra algum caractere depois de tirar a pontuação). Acento fica como no catálogo: a mudança é compartilhada (ADR-15).

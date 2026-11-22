@@ -27,15 +27,15 @@ Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `querie
 
 ### `RegisterCustomer`
 
-- **Entrada:** ator, `document`, `name`, `email` (opcional), `phone` (opcional, E.164).
-- **Pré-condições:** papel Administrador ou Comercial (`forbidden`). Formato: `Document`, `CustomerName`, `Email`, `Phone` (400). Documento ainda não usado, entre ativos e desativados (`ConflictException`, `customer_document_taken`).
+- **Entrada:** ator, `document`, `name`, `email` (opcional), `phone` (opcional, E.164); **ao menos um dos dois** (ADR-16).
+- **Pré-condições:** papel Administrador ou Comercial (`forbidden`). Formato: `Document`, `CustomerName`, `Email`, `Phone` (400). Ao menos um contato (`contact_required`, 422). Documento ainda não usado, entre ativos e desativados (`ConflictException`, `customer_document_taken`).
 - **Fluxo:** monta os VOs, confere o documento no repository, `Customer.register`, salva.
 - **Retorno:** `UUIDResponse`. **Endpoint:** `POST /customers` (201).
 
 ### `UpdateCustomer`
 
-- **Entrada:** ator, `customerId`, `name`, `email`, `phone`. O documento **não** vem: não muda (ADR-3). E-mail ou telefone ausente apaga o valor.
-- **Pré-condições:** papel; formato (400); cliente existe (`NotFoundException`, `customer_not_found`) e está ativo (`customer_deactivated`).
+- **Entrada:** ator, `customerId`, `name`, `email`, `phone`. O documento **não** vem: não muda, e não há command de correção (ADR-3, ADR-12). E-mail ou telefone ausente apaga o valor, mas não os dois.
+- **Pré-condições:** papel; formato (400); cliente existe (`NotFoundException`, `customer_not_found`) e está ativo (`customer_deactivated`); ao menos um contato (`contact_required`, 422).
 - **Fluxo:** carrega, `edit`, salva (lock otimista: `concurrent_update`, 409).
 - **Endpoint:** `PUT /customers/{customerId}`.
 
@@ -94,7 +94,7 @@ Todas `@UseCase(transactional = false)`, abertas aos três papéis. Não carrega
 ### `ListCustomers`
 
 - **Entrada:** `text`, `status`, `page`, `size`; o filtro é o `CustomerFilter`.
-- **Busca:** `text` casa o nome, o documento (sem pontuação) ou a cidade de um local ativo, sem diferenciar maiúsculas ([`domain-model.md`](domain-model.md#persistência)).
+- **Busca:** `text` casa o nome, o documento (sem pontuação), a cidade de um local ativo ou o número de série de um equipamento ativo, sem diferenciar maiúsculas e sem normalizar acento, como o catálogo faz hoje (ADR-13, ADR-15; [`domain-model.md`](domain-model.md#persistência)). Casos de teste previstos: achar o cliente pelo trecho da série; não achar pela série de equipamento desativado; série igual em modelos de clientes diferentes devolve os dois; série digitada em maiúsculas ou minúsculas acha igual.
 - **Retorno:** `Page<CustomerSummary>`: `id`, `name`, `document`, `documentType` (`CPF` ou `CNPJ`), `email`, `phone`, `status`, `locationCount` (ativos), `equipmentCount` (ativos, em locais ativos), `cities` (cidade e UF distintas dos locais ativos). *Proposta*: as colunas da tela fecham com o mockup.
 - **Endpoint:** `GET /customers`.
 
@@ -124,6 +124,7 @@ Contrato público ([`architecture.md`](../../rules/architecture.md) §7.3). Cód
 | `installed_equipment_deactivated` | 422 | este equipamento está desativado | editar; desativar de novo |
 | `installed_equipment_not_deactivated` | 422 | este equipamento não está desativado | reativar quem está ativo |
 | `model_deactivated` | 422 | este modelo está desativado | instalar modelo desativado (código do catálogo) |
+| `contact_required` | 422 | informe pelo menos um contato: e-mail ou telefone | cadastrar ou editar cliente sem e-mail e sem telefone |
 | `invalid_installation_date` | 400 | a data de instalação não pode ser depois de hoje | `InstallationDate` no futuro |
 | `concurrent_update` | 409 | o registro foi alterado ao mesmo tempo por outra operação; tente de novo | lock otimista (código e mensagem do kernel) |
 
@@ -136,6 +137,6 @@ Nenhum (ver [`domain-model.md`](domain-model.md#domain-events-e-integration-even
 ## Fora de escopo
 
 - **Apagar** cliente, local ou equipamento: só desativa (ADR-6).
-- **Trocar o documento** de um cliente, **mover um equipamento** de local ou **trocar o modelo** dele (ADR-3, ADR-5).
-- **Lista geral de equipamentos** (todos os clientes, por modelo ou por série): a busca por série fica em [`open-questions.md`](open-questions.md).
+- **Trocar o documento** de um cliente (ADR-3, ADR-12), **mover um equipamento** de local (ADR-14) ou **trocar o modelo** dele (ADR-5).
+- **Lista geral de equipamentos** (todos os clientes, por modelo ou por série): a série acha o **cliente**, na busca da lista de clientes (ADR-13).
 - **Contatos múltiplos, consulta de CEP, garantia, foto, histórico, importação em lote, junção de duplicados** (README da feature).

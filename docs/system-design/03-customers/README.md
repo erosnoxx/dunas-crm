@@ -7,10 +7,10 @@ O cadastro de **quem** a DUNAS atende e **do que** está instalado em cada lugar
 ## Escopo desta feature
 
 **Dentro:**
-- Cliente: cadastrar, editar, desativar e reativar. Pessoa física ou jurídica, pelo CPF ou CNPJ (o tipo vem do documento), com nome ou razão social, um e-mail e um telefone, os dois opcionais (ADR-2). Documento único no cadastro (ADR-3).
+- Cliente: cadastrar, editar, desativar e reativar. Pessoa física ou jurídica, pelo CPF ou CNPJ (o tipo vem do documento), com nome ou razão social, um e-mail e um telefone, **pelo menos um dos dois** (ADR-16). Documento único no cadastro e imutável (ADR-3, ADR-12).
 - Local: cadastrar no cliente, editar, desativar e reativar. Um nome curto ("Casa", "Fazenda Boa Vista") e o endereço em campos, digitado à mão (ADR-4).
 - Equipamento instalado: cadastrar no local, editar, desativar e reativar. Um modelo do catálogo, o número de série (único por modelo) e a data de instalação opcional; uma linha por unidade (ADR-5).
-- Lista de clientes com busca por texto (nome, documento, cidade de um local) e filtro de situação, paginada como o catálogo; ficha do cliente com os locais e os equipamentos de cada um.
+- Lista de clientes com busca por texto (nome, documento, cidade de um local, número de série de um equipamento: ADR-13) e filtro de situação, paginada como o catálogo; ficha do cliente com os locais e os equipamentos de cada um.
 - Permissões: Administrador e Comercial escrevem; os três papéis consultam (ADR-7).
 - As telas listadas em [`design/`](design/README.md), **pendentes de mockup e aprovação**.
 
@@ -18,7 +18,9 @@ O cadastro de **quem** a DUNAS atende e **do que** está instalado em cada lugar
 - **Contatos múltiplos** por cliente (pessoa de contato, cargo, vários telefones): decisão do usuário, um e-mail e um telefone (ADR-2).
 - **Consulta automática de CEP** (preencher o endereço a partir do CEP): seria integração com terceiro, com Translator ([`architecture.md`](../../rules/architecture.md) §4.3); fica para quando houver demanda (ADR-4).
 - **Garantia, foto, nota fiscal e histórico do equipamento** (troca, manutenção feita): decisão do usuário (ADR-9).
-- **Mover um equipamento de local ou trocar o modelo dele:** o local e o modelo não mudam depois do cadastro (ADR-5); o caso real de mudança está em [`open-questions.md`](open-questions.md).
+- **Mover um equipamento de local ou trocar o modelo dele:** o local e o modelo não mudam depois do cadastro (ADR-5); mover fica para quando o caso aparecer (ADR-14), sem `MoveInstalledEquipment` nesta versão.
+- **Corrigir o documento de um cliente:** o documento é imutável, nem o Administrador o corrige (ADR-12).
+- **Busca sem acento:** esta versão busca como o catálogo faz hoje; a mudança é compartilhada com o catálogo, em feature própria (ADR-15).
 - **Apagar** cliente, local ou equipamento: só desativa (ADR-6).
 - **Usina e integração com as nuvens dos fabricantes:** nascem com o monitoramento, que vai apontar para o local.
 - **Importação em lote, junção de clientes duplicados e histórico de alterações** ([`open-questions.md`](open-questions.md), ADR-9).

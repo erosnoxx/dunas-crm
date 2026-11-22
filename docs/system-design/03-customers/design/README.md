@@ -12,14 +12,14 @@ As telas abaixo são a **lista do que precisa ser desenhado**, na identidade DUN
 
 | # | Tela | O que precisa validar | Status |
 |---|---|---|---|
-| 1 | Clientes, web | Item "Clientes" no menu; lista com busca única (nome, documento, cidade) e filtro de situação; colunas (nome, documento formatado com o tipo, cidades, número de locais e de equipamentos, situação por forma além da cor); botão "Novo cliente" | pendente de mockup e aprovação |
+| 1 | Clientes, web | Item "Clientes" no menu; lista com busca única (nome, documento, cidade, número de série), com placeholder e dica que dizem que a busca aceita a série do equipamento (ADR-13), e filtro de situação; colunas (nome, documento formatado com o tipo, cidades, número de locais e de equipamentos, situação por forma além da cor); botão "Novo cliente" | pendente de mockup e aprovação |
 | 2 | Clientes, celular | Os mesmos dados em cartões; "Novo cliente" fixo acima da barra inferior; item "Clientes" na barra inferior | pendente de mockup e aprovação |
 | 3 | Clientes, celular, sem resultado | Estado vazio da busca, com "Limpar busca e filtros" | pendente de mockup e aprovação |
 | 4 | Clientes, web, nenhum cadastrado | Estado vazio da primeira vez, com o convite a cadastrar | pendente de mockup e aprovação |
 | 5 | Clientes, celular, Técnico | Sem botões de escrita e com o aviso de que o papel só consulta (ADR-7) | pendente de mockup e aprovação |
 | 6 | Clientes, web, erro de carregamento | Falha de rede ao listar, com "Tentar de novo" | pendente de mockup e aprovação |
-| 7 | Novo cliente, web | Documento (CPF ou CNPJ, o tipo reconhecido ao digitar), rótulo "Nome" ou "Razão social" conforme o tipo, e-mail e telefone opcionais, máscara brasileira no telefone | pendente de mockup e aprovação |
-| 8 | Novo cliente, celular, com erro | Erro "já existe um cliente com este documento" e erro de CPF inválido no campo, com ícone e texto, não só cor; se a tela leva ao cliente existente | pendente de mockup e aprovação |
+| 7 | Novo cliente, web | Documento (CPF ou CNPJ, o tipo reconhecido ao digitar), rótulo "Nome" ou "Razão social" conforme o tipo, e-mail e telefone com a indicação de que um dos dois é obrigatório (ADR-16), máscara brasileira no telefone | pendente de mockup e aprovação |
+| 8 | Novo cliente, celular, com erro | Erro "já existe um cliente com este documento", erro de CPF inválido e erro "informe pelo menos um contato: e-mail ou telefone" (`contact_required`) no formulário, com ícone e texto, não só cor; se a tela leva ao cliente existente | pendente de mockup e aprovação |
 | 9 | Ficha do cliente, web | Dados do cliente (documento somente leitura, ADR-3), editar e desativar sem confirmação; os locais com endereço e situação; os equipamentos de cada local (modelo, fabricante, tipo e característica, série, data); ações "Novo local" e "Novo equipamento" | pendente de mockup e aprovação |
 | 10 | Ficha do cliente, celular | A mesma ficha empilhada; como os locais e os equipamentos se expandem | pendente de mockup e aprovação |
 | 11 | Ficha do cliente, celular, sem locais | Estado vazio dos locais, com o convite a cadastrar o primeiro (ADR-4) | pendente de mockup e aprovação |
