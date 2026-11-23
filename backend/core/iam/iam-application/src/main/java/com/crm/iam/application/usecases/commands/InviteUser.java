@@ -9,7 +9,7 @@ import com.crm.iam.application.contracts.repositories.OneTimeTokenRepository;
 import com.crm.iam.application.contracts.repositories.UserRepository;
 import com.crm.iam.domain.entities.OneTimeToken;
 import com.crm.iam.domain.entities.User;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
 import com.crm.iam.domain.vos.TokenSecret;
 import com.crm.iam.domain.vos.UserName;
 import com.crm.shared.application.schemas.response.UUIDResponse;

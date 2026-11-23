@@ -1,9 +1,10 @@
 package com.crm.iam.application.contracts.repositories;
 
 import com.crm.common.application.repository.Repository;
+import com.crm.iam.application.criteria.OneTimeTokenCriteria;
 import com.crm.iam.domain.entities.OneTimeToken;
 import com.crm.iam.domain.vos.TokenHash;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
 
 import java.util.List;
 import java.util.Optional;

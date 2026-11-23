@@ -1,7 +1,7 @@
 package com.crm.registry.application.catalog.schemas;
 
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
-import com.crm.registry.domain.catalog.vos.MeasurementUnit;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.MeasurementUnit;
 
 import java.util.List;
 import java.util.UUID;

@@ -8,11 +8,21 @@ import com.crm.iam.domain.entities.Session;
 import com.crm.iam.domain.entities.User;
 import com.crm.iam.domain.vos.DeviceLabel;
 import com.crm.iam.domain.vos.PasswordHash;
+import com.crm.iam.infrastructure.mappers.OneTimeTokenMapper;
+import com.crm.iam.infrastructure.mappers.SessionMapper;
+import com.crm.iam.infrastructure.mappers.UserMapper;
+import com.crm.iam.infrastructure.persistence.entities.UserEntity;
+import com.crm.iam.infrastructure.persistence.jpa.OneTimeTokenJpaRepository;
+import com.crm.iam.infrastructure.persistence.jpa.SessionJpaRepository;
+import com.crm.iam.infrastructure.persistence.jpa.UserJpaRepository;
+import com.crm.iam.infrastructure.readers.SessionReaderImpl;
+import com.crm.iam.infrastructure.readers.UserReaderImpl;
+import com.crm.iam.infrastructure.repositories.*;
 import com.crm.shared.domain.enums.Role;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
 import com.crm.iam.domain.vos.TokenSecret;
 import com.crm.iam.domain.vos.UserName;
-import com.crm.iam.domain.vos.UserStatus;
+import com.crm.iam.domain.enums.UserStatus;
 import com.crm.shared.domain.vos.contact.Email;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,45 +89,45 @@ class IamPersistencePostgresTest {
         }
 
         @Bean
-        JpaUserRepositoryImpl userRepository(UserJpaRepository jpa, EntityManager em) {
-            return new JpaUserRepositoryImpl(jpa, em, new UserMapper());
+        UserRepositoryImpl userRepository(UserJpaRepository jpa, EntityManager em) {
+            return new UserRepositoryImpl(jpa, em, new UserMapper());
         }
 
         @Bean
-        JpaOneTimeTokenRepositoryImpl tokenRepository(OneTimeTokenJpaRepository jpa, EntityManager em) {
-            return new JpaOneTimeTokenRepositoryImpl(jpa, em, new OneTimeTokenMapper());
+        OneTimeTokenRepositoryImpl tokenRepository(OneTimeTokenJpaRepository jpa, EntityManager em) {
+            return new OneTimeTokenRepositoryImpl(jpa, em, new OneTimeTokenMapper());
         }
 
         @Bean
-        JpaSessionRepositoryImpl sessionRepository(SessionJpaRepository jpa, EntityManager em) {
-            return new JpaSessionRepositoryImpl(jpa, em, new SessionMapper());
+        SessionRepositoryImpl sessionRepository(SessionJpaRepository jpa, EntityManager em) {
+            return new SessionRepositoryImpl(jpa, em, new SessionMapper());
         }
 
         @Bean
-        JpaUserReaderImpl userReader(EntityManager em) {
-            return new JpaUserReaderImpl(em);
+        UserReaderImpl userReader(EntityManager em) {
+            return new UserReaderImpl(em);
         }
 
         @Bean
-        JpaSessionReaderImpl sessionReader(EntityManager em) {
-            return new JpaSessionReaderImpl(em);
+        SessionReaderImpl sessionReader(EntityManager em) {
+            return new SessionReaderImpl(em);
         }
     }
 
     @Autowired
-    private JpaUserRepositoryImpl users;
+    private UserRepositoryImpl users;
 
     @Autowired
-    private JpaOneTimeTokenRepositoryImpl tokens;
+    private OneTimeTokenRepositoryImpl tokens;
 
     @Autowired
-    private JpaSessionRepositoryImpl sessions;
+    private SessionRepositoryImpl sessions;
 
     @Autowired
-    private JpaUserReaderImpl userReader;
+    private UserReaderImpl userReader;
 
     @Autowired
-    private JpaSessionReaderImpl sessionReader;
+    private SessionReaderImpl sessionReader;
 
     @Autowired
     private JdbcTemplate jdbc;

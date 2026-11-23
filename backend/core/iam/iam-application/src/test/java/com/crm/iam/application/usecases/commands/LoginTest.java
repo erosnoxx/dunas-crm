@@ -9,7 +9,7 @@ import com.crm.iam.application.contracts.services.PasswordHasher;
 import com.crm.iam.domain.entities.Session;
 import com.crm.iam.domain.vos.Password;
 import com.crm.iam.domain.vos.TokenSecret;
-import com.crm.iam.domain.vos.UserStatus;
+import com.crm.iam.domain.enums.UserStatus;
 import com.crm.shared.domain.vos.contact.Email;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

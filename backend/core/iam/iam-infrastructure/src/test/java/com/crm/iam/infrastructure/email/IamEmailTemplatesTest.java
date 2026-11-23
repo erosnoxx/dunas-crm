@@ -3,7 +3,7 @@ package com.crm.iam.infrastructure.email;
 import com.crm.common.application.exceptions.InternalServerErrorException;
 import com.crm.iam.domain.entities.User;
 import com.crm.shared.domain.enums.Role;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
 import com.crm.iam.domain.vos.TokenSecret;
 import com.crm.iam.domain.vos.UserName;
 import com.crm.shared.domain.vos.contact.Email;

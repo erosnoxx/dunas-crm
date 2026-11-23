@@ -4,7 +4,7 @@ import com.crm.common.domain.entities.AggregateRoot;
 import com.crm.common.domain.exceptions.DomainException;
 import com.crm.iam.domain.events.OneTimeTokenIssued;
 import com.crm.iam.domain.vos.TokenHash;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
 import com.crm.iam.domain.vos.TokenSecret;
 import lombok.Getter;
 

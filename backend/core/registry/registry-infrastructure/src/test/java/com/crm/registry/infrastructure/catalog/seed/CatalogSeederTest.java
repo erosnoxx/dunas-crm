@@ -7,7 +7,7 @@ import com.crm.registry.application.catalog.contracts.repositories.ManufacturerR
 import com.crm.registry.domain.catalog.entities.EquipmentModel;
 import com.crm.registry.domain.catalog.entities.EquipmentType;
 import com.crm.registry.domain.catalog.entities.Manufacturer;
-import com.crm.registry.domain.catalog.vos.MeasurementUnit;
+import com.crm.registry.domain.catalog.enums.MeasurementUnit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

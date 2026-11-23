@@ -2,7 +2,7 @@ package com.crm.iam.domain.entities;
 
 import com.crm.common.domain.exceptions.DomainException;
 import com.crm.iam.domain.events.OneTimeTokenIssued;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
 import com.crm.iam.domain.vos.TokenSecret;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

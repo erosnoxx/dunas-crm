@@ -3,6 +3,7 @@ package com.crm.iam.infrastructure.persistence;
 import com.crm.iam.domain.entities.Session;
 import com.crm.iam.domain.vos.DeviceLabel;
 import com.crm.iam.domain.vos.TokenHash;
+import com.crm.iam.infrastructure.mappers.SessionMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

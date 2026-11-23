@@ -1,6 +1,7 @@
 package com.crm.registry.application.catalog.contracts.repositories;
 
 import com.crm.common.application.repository.Repository;
+import com.crm.registry.application.catalog.criteria.EquipmentTypeCriteria;
 import com.crm.registry.domain.catalog.entities.EquipmentType;
 import com.crm.registry.domain.catalog.vos.TypeName;
 

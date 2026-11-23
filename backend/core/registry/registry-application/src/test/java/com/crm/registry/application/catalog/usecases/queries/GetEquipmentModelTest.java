@@ -2,7 +2,7 @@ package com.crm.registry.application.catalog.usecases.queries;
 
 import com.crm.registry.application.catalog.contracts.readers.EquipmentModelReader;
 import com.crm.registry.application.catalog.schemas.EquipmentModelSummary;
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

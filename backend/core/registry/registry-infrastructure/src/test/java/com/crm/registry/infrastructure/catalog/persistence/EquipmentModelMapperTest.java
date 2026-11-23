@@ -1,10 +1,11 @@
 package com.crm.registry.infrastructure.catalog.persistence;
 
 import com.crm.registry.domain.catalog.entities.EquipmentModel;
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
 import com.crm.registry.domain.catalog.vos.CharacteristicAmount;
 import com.crm.registry.domain.catalog.vos.CharacteristicValue;
 import com.crm.registry.domain.catalog.vos.ModelName;
+import com.crm.registry.infrastructure.catalog.mappers.EquipmentModelMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

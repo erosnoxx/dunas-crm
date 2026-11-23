@@ -9,7 +9,7 @@ import com.crm.registry.application.catalog.contracts.repositories.EquipmentType
 import com.crm.registry.application.catalog.schemas.CharacteristicInput;
 import com.crm.registry.domain.catalog.entities.EquipmentType;
 import com.crm.registry.domain.catalog.vos.CharacteristicName;
-import com.crm.registry.domain.catalog.vos.MeasurementUnit;
+import com.crm.registry.domain.catalog.enums.MeasurementUnit;
 import com.crm.registry.domain.catalog.vos.TypeName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

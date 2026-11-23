@@ -1,6 +1,7 @@
 package com.crm.registry.application.catalog.contracts.repositories;
 
 import com.crm.common.application.repository.Repository;
+import com.crm.registry.application.catalog.criteria.ManufacturerCriteria;
 import com.crm.registry.domain.catalog.entities.Manufacturer;
 import com.crm.registry.domain.catalog.vos.ManufacturerName;
 

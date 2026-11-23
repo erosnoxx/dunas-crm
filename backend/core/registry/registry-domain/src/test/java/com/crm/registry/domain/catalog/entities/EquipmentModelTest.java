@@ -1,12 +1,12 @@
 package com.crm.registry.domain.catalog.entities;
 
 import com.crm.common.domain.exceptions.DomainException;
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
 import com.crm.registry.domain.catalog.vos.CharacteristicAmount;
 import com.crm.registry.domain.catalog.vos.CharacteristicName;
 import com.crm.registry.domain.catalog.vos.CharacteristicValue;
 import com.crm.registry.domain.catalog.vos.ManufacturerName;
-import com.crm.registry.domain.catalog.vos.MeasurementUnit;
+import com.crm.registry.domain.catalog.enums.MeasurementUnit;
 import com.crm.registry.domain.catalog.vos.ModelName;
 import com.crm.registry.domain.catalog.vos.TypeName;
 import org.junit.jupiter.api.DisplayName;
