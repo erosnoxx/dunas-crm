@@ -11,7 +11,7 @@ import com.crm.registry.application.catalog.usecases.commands.ReactivateManufact
 import com.crm.registry.application.catalog.usecases.commands.RegisterManufacturer;
 import com.crm.registry.application.catalog.usecases.commands.RenameManufacturer;
 import com.crm.registry.application.catalog.usecases.queries.ListManufacturers;
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
 import com.crm.shared.application.schemas.response.UUIDResponse;
 import com.crm.web.iam.ActorRequestAttribute;
 import com.crm.web.iam.IamMvc;

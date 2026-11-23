@@ -1,7 +1,7 @@
 package com.crm.iam.domain.events;
 
 import com.crm.common.domain.events.DomainEvent;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
 import com.crm.iam.domain.vos.TokenSecret;
 
 import java.time.Instant;

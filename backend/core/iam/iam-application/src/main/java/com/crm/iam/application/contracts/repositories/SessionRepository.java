@@ -1,6 +1,7 @@
 package com.crm.iam.application.contracts.repositories;
 
 import com.crm.common.application.repository.Repository;
+import com.crm.iam.application.criteria.SessionCriteria;
 import com.crm.iam.domain.entities.Session;
 
 import java.time.Instant;

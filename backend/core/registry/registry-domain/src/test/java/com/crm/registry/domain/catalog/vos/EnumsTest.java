@@ -1,5 +1,7 @@
 package com.crm.registry.domain.catalog.vos;
 
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.MeasurementUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

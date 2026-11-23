@@ -12,14 +12,25 @@ import com.crm.registry.application.catalog.schemas.StatusFilter;
 import com.crm.registry.domain.catalog.entities.EquipmentModel;
 import com.crm.registry.domain.catalog.entities.EquipmentType;
 import com.crm.registry.domain.catalog.entities.Manufacturer;
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
 import com.crm.registry.domain.catalog.vos.CharacteristicAmount;
 import com.crm.registry.domain.catalog.vos.CharacteristicName;
 import com.crm.registry.domain.catalog.vos.CharacteristicValue;
 import com.crm.registry.domain.catalog.vos.ManufacturerName;
-import com.crm.registry.domain.catalog.vos.MeasurementUnit;
+import com.crm.registry.domain.catalog.enums.MeasurementUnit;
 import com.crm.registry.domain.catalog.vos.ModelName;
 import com.crm.registry.domain.catalog.vos.TypeName;
+import com.crm.registry.infrastructure.catalog.mappers.EquipmentModelMapper;
+import com.crm.registry.infrastructure.catalog.mappers.EquipmentTypeMapper;
+import com.crm.registry.infrastructure.catalog.mappers.ManufacturerMapper;
+import com.crm.registry.infrastructure.catalog.persistence.entities.ManufacturerEntity;
+import com.crm.registry.infrastructure.catalog.persistence.jpa.EquipmentModelJpaRepository;
+import com.crm.registry.infrastructure.catalog.persistence.jpa.EquipmentTypeJpaRepository;
+import com.crm.registry.infrastructure.catalog.persistence.jpa.ManufacturerJpaRepository;
+import com.crm.registry.infrastructure.catalog.readers.EquipmentModelReaderImpl;
+import com.crm.registry.infrastructure.catalog.readers.EquipmentTypeReaderImpl;
+import com.crm.registry.infrastructure.catalog.readers.ManufacturerReaderImpl;
+import com.crm.registry.infrastructure.catalog.repositories.*;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -86,53 +97,53 @@ class CatalogPersistencePostgresTest {
         }
 
         @Bean
-        JpaManufacturerRepositoryImpl manufacturerRepository(ManufacturerJpaRepository jpa, EntityManager em) {
-            return new JpaManufacturerRepositoryImpl(jpa, em, new ManufacturerMapper());
+        ManufacturerRepositoryImpl manufacturerRepository(ManufacturerJpaRepository jpa, EntityManager em) {
+            return new ManufacturerRepositoryImpl(jpa, em, new ManufacturerMapper());
         }
 
         @Bean
-        JpaEquipmentTypeRepositoryImpl typeRepository(EquipmentTypeJpaRepository jpa, EntityManager em) {
-            return new JpaEquipmentTypeRepositoryImpl(jpa, em, new EquipmentTypeMapper());
+        EquipmentTypeRepositoryImpl typeRepository(EquipmentTypeJpaRepository jpa, EntityManager em) {
+            return new EquipmentTypeRepositoryImpl(jpa, em, new EquipmentTypeMapper());
         }
 
         @Bean
-        JpaEquipmentModelRepositoryImpl modelRepository(EquipmentModelJpaRepository jpa, EntityManager em) {
-            return new JpaEquipmentModelRepositoryImpl(jpa, em, new EquipmentModelMapper());
+        EquipmentModelRepositoryImpl modelRepository(EquipmentModelJpaRepository jpa, EntityManager em) {
+            return new EquipmentModelRepositoryImpl(jpa, em, new EquipmentModelMapper());
         }
 
         @Bean
-        JpaManufacturerReaderImpl manufacturerReader(EntityManager em) {
-            return new JpaManufacturerReaderImpl(em);
+        ManufacturerReaderImpl manufacturerReader(EntityManager em) {
+            return new ManufacturerReaderImpl(em);
         }
 
         @Bean
-        JpaEquipmentTypeReaderImpl typeReader(EntityManager em) {
-            return new JpaEquipmentTypeReaderImpl(em);
+        EquipmentTypeReaderImpl typeReader(EntityManager em) {
+            return new EquipmentTypeReaderImpl(em);
         }
 
         @Bean
-        JpaEquipmentModelReaderImpl modelReader(EntityManager em) {
-            return new JpaEquipmentModelReaderImpl(em);
+        EquipmentModelReaderImpl modelReader(EntityManager em) {
+            return new EquipmentModelReaderImpl(em);
         }
     }
 
     @Autowired
-    private JpaManufacturerRepositoryImpl manufacturers;
+    private ManufacturerRepositoryImpl manufacturers;
 
     @Autowired
-    private JpaEquipmentTypeRepositoryImpl types;
+    private EquipmentTypeRepositoryImpl types;
 
     @Autowired
-    private JpaEquipmentModelRepositoryImpl models;
+    private EquipmentModelRepositoryImpl models;
 
     @Autowired
-    private JpaManufacturerReaderImpl manufacturerReader;
+    private ManufacturerReaderImpl manufacturerReader;
 
     @Autowired
-    private JpaEquipmentTypeReaderImpl typeReader;
+    private EquipmentTypeReaderImpl typeReader;
 
     @Autowired
-    private JpaEquipmentModelReaderImpl modelReader;
+    private EquipmentModelReaderImpl modelReader;
 
     @Autowired
     private JdbcTemplate jdbc;

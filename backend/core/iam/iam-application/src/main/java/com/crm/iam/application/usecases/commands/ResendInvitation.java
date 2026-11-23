@@ -9,9 +9,9 @@ import com.crm.iam.application.IamSettings;
 import com.crm.iam.application.contracts.repositories.OneTimeTokenRepository;
 import com.crm.iam.application.contracts.repositories.UserRepository;
 import com.crm.iam.domain.entities.OneTimeToken;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
 import com.crm.iam.domain.vos.TokenSecret;
-import com.crm.iam.domain.vos.UserStatus;
+import com.crm.iam.domain.enums.UserStatus;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Clock;

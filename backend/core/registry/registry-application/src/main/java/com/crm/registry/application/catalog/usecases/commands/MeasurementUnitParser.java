@@ -2,7 +2,7 @@ package com.crm.registry.application.catalog.usecases.commands;
 
 import com.crm.common.application.exceptions.BadRequestException;
 import com.crm.common.application.exceptions.InvalidParam;
-import com.crm.registry.domain.catalog.vos.MeasurementUnit;
+import com.crm.registry.domain.catalog.enums.MeasurementUnit;
 
 import java.util.Arrays;
 import java.util.List;

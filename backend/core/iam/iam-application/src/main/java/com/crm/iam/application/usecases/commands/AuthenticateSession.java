@@ -10,7 +10,7 @@ import com.crm.iam.application.contracts.readers.SessionReader;
 import com.crm.iam.application.contracts.repositories.SessionRepository;
 import com.crm.iam.application.schemas.SessionPrincipal;
 import com.crm.iam.domain.vos.TokenSecret;
-import com.crm.iam.domain.vos.UserStatus;
+import com.crm.iam.domain.enums.UserStatus;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Clock;

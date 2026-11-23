@@ -4,7 +4,7 @@ import com.crm.common.application.exceptions.ForbiddenException;
 import com.crm.shared.application.Actor;
 import com.crm.iam.application.contracts.repositories.UserRepository;
 import com.crm.shared.domain.enums.Role;
-import com.crm.iam.domain.vos.UserStatus;
+import com.crm.iam.domain.enums.UserStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

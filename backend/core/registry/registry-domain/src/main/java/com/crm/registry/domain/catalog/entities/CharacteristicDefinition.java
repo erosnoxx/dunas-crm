@@ -2,7 +2,7 @@ package com.crm.registry.domain.catalog.entities;
 
 import com.crm.common.domain.entities.DomainEntity;
 import com.crm.registry.domain.catalog.vos.CharacteristicName;
-import com.crm.registry.domain.catalog.vos.MeasurementUnit;
+import com.crm.registry.domain.catalog.enums.MeasurementUnit;
 import lombok.Getter;
 
 import java.util.UUID;

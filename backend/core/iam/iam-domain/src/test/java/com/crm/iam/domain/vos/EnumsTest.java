@@ -1,5 +1,7 @@
 package com.crm.iam.domain.vos;
 
+import com.crm.iam.domain.enums.TokenPurpose;
+import com.crm.iam.domain.enums.UserStatus;
 import com.crm.shared.domain.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

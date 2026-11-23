@@ -1,8 +1,9 @@
 package com.crm.registry.infrastructure.catalog.persistence;
 
 import com.crm.registry.domain.catalog.entities.Manufacturer;
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
 import com.crm.registry.domain.catalog.vos.ManufacturerName;
+import com.crm.registry.infrastructure.catalog.mappers.ManufacturerMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
