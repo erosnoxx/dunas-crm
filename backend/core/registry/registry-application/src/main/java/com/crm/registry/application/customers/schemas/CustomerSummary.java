@@ -10,9 +10,9 @@ import java.util.UUID;
 /**
  * Linha da lista de clientes. Sem e-mail e telefone: só o detalhe os traz (ADR-29).
  *
- * @param locationCount  localizações do cliente
- * @param equipmentCount equipamentos instalados do cliente
- * @param cities         cidades das localizações
+ * @param locationCount  localizações ativas do cliente
+ * @param equipmentCount equipamentos ativos nas localizações ativas do cliente
+ * @param cities         cidades das localizações ativas
  * @param matchedSerials seriais que casaram com o texto da busca
  */
 public record CustomerSummary(

@@ -41,6 +41,14 @@ final class AddressParser {
                         List.of(new InvalidParam("address.state", "uf desconhecida"))
                 ));
 
-        return new Address(zipCode, street, number, complement, neighborhood, city, state);
+        return new Address(
+                zipCode,
+                street,
+                number,
+                complement,
+                neighborhood,
+                city,
+                state
+        );
     }
 }

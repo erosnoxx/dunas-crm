@@ -50,7 +50,11 @@ public class CustomerRepositoryImpl
         }
         catch (ConflictException e) {
             if (UniqueConstraint.isViolated(e, DOCUMENT_CONSTRAINT))
-                throw new ConflictException("customer_document_taken", "já existe um cliente com este documento", e.getCause());
+                throw new ConflictException(
+                    "customer_document_taken",
+                    "já existe um cliente com este documento",
+                    e.getCause()
+            );
 
             throw e;
         }

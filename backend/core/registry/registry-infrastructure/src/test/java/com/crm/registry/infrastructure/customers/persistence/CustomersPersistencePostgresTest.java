@@ -308,7 +308,7 @@ class CustomersPersistencePostgresTest {
 
         assertThatThrownBy(() -> savedEquipment(location, customer, model, "abc-123"))
                 .isInstanceOf(ConflictException.class)
-                .hasMessage("este modelo já tem um equipamento instalado com esse número de série")
+                .hasMessage("este modelo já tem um equipamento com esse número de série")
                 .satisfies(error -> assertThat(codeOf(error)).isEqualTo("serial_number_taken"));
     }
 

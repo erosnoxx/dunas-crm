@@ -64,7 +64,13 @@ public class InstallEquipment {
         var customer = customers.findById(location.getCustomerId())
                 .orElseThrow(() -> new NotFoundException("customer_not_found", "cliente não encontrado"));
 
-        var equipment = InstalledEquipment.install(location, customer, model, serialNumber, installedOn);
+        var equipment = InstalledEquipment.install(
+                location,
+                customer,
+                model,
+                serialNumber,
+                installedOn
+        );
 
         if (repository.existsByModelAndSerialNumber(model.getId(), serialNumber, null))
             throw new ConflictException("serial_number_taken", "este modelo já tem um equipamento com esse número de série");

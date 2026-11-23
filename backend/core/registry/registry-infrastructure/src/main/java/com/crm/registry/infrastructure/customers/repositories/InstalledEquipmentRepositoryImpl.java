@@ -40,7 +40,11 @@ public class InstalledEquipmentRepositoryImpl
     }
 
     @Override
-    public boolean existsByModelAndSerialNumber(UUID modelId, SerialNumber serialNumber, UUID exceptId) {
+    public boolean existsByModelAndSerialNumber(
+            UUID modelId,
+            SerialNumber serialNumber,
+            UUID exceptId
+    ) {
         return jpaRepository.existsByModelAndSerialNumber(modelId, serialNumber.getValue(), exceptId);
     }
 
@@ -51,7 +55,11 @@ public class InstalledEquipmentRepositoryImpl
         }
         catch (ConflictException e) {
             if (UniqueConstraint.isViolated(e, SERIAL_CONSTRAINT))
-                throw new ConflictException("serial_number_taken", "este modelo já tem um equipamento instalado com esse número de série", e.getCause());
+                throw new ConflictException(
+                    "serial_number_taken",
+                    "este modelo já tem um equipamento com esse número de série",
+                    e.getCause()
+            );
 
             throw e;
         }

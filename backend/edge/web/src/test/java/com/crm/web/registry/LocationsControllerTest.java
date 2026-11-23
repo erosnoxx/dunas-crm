@@ -1,6 +1,6 @@
 package com.crm.web.registry;
 
-import com.crm.common.application.exceptions.ConflictException;
+import com.crm.common.application.exceptions.ConcurrentUpdateException;
 import com.crm.common.application.exceptions.UnprocessableEntityException;
 import com.crm.registry.application.customers.schemas.AddressInput;
 import com.crm.registry.application.customers.usecases.commands.DeactivateLocation;
@@ -139,11 +139,11 @@ class LocationsControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("customer_deactivated"));
 
-        doThrow(new ConflictException("location_name_taken", "nome em uso"))
+        doThrow(new ConcurrentUpdateException())
                 .when(updateLocation).execute(any());
         mvc.perform(json(put("/locations/{id}", ID), body(ADDRESS)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value("location_name_taken"));
+                .andExpect(jsonPath("$.code").value("concurrent_update"));
     }
 
     @Test

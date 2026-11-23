@@ -51,7 +51,12 @@ public class UpdateCustomer {
         var customer = repository.findById(params.customerId())
                 .orElseThrow(() -> new NotFoundException("customer_not_found", "cliente não encontrado"));
 
-        customer.edit(name, tradeName, email, phone);
+        customer.edit(
+                name,
+                tradeName,
+                email,
+                phone
+        );
 
         repository.save(customer);
     }

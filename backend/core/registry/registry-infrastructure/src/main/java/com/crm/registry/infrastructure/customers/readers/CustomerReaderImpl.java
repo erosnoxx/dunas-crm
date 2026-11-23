@@ -195,6 +195,7 @@ public class CustomerReaderImpl implements CustomerReader {
                         """.formatted(ACTIVE), LocationEntity.class)
                 .setParameter("id", customerId)
                 .getResultList();
+
         var equipment = equipmentOf(customerId);
 
         var views = locations.stream()

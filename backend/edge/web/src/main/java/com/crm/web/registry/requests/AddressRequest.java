@@ -17,6 +17,14 @@ public record AddressRequest(
 
     /** Converte para a entrada do use case. */
     public AddressInput toInput() {
-        return new AddressInput(zipCode, street, number, complement, neighborhood, city, state);
+        return new AddressInput(
+                zipCode,
+                street,
+                number,
+                complement,
+                neighborhood,
+                city,
+                state
+        );
     }
 }

@@ -15,5 +15,9 @@ public interface InstalledEquipmentRepository extends Repository<InstalledEquipm
      *
      * @param exceptId equipamento ignorado na comparação (o próprio, ao editar); nulo = nenhum
      */
-    boolean existsByModelAndSerialNumber(UUID modelId, SerialNumber serialNumber, UUID exceptId);
+    boolean existsByModelAndSerialNumber(
+            UUID modelId,
+            SerialNumber serialNumber,
+            UUID exceptId
+    );
 }

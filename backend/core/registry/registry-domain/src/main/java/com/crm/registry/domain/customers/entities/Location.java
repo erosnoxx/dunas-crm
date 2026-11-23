@@ -42,11 +42,22 @@ public class Location extends AggregateRoot {
     }
 
     /** Cadastra o local, que nasce ativo; só vale para um cliente ativo. */
-    public static Location register(Customer customer, LocationName name, Address address) {
+    public static Location register(
+            Customer customer,
+            LocationName name,
+            Address address
+    ) {
         if (!customer.isActive())
             throw new DomainException("customer_deactivated", "este cliente está desativado");
 
-        return new Location(UUID.randomUUID(), null, customer.getId(), name, address, CustomerStatus.ACTIVE);
+        return new Location(
+                UUID.randomUUID(),
+                null,
+                customer.getId(),
+                name,
+                address,
+                CustomerStatus.ACTIVE
+        );
     }
 
     /** Reconstrução do banco: não valida de novo, não registra evento. */
@@ -58,7 +69,14 @@ public class Location extends AggregateRoot {
             Address address,
             CustomerStatus status
     ) {
-        return new Location(id, version, customerId, name, address, status);
+        return new Location(
+                id,
+                version,
+                customerId,
+                name,
+                address,
+                status
+        );
     }
 
     public UUID getCustomerId() {

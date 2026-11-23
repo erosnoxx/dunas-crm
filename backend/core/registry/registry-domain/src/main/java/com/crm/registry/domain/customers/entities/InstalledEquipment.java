@@ -66,7 +66,14 @@ public class InstalledEquipment extends AggregateRoot {
             throw new DomainException("model_deactivated", "este modelo está desativado");
 
         return new InstalledEquipment(
-                UUID.randomUUID(), null, location.getId(), model.getId(), serialNumber, installedOn, CustomerStatus.ACTIVE);
+                UUID.randomUUID(),
+                null,
+                location.getId(),
+                model.getId(),
+                serialNumber,
+                installedOn,
+                CustomerStatus.ACTIVE
+        );
     }
 
     /** Reconstrução do banco: não valida de novo, não registra evento. */
@@ -79,7 +86,15 @@ public class InstalledEquipment extends AggregateRoot {
             InstallationDate installedOn,
             CustomerStatus status
     ) {
-        return new InstalledEquipment(id, version, locationId, modelId, serialNumber, installedOn, status);
+        return new InstalledEquipment(
+                id,
+                version,
+                locationId,
+                modelId,
+                serialNumber,
+                installedOn,
+                status
+        );
     }
 
     public UUID getLocationId() {

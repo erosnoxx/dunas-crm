@@ -52,7 +52,13 @@ public class RegisterCustomer {
         var email = OptionalValue.of(params.email(), Email::of);
         var phone = OptionalValue.of(params.phone(), Phone::of);
 
-        var customer = Customer.register(document, name, tradeName, email, phone);
+        var customer = Customer.register(
+                document,
+                name,
+                tradeName,
+                email,
+                phone
+        );
 
         if (repository.existsByDocument(document))
             throw new ConflictException("customer_document_taken", "já existe um cliente com este documento");

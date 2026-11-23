@@ -66,7 +66,16 @@ public class Customer extends AggregateRoot {
         requireContact(email, phone);
         requireTradeNameAllowed(document, tradeName);
 
-        return new Customer(UUID.randomUUID(), null, document, name, tradeName, email, phone, CustomerStatus.ACTIVE);
+        return new Customer(
+                UUID.randomUUID(),
+                null,
+                document,
+                name,
+                tradeName,
+                email,
+                phone,
+                CustomerStatus.ACTIVE
+        );
     }
 
     /** Reconstrução do banco: não valida de novo, não registra evento. */
@@ -80,7 +89,16 @@ public class Customer extends AggregateRoot {
             Phone phone,
             CustomerStatus status
     ) {
-        return new Customer(id, version, document, name, tradeName, email, phone, status);
+        return new Customer(
+                id,
+                version,
+                document,
+                name,
+                tradeName,
+                email,
+                phone,
+                status
+        );
     }
 
     public Document getDocument() {
@@ -112,7 +130,12 @@ public class Customer extends AggregateRoot {
     }
 
     /** Substitui nome, nome fantasia e contatos (nulo remove); o documento nunca muda. */
-    public void edit(CustomerName name, CustomerName tradeName, Email email, Phone phone) {
+    public void edit(
+            CustomerName name,
+            CustomerName tradeName,
+            Email email,
+            Phone phone
+    ) {
         requireActive();
         requireContact(email, phone);
         requireTradeNameAllowed(document, tradeName);
