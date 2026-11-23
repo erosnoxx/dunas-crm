@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Clientes, celular, sem resultado</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1220;color:#E8EDF5;font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:24px}
+h1,h2,p{margin:0}
+.phone{width:390px;height:844px;display:flex;flex-direction:column;background:#0B1220;overflow:hidden}
+.top{height:64px;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:0 16px;background:#0F1729;border-bottom:1px solid #26324A;flex-shrink:0}
+.top img{width:36px;height:36px;border-radius:8px;display:block}
+.ttl{flex:1;font-family:"Chakra Petch",system-ui,sans-serif;font-size:24px;line-height:28px;font-weight:600}
+.av{width:40px;height:40px;border-radius:50%;background:#1B2A44;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px}
+.body{flex:1;min-height:0;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:12px}
+.in{height:44px;box-sizing:border-box;width:100%;background:#131C2E;border:1px solid #34476B;color:#E8EDF5;padding:0 12px;font:inherit;font-size:16px}
+.help{font-size:12px;line-height:16px;color:#9AA7BD;margin-top:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.chips{display:flex;gap:8px}
+.chip{flex:1;height:44px;box-sizing:border-box;background:#131C2E;border:1px solid #34476B;color:#E8EDF5;padding:0 10px;font:inherit;font-size:14px}
+.empty{margin-top:32px;padding:24px 16px;background:#131C2E;border:1px solid #26324A;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.empty h2{font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;line-height:24px;font-weight:600}
+.empty p{font-size:14px;line-height:20px;color:#9AA7BD}
+.lnk{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 12px;color:#FF7E00;font-weight:600;font-size:14px;text-decoration:none}
+.act{padding:12px 16px;background:#0B1220;flex-shrink:0}
+.btn{height:48px;width:100%;border:0;background:#FF7E00;color:#0B1220;font:600 16px "IBM Plex Sans",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+.bnav{height:64px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#0F1729;border-top:1px solid #26324A;flex-shrink:0}
+.bnav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;line-height:16px;font-weight:600;color:#9AA7BD;text-decoration:none}
+.bnav a.on{color:#FF7E00}
+</style>
+</helmet>
+<div class="phone">
+  <header class="top">
+    <img src="/_blob/92042a9ffee5d55ce807843f55fc291d" alt="">
+    <p class="ttl">Clientes</p>
+    <div class="av" aria-hidden="true">M</div>
+  </header>
+
+  <div class="body">
+    <div>
+      <label class="sr" for="q">Buscar cliente</label>
+      <input id="q" class="in" type="search" value="HV9910042" aria-describedby="q-dica">
+      <p id="q-dica" class="help">Também acha pelo número de série do equipamento.</p>
+    </div>
+    <div class="chips">
+      <label class="sr" for="s">Situação</label>
+      <select id="s" class="chip"><option>Ativos</option><option>Desativados</option><option>Todos</option></select>
+    </div>
+    <section class="empty" aria-live="polite">
+      <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9AA7BD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <h2>Nenhum cliente encontrado</h2>
+      <p>Nenhum cliente ativo tem "HV9910042" no nome, no documento, numa cidade ou no número de série de um equipamento. Confira a busca, veja os desativados ou cadastre o cliente.</p>
+      <a class="lnk" href="Clientes-celular.dc.html">Limpar busca e filtros</a>
+    </section>
+  </div>
+
+  <div class="act">
+    <a class="btn" href="Novo-cliente-celular-erros.dc.html">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Novo cliente
+    </a>
+  </div>
+
+  <nav class="bnav" aria-label="Principal">
+    <a class="on" href="#" aria-current="page">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 2v2M8 2v2"/><rect x="3" y="4" width="18" height="18" rx="2"/><circle cx="12" cy="11" r="3"/><path d="M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
+      Clientes
+    </a>
+    <a href="#">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+      Catálogo
+    </a>
+    <a href="#">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+      Usuários
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

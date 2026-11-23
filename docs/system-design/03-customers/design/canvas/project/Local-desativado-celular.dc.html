@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Local desativado na ficha, celular</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1220;color:#E8EDF5;font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:24px}
+h1,h2,h3,p{margin:0}
+.phone{width:390px;height:844px;display:flex;flex-direction:column;background:#0B1220;overflow:hidden}
+.top{height:64px;box-sizing:border-box;display:flex;align-items:center;gap:4px;padding:0 8px;background:#0F1729;border-bottom:1px solid #26324A;flex-shrink:0}
+.bk{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#E8EDF5;text-decoration:none}
+.ttl{flex:1;font-family:"Chakra Petch",system-ui,sans-serif;font-size:24px;line-height:28px;font-weight:600}
+.body{flex:1;min-height:0;overflow:hidden;padding:20px 16px;display:flex;flex-direction:column;gap:16px}
+.name{font-family:"Chakra Petch",system-ui,sans-serif;font-size:22px;line-height:28px;font-weight:600}
+.sub{font-size:16px;color:#9AA7BD}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:3px 10px;background:#1B2A44;white-space:nowrap;color:#E8EDF5}
+.st.off{background:transparent;border:1px solid #34476B;color:#9AA7BD;padding:2px 9px}
+.lh{display:flex;align-items:baseline;gap:10px}
+.lh h2{font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;line-height:24px;font-weight:600}
+.lh span{font-size:14px;color:#9AA7BD}
+.loc{background:#131C2E;border:1px solid #26324A;flex-shrink:0}
+.loc summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;min-height:44px}
+.loc summary::-webkit-details-marker{display:none}
+.loc summary .t{flex:1;min-width:0}
+.loc summary h3{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.addr{font-size:14px;line-height:20px;color:#9AA7BD;margin-top:2px}
+.cnt{font-size:14px;line-height:20px;margin-top:2px}
+.num{font-family:"Chakra Petch",system-ui,sans-serif;font-weight:600;font-variant-numeric:tabular-nums}
+.chev{flex-shrink:0;margin-top:2px;color:#9AA7BD}
+.note{display:flex;gap:8px;align-items:flex-start;padding:10px 16px;background:#0F1729;border-top:1px solid #26324A;font-size:14px;line-height:20px;color:#9AA7BD}
+.note svg{flex-shrink:0;margin-top:2px}
+.eqs{border-top:1px solid #26324A}
+.eq{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;border-bottom:1px solid #26324A;text-decoration:none;color:inherit}
+.eq .t{flex:1;min-width:0}
+.eq .m{font-weight:600;font-size:16px}
+.eq .s{font-size:14px;line-height:20px;color:#9AA7BD}
+.ser{font-variant-numeric:tabular-nums}
+.la{padding:12px 16px}
+.btn{height:48px;width:100%;border:0;background:#FF7E00;color:#0B1220;font:600 16px "IBM Plex Sans",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+.act{padding:12px 16px;background:#0F1729;border-top:1px solid #26324A;flex-shrink:0}
+.btn2{height:48px;width:100%;background:#1B2A44;color:#E8EDF5;font:600 16px "IBM Plex Sans",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+</style>
+</helmet>
+<div class="phone">
+  <header class="top">
+    <a class="bk" href="Clientes-celular.dc.html" aria-label="Voltar para Clientes">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    <p class="ttl">Cliente</p>
+  </header>
+
+  <div class="body">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h1 class="name">J. Silva Comércio de Alimentos Ltda</h1>
+      <p class="sub">Padaria Boa Vista</p>
+    </div>
+
+    <div class="lh"><h2>Locais</h2><span>2 ativos, 1 desativado</span></div>
+
+    <details class="loc">
+      <summary>
+        <div class="t">
+          <h3>Loja Centro <span class="st"><span aria-hidden="true">●</span>Ativo</span></h3>
+          <p class="cnt"><span class="num">3</span> equipamentos ativos</p>
+        </div>
+        <svg class="chev" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </summary>
+    </details>
+
+    <details class="loc">
+      <summary>
+        <div class="t">
+          <h3>Fábrica <span class="st"><span aria-hidden="true">●</span>Ativo</span></h3>
+          <p class="cnt"><span class="num">2</span> equipamentos ativos</p>
+        </div>
+        <svg class="chev" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </summary>
+    </details>
+
+    <details class="loc" open>
+      <summary>
+        <div class="t">
+          <h3 style="color:#9AA7BD">Loja Santa Mônica <span class="st off"><span aria-hidden="true">○</span>Desativado</span></h3>
+          <p class="addr">Av. Segismundo Pereira, 880 · Santa Mônica · Uberlândia/MG · CEP 38408-170</p>
+          <p class="cnt"><span class="num">1</span> equipamento ativo</p>
+        </div>
+        <svg class="chev" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+      </summary>
+      <p class="note">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 11v5M12 7.5v.5"/></svg>
+        Local desativado: não recebe equipamento novo e não se edita até ser reativado. Os equipamentos dele ficam como estão.
+      </p>
+      <div class="eqs">
+        <a class="eq" href="Equipamento-celular.dc.html"><div class="t"><div class="m">SUN2000-3KTL-L1</div><div class="s">Huawei · Inversor · <span class="num">3 kW</span></div><div class="s ser">Série HV2130051877 · 15/06/2023</div></div><span class="st"><span aria-hidden="true">●</span>Ativo</span></a>
+      </div>
+      <div class="la"><a class="btn2" href="Ficha-celular.dc.html">Reativar local</a></div>
+    </details>
+  </div>
+
+  <div class="act">
+    <a class="btn" href="Novo-local-celular-erros.dc.html">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Novo local
+    </a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
