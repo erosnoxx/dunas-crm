@@ -35,6 +35,7 @@ import com.crm.registry.infrastructure.catalog.repositories.ManufacturerReposito
 import com.crm.registry.infrastructure.catalog.persistence.jpa.ManufacturerJpaRepository;
 import com.crm.registry.infrastructure.catalog.mappers.ManufacturerMapper;
 import com.crm.registry.infrastructure.catalog.seed.CatalogSeeder;
+import com.crm.registry.application.customers.contracts.readers.CustomerReader;
 import com.crm.registry.application.customers.contracts.repositories.CustomerRepository;
 import com.crm.registry.application.customers.contracts.repositories.InstalledEquipmentRepository;
 import com.crm.registry.application.customers.contracts.repositories.LocationRepository;
@@ -44,6 +45,7 @@ import com.crm.registry.infrastructure.customers.mappers.LocationMapper;
 import com.crm.registry.infrastructure.customers.persistence.jpa.CustomerJpaRepository;
 import com.crm.registry.infrastructure.customers.persistence.jpa.InstalledEquipmentJpaRepository;
 import com.crm.registry.infrastructure.customers.persistence.jpa.LocationJpaRepository;
+import com.crm.registry.infrastructure.customers.readers.CustomerReaderImpl;
 import com.crm.registry.infrastructure.customers.repositories.CustomerRepositoryImpl;
 import com.crm.registry.infrastructure.customers.repositories.InstalledEquipmentRepositoryImpl;
 import com.crm.registry.infrastructure.customers.repositories.LocationRepositoryImpl;
@@ -283,6 +285,11 @@ public class RegistryBeans {
                 em,
                 mapper
         );
+    }
+
+    @Bean
+    public CustomerReader customerReader(EntityManager em) {
+        return new CustomerReaderImpl(em);
     }
 
     // --- seed ---------------------------------------------------------------------------------
