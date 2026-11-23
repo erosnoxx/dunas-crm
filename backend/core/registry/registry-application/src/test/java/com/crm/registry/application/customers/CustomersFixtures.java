@@ -2,7 +2,17 @@ package com.crm.registry.application.customers;
 
 import com.crm.common.application.exceptions.ApplicationException;
 import com.crm.common.domain.exceptions.DomainException;
+import com.crm.registry.application.customers.schemas.AddressInput;
 import com.crm.registry.domain.customers.entities.Customer;
+import com.crm.registry.domain.customers.entities.Location;
+import com.crm.registry.domain.customers.vos.LocationName;
+import com.crm.shared.domain.enums.UF;
+import com.crm.shared.domain.vos.address.Address;
+import com.crm.shared.domain.vos.address.AddressNumber;
+import com.crm.shared.domain.vos.address.CityName;
+import com.crm.shared.domain.vos.address.Neighborhood;
+import com.crm.shared.domain.vos.address.Street;
+import com.crm.shared.domain.vos.address.ZipCode;
 import com.crm.registry.domain.customers.vos.CustomerName;
 import com.crm.shared.application.Actor;
 import com.crm.shared.domain.enums.Role;
@@ -34,6 +44,18 @@ public final class CustomersFixtures {
     /** Pessoa física ativa com e-mail. */
     public static Customer individual() {
         return Customer.register(Document.of(CPF), CustomerName.of("Maria Souza"), null, Email.of("maria@x.com"), null);
+    }
+
+    /** Local ativo do cliente, em Recife, sem complemento. */
+    public static Location location(Customer customer) {
+        return Location.register(customer, LocationName.of("Casa"), new Address(
+                ZipCode.of("50030-230"), Street.of("Rua A"), AddressNumber.of("1"), null,
+                Neighborhood.of("Centro"), CityName.of("Recife"), UF.PE));
+    }
+
+    /** Endereço válido como chega da requisição, sem complemento. */
+    public static AddressInput addressInput() {
+        return new AddressInput("01310-100", "Avenida Paulista", "1578", null, "Bela Vista", "São Paulo", "SP");
     }
 
     public static ThrowingConsumer<Throwable> applicationCode(String code) {
