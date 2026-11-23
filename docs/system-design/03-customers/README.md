@@ -47,12 +47,12 @@ Nenhuma de domínio do `customers`. A feature reaproveita, de `shared-domain`, o
 
 ## Como este documento foi produzido
 
-Decisões do usuário em 2026-11-21 e as que ele delegou em 2026-11-22 (ADR-17 a ADR-32, as seis últimas tomadas com a aprovação dos mockups), registradas em [`decisions.md`](decisions.md); o restante é **proposta para aprovação**, marcada *proposta* onde aparece. A regra 6 de [`docs/CLAUDE.md`](../../CLAUDE.md) está cumprida: as telas de [`design/`](design/README.md) foram aprovadas em 2026-11-22.
+Decisões do usuário em 2026-11-21 e as que ele delegou em 2026-11-22 (ADR-17 a ADR-32, as seis últimas tomadas com a aprovação dos mockups), registradas em [`decisions.md`](decisions.md); o restante (os pontos que eram *proposta*) foi aceito com a aprovação da spec em 2026-11-22 ([ADR-33](decisions.md#adr-33-limites-e-propostas-aceitos-com-a-aprovação-da-spec)). A regra 6 de [`docs/CLAUDE.md`](../../CLAUDE.md) está cumprida: as telas de [`design/`](design/README.md) foram aprovadas em 2026-11-22.
 
 ## Critério de aceite
 
 - [x] Telas de [`design/`](design/README.md) desenhadas e aprovadas antes de fechar `domain-model.md` e `usecases.md` (2026-11-22)
-- [ ] `domain-model.md`, `usecases.md` e os pontos *proposta* aprovados pelo usuário; [`open-questions.md`](open-questions.md) sem pendência que mude domínio
+- [x] `domain-model.md`, `usecases.md` e os pontos que eram *proposta* aprovados pelo usuário; [`open-questions.md`](open-questions.md) sem pendência que mude domínio
 - [ ] Plano de implementação em `docs/plans/`, backend e frontend juntos, e executado
 - [ ] `mvn test` passa, a partir de `backend/` (inclui os testes de arquitetura e o ponta a ponta do `customers`)
 - [ ] `npm run typecheck && npm run lint && npm test && npm run build && npm run format:check` passa, a partir de `frontend/`

@@ -22,7 +22,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Contexto:** o mesmo CPF digitado com e sem pontuação não pode virar dois clientes. Um cliente desativado que volta a comprar é o mesmo cliente.
 
-**Decisão:** decisão do usuário: **documento único** no cadastro; o segundo cadastro com o mesmo CPF ou CNPJ é recusado com 409 (`customer_document_taken`), comparando o documento **normalizado** (só letras e dígitos, em maiúsculas, como o `Document` já guarda). *Proposta:* a unicidade cobre os **desativados** (o caminho é reativar), e o documento **não muda** depois do cadastro, nem por correção ([ADR-12](#adr-12-o-documento-do-cliente-é-imutável-sem-command-de-correção)).
+**Decisão:** decisão do usuário: **documento único** no cadastro; o segundo cadastro com o mesmo CPF ou CNPJ é recusado com 409 (`customer_document_taken`), comparando o documento **normalizado** (só letras e dígitos, em maiúsculas, como o `Document` já guarda). Aceito com a aprovação da spec (2026-11-22): a unicidade cobre os **desativados** (o caminho é reativar), e o documento **não muda** depois do cadastro, nem por correção ([ADR-12](#adr-12-o-documento-do-cliente-é-imutável-sem-command-de-correção)).
 
 **Consequência:** a unicidade é um `UNIQUE (document)` no banco, sem corrida, e o repository traduz a violação no mesmo código. A mensagem de erro não repete o documento (a mensagem vai ao log: [`code-style.md`](../../rules/code-style.md) §5). Mudar a pessoa física para jurídica é cadastro novo. Como a unicidade cobre os desativados, desativar e cadastrar de novo **não** libera um documento digitado errado (ADR-12).
 
@@ -30,7 +30,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Contexto:** um cliente instala em mais de um lugar (casa, filial, fazenda), e o equipamento está num lugar, não "no cliente". O `Address` de `shared-domain` já exige CEP, logradouro, número, bairro, cidade e UF, com complemento opcional, sem endereço parcial.
 
-**Decisão:** decisão do usuário: **local** é um endereço onde há instalação; o cliente tem **1..N locais**, e o equipamento se liga ao local. Endereço **em campos** (o `Address` do shared), **sem consulta automática de CEP** por enquanto. *Proposta:* o local tem um **nome curto** (`LocationName`, de 2 a 60 caracteres) para a ficha distinguir "Casa" de "Fazenda" sem ler o endereço inteiro; o cliente pode existir **sem nenhum local** (o cadastro do cliente e o do primeiro local são passos separados).
+**Decisão:** decisão do usuário: **local** é um endereço onde há instalação; o cliente tem **1..N locais**, e o equipamento se liga ao local. Endereço **em campos** (o `Address` do shared), **sem consulta automática de CEP** por enquanto. Aceito com a aprovação da spec (2026-11-22): o local tem um **nome curto** (`LocationName`, de 2 a 60 caracteres) para a ficha distinguir "Casa" de "Fazenda" sem ler o endereço inteiro; o cliente pode existir **sem nenhum local** (o cadastro do cliente e o do primeiro local são passos separados).
 
 **Consequência:** o CEP é conferido só no formato (8 dígitos): um CEP que não existe passa. A consulta de CEP, quando vier, é integração com terceiro, atrás de contrato e Translator ([`architecture.md`](../../rules/architecture.md) §4.3), e só preenche o formulário: o domínio não muda.
 
@@ -38,7 +38,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Contexto:** a manutenção e o monitoramento olham a unidade física: o inversor de série X, no telhado Y. Quantidade como número ("3 splits") perde qual unidade é qual.
 
-**Decisão:** decisão do usuário: o equipamento instalado é **modelo do catálogo + local + número de série + data de instalação opcional**, **uma linha por unidade**. A série é **texto livre, única por modelo**. *Proposta:* a unicidade não diferencia maiúsculas e cobre os **desativados**; o **local e o modelo não mudam** depois do cadastro (errou? desativa e cadastra de novo, como o fabricante e o tipo do modelo em [`02-catalog` ADR-4](../02-catalog/decisions.md)); a **série e a data mudam**, para corrigir digitação ([ADR-17](#adr-17-a-série-do-equipamento-muda-para-corrigir-digitação)). A data não pode ser depois de hoje.
+**Decisão:** decisão do usuário: o equipamento instalado é **modelo do catálogo + local + número de série + data de instalação opcional**, **uma linha por unidade**. A série é **texto livre, única por modelo**. Aceito com a aprovação da spec (2026-11-22): a unicidade não diferencia maiúsculas e cobre os **desativados**; o **local e o modelo não mudam** depois do cadastro (errou? desativa e cadastra de novo, como o fabricante e o tipo do modelo em [`02-catalog` ADR-4](../02-catalog/decisions.md)); a **série e a data mudam**, para corrigir digitação ([ADR-17](#adr-17-a-série-do-equipamento-muda-para-corrigir-digitação)). A data não pode ser depois de hoje.
 
 **Consequência:** a unicidade é `UNIQUE (model_id, lower(serial_number))`, sem corrida. Como cobre os desativados e o local não muda, uma unidade **retirada de um cliente e reinstalada em outro** não se cadastra de novo: é o caso "mover equipamento", fora desta versão (ADR-14).
 
@@ -46,7 +46,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Contexto:** o cliente, o local e o equipamento vão ser referenciados por manutenção e monitoramento; apagar quebra a referência. O catálogo fixou "desativar não propaga" e "o pai desativado só bloqueia cadastro novo" ([`02-catalog` ADR-5](../02-catalog/decisions.md)).
 
-**Decisão:** decisão do usuário: cliente, local e equipamento se **desativam e reativam**; nada se apaga; **sem confirmação**; desativar **não propaga** (desativar o cliente não desativa os locais; desativar o local não desativa os equipamentos). *Proposta*, alinhada ao catálogo:
+**Decisão:** decisão do usuário: cliente, local e equipamento se **desativam e reativam**; nada se apaga; **sem confirmação**; desativar **não propaga** (desativar o cliente não desativa os locais; desativar o local não desativa os equipamentos). Aceito com a aprovação da spec (2026-11-22), alinhado ao catálogo:
 - **Local novo** exige o cliente ativo (`customer_deactivated`).
 - **Equipamento novo** exige o local ativo, **o cliente do local ativo** e o modelo ativo (`location_deactivated`, `customer_deactivated`, `model_deactivated`). O cliente é conferido porque, sem propagação, o local de um cliente desativado continua ativo, e conferir só o local deixaria instalar para quem não é mais cliente.
 - O **fabricante e o tipo** do modelo **não** são conferidos: desativá-los não desativa o modelo, e o modelo ativo continua instalável. Isso fecha a pendência "Fabricante desativado: o modelo dele ainda pode ser instalado?" do [`open-questions.md` do catálogo](../02-catalog/open-questions.md) quando esta spec for aprovada.
@@ -66,7 +66,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Contexto:** a regra `subdomainsDependOnlyInDeclaredDirection` permite `registry.customers → registry.catalog` em **qualquer camada** (o pacote verificado é `com.crm.registry.*.catalog..`), e a [`architecture.md`](../../rules/architecture.md) §4.4 diz que subdomínios do mesmo BC têm "referência comum, sem projeção nem evento", com FK permitida. A §6.1 diz que aggregates se referenciam por `UUID` e que a regra que liga dois aggregates mora no domínio.
 
-**Decisão:** *proposta*, dentro da regra existente (nenhuma regra de arquitetura nova):
+**Decisão:** aceita com a aprovação da spec (2026-11-22), dentro da regra existente (nenhuma regra de arquitetura nova):
 - **Domínio:** `InstalledEquipment` guarda `modelId` (`UUID`) e recebe o `EquipmentModel` **por parâmetro** em `install`, para conferir `isActive()`. Nenhum outro tipo do catálogo entra no domínio do `customers`.
 - **Application:** `InstallEquipment` carrega o modelo pelo `EquipmentModelRepository` do catálogo e reaproveita os códigos `model_not_found` e `model_deactivated` (mesmo BC, mesmo significado).
 - **Infrastructure:** `installed_equipment.model_id` tem FK para `equipment_models`; o reader da ficha junta as tabelas do catálogo para os nomes de modelo, fabricante e tipo e o valor da característica.
@@ -84,7 +84,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Contexto:** cliente, local e equipamento poderiam ser um aggregate só (o cliente com os locais e os equipamentos dentro). As invariantes que cruzam os três são as de unicidade (do banco, entre clientes) e as de "pai ativo".
 
-**Decisão:** *proposta:* **`Customer`, `Location` e `InstalledEquipment` são aggregates próprios**, com `customerId` no local e `locationId` e `modelId` no equipamento; o pai entra por parâmetro na criação do filho. A análise está no [`domain-model.md`](domain-model.md#fronteiras-de-consistência-por-que-três-aggregates).
+**Decisão:** aceita com a aprovação da spec (2026-11-22): **`Customer`, `Location` e `InstalledEquipment` são aggregates próprios**, com `customerId` no local e `locationId` e `modelId` no equipamento; o pai entra por parâmetro na criação do filho. A análise está no [`domain-model.md`](domain-model.md#fronteiras-de-consistência-por-que-três-aggregates).
 
 **Consequência:** cada um tem repository, rota e versão próprios; cadastrar um equipamento não disputa a versão do cliente. A checagem do pai ativo não trava o pai (risco aceito, sem estado inválido possível).
 
@@ -92,7 +92,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Contexto:** a equipe procura o cliente pelo nome, pelo documento que ele dita ao telefone ou pela cidade da instalação.
 
-**Decisão:** decisão do usuário: busca por **texto** (nome, documento, cidade) e filtro de **situação**, paginada como o catálogo (`page`, `size` de 20, máximo 100). *Proposta:* o texto casa sem diferenciar maiúsculas; o documento casa sem pontuação (digitar "123.456" acha "12345678909"); a cidade casa a de qualquer local **ativo**; a situação padrão é `ACTIVE`.
+**Decisão:** decisão do usuário: busca por **texto** (nome, documento, cidade) e filtro de **situação**, paginada como o catálogo (`page`, `size` de 20, máximo 100). Aceito com a aprovação da spec (2026-11-22): o texto casa sem diferenciar maiúsculas; o documento casa sem pontuação (digitar "123.456" acha "12345678909"); a cidade casa a de qualquer local **ativo**; a situação padrão é `ACTIVE`.
 
 **Consequência:** a busca não diferencia acento do mesmo jeito que o catálogo não diferencia (ADR-15). A busca por número de série é o [ADR-13](#adr-13-a-busca-da-lista-de-clientes-também-casa-o-número-de-série).
 
@@ -108,7 +108,7 @@ ADRs **locais desta feature**. Decisão global ou de arquitetura do sistema não
 
 **Contexto:** o técnico em campo tem a etiqueta do inversor e quer achar o cliente; a busca do ADR-11 não olhava a série.
 
-**Decisão:** decisão do usuário: o texto da busca da lista de clientes **também casa o número de série** dos equipamentos instalados. *Proposta* dos detalhes: casa a série de equipamento **ativo**, por trecho, sem diferenciar maiúsculas (a série é única por modelo, não global, então mais de um cliente pode aparecer).
+**Decisão:** decisão do usuário: o texto da busca da lista de clientes **também casa o número de série** dos equipamentos instalados. Detalhes aceitos com a aprovação da spec (2026-11-22): casa a série de equipamento **ativo**, por trecho, sem diferenciar maiúsculas (a série é única por modelo, não global, então mais de um cliente pode aparecer).
 
 **Consequência:** o `ListCustomers` e o reader passam a procurar também em `installed_equipment`, por subconsulta `exists` ligada ao cliente pelos locais (o equipamento não guarda o cliente: ADR-5). O índice único `(model_id, lower(serial_number))` não serve à busca por trecho, então a subconsulta varre a tabela; a lista de uma empresa só é pequena, e isso é aceito. Muda a tela da lista: o campo de busca avisa que aceita série (ver [`design/`](design/README.md)).
 
@@ -274,3 +274,11 @@ Com texto ou com outro filtro, o vazio é o da tela 3 ("Nenhum cliente encontrad
 - **Onde fica cada ação:** "Desativar local" mora **só** na página de edição do local; "Reativar local", no bloco do local na ficha (telas 9 e 16) e na página do local desativado. "Desativar equipamento" e "Reativar equipamento" moram na página do equipamento, aberta por "Editar" (ativo) ou "Abrir" (desativado) na ficha.
 
 **Consequência:** as páginas de edição leem da ficha (ADR-22), sem `GET` próprio. As páginas derivadas vão à comparação mockup × resultado.
+
+## ADR-33: limites e propostas aceitos com a aprovação da spec
+
+**Contexto:** `domain-model.md` e `usecases.md` traziam pontos marcados *proposta* (aggregates próprios, `LocationName` de 2 a 60, unicidade da série sem diferenciar maiúsculas e incluindo desativados, texto e documento da busca, reativar sem conferir o pai, `CustomerStatus` próprio, entre outros) e limites de tamanho dos campos.
+
+**Decisão:** o usuário aprovou os mockups em 2026-11-22 e delegou o restante ao controlador ("tome sozinho as decisões usando o bom senso"). Todos os pontos *proposta* e os limites de `domain-model.md` e `usecases.md` ficam **aceitos como escritos**. Mudar qualquer um vira um ADR novo.
+
+**Consequência:** a spec vale como escrita; ninguém precisa reabrir esses pontos antes do plano.

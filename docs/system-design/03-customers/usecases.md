@@ -2,7 +2,7 @@
 
 Forma dos use cases (sem interface, sem sufixo, `@UseCase`, `commands` e `queries`): [`architecture.md`](../../rules/architecture.md) §7. Domínio: [`domain-model.md`](domain-model.md). Telas: [`design/`](design/README.md).
 
-> Proposta para aprovação. Os mockups de [`design/`](design/README.md) foram aprovados em 2026-11-22, e as respostas das queries fecharam com eles (ADR-27 a ADR-29); os pontos marcados *proposta* seguem para a aprovação do usuário.
+> Aprovado em 2026-11-22. Os mockups de [`design/`](design/README.md) foram aprovados em 2026-11-22, e as respostas das queries fecharam com eles (ADR-27 a ADR-29); os pontos que eram *proposta* foram aceitos com a aprovação (ADR-33).
 
 ## Convenções desta feature
 
@@ -87,7 +87,7 @@ Seis use cases com a mesma forma: ator, id; papel; carrega; chama o método de d
 | `DeactivateInstalledEquipment` | `POST /installed-equipment/{id}/deactivation` | `installed_equipment_not_found`, `installed_equipment_deactivated` |
 | `ReactivateInstalledEquipment` | `POST /installed-equipment/{id}/reactivation` | `installed_equipment_not_found`, `installed_equipment_not_deactivated` |
 
-Reativar não confere o pai (*proposta*, como o catálogo): reativar um local de cliente desativado é permitido.
+Reativar não confere o pai (como o catálogo, ADR-33): reativar um local de cliente desativado é permitido.
 
 ## Queries
 

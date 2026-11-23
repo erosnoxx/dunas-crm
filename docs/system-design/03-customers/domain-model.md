@@ -2,11 +2,11 @@
 
 **Este arquivo é a fonte de verdade do domínio desta feature.** Nenhum `CLAUDE.md`, skill ou código o duplica: todos o referenciam. Casos de uso e códigos de erro: [`usecases.md`](usecases.md). Decisões: [`decisions.md`](decisions.md). Telas: [`design/`](design/README.md).
 
-> Proposta para aprovação. Os mockups de [`design/`](design/README.md) foram aprovados em 2026-11-22 (regra 6 de [`docs/CLAUDE.md`](../../CLAUDE.md)) e não mudaram o domínio (ADR-27 a ADR-32); os pontos marcados *proposta* seguem para a aprovação do usuário.
+> Aprovado em 2026-11-22. Os mockups de [`design/`](design/README.md) foram aprovados em 2026-11-22 (regra 6 de [`docs/CLAUDE.md`](../../CLAUDE.md)) e não mudaram o domínio (ADR-27 a ADR-32); os pontos que eram *proposta* foram aceitos com a aprovação (ADR-33).
 
 ## Nota de proveniência
 
-Modelado a partir das decisões do usuário em [`decisions.md`](decisions.md), do padrão do [catálogo](../02-catalog/domain-model.md) e da leitura dos VOs de `shared-domain`. O que **eu** escolhi sem decisão prévia do usuário está marcado como *proposta* e tem ADR; o que ele delegou cita o ADR da decisão (ADR-17 a ADR-26).
+Modelado a partir das decisões do usuário em [`decisions.md`](decisions.md), do padrão do [catálogo](../02-catalog/domain-model.md) e da leitura dos VOs de `shared-domain`. O que **eu** escolhi sem decisão prévia do usuário tem ADR (era *proposta*, aceita no ADR-33); o que ele delegou cita o ADR da decisão (ADR-17 a ADR-26).
 
 ## BC e subdomínio
 
@@ -14,7 +14,7 @@ BC **`registry`**, subdomínio **`customers`** (ADR-1). Os três aggregates abai
 
 ## Fronteiras de consistência: por que três aggregates
 
-A pergunta é se `Location` e `InstalledEquipment` são entidades internas do `Customer` ou aggregates próprios. Pesando as invariantes e o tamanho (*proposta*, ADR-10):
+A pergunta é se `Location` e `InstalledEquipment` são entidades internas do `Customer` ou aggregates próprios. Pesando as invariantes e o tamanho (ADR-10):
 
 | Invariante | Onde se garante | Precisa de um aggregate só? |
 |---|---|---|
@@ -70,7 +70,7 @@ Um endereço do cliente onde há (ou haverá) instalação. **Fronteira de consi
 | `address` | `Address` (shared) | CEP, logradouro, número, complemento opcional, bairro, cidade, UF |
 | `status` | `CustomerStatus` | |
 
-**Invariantes:** `customerId` é imutável; só se cria local em cliente `ACTIVE`; só se edita local `ACTIVE`. O nome não é único no cliente e o mesmo endereço pode se repetir (*proposta*: nenhuma regra pedida, e recusar exigiria comparar endereço digitado à mão).
+**Invariantes:** `customerId` é imutável; só se cria local em cliente `ACTIVE`; só se edita local `ACTIVE`. O nome não é único no cliente e o mesmo endereço pode se repetir (nenhuma regra pedida, e recusar exigiria comparar endereço digitado à mão).
 
 **Métodos de domínio** (o cliente entra por parâmetro):
 
@@ -135,7 +135,7 @@ O cliente não é campo: é o do local. Guardar os dois abriria espaço para dis
 | `InstallationDate` | `LocalDateValueObject` | não pode ser depois de hoje; "hoje" vem de um `Clock` recebido, como o `BirthDate` (`of(valor, clock)`) | `registry-domain` |
 | `CustomerStatus` | enum | `ACTIVE`, `DEACTIVATED` | `registry-domain` |
 
-Todo VO de `StringValueObject` já corta espaço das pontas e recusa vazio. Nenhum VO novo sobe para `shared-domain`: só o `customers` os usa (critério da [`architecture.md`](../../rules/architecture.md) §3.1). `CustomerStatus` é enum próprio e não reaproveita o `CatalogStatus`, para a situação do cliente não depender de uma mudança no catálogo (*proposta*).
+Todo VO de `StringValueObject` já corta espaço das pontas e recusa vazio. Nenhum VO novo sobe para `shared-domain`: só o `customers` os usa (critério da [`architecture.md`](../../rules/architecture.md) §3.1). `CustomerStatus` é enum próprio e não reaproveita o `CatalogStatus`, para a situação do cliente não depender de uma mudança no catálogo (aceito, ADR-33).
 
 **Mensagens que não podem carregar o documento.** O log do `@UseCase` escreve a mensagem da exceção ([`code-style.md`](../../rules/code-style.md) §5): nenhuma mensagem deste subdomínio inclui CPF, CNPJ, e-mail ou telefone.
 
@@ -176,6 +176,6 @@ Migration `V2__create_customers.sql` em `registry-infrastructure/src/main/resour
 - **Unicidade da série:** sem diferenciar maiúsculas, como os nomes do catálogo, e também sobre os desativados (ADR-5).
 - **Concorrência:** o use case confere a unicidade antes, para a resposta amigável; na corrida, o repository traduz a violação do índice pelo nome dele no mesmo código de erro (como o `UniqueConstraint` do catálogo). Edições simultâneas do mesmo aggregate caem no lock otimista (`concurrent_update`, 409).
 - O estado (`status`) e a UF (`state`) são texto com o nome do enum. O endereço são colunas de `locations`, não tabela própria: é VO do local.
-- **Busca da lista de clientes** (*proposta*): o texto casa, sem diferenciar maiúsculas, o nome do cliente, o nome fantasia (ADR-21), a cidade de algum local **ativo** dele, o número de série de algum equipamento **ativo** dele (subconsulta `exists` pelos locais; sem índice próprio, a lista é pequena: ADR-13), e o documento (o texto sem pontuação, contido no `document`, só quando sobra algum caractere depois de tirar a pontuação). Acento fica como no catálogo: a mudança é compartilhada (ADR-15).
+- **Busca da lista de clientes** (aceita, ADR-33): o texto casa, sem diferenciar maiúsculas, o nome do cliente, o nome fantasia (ADR-21), a cidade de algum local **ativo** dele, o número de série de algum equipamento **ativo** dele (subconsulta `exists` pelos locais; sem índice próprio, a lista é pequena: ADR-13), e o documento (o texto sem pontuação, contido no `document`, só quando sobra algum caractere depois de tirar a pontuação). Acento fica como no catálogo: a mudança é compartilhada (ADR-15).
 - **Projeção da lista:** as cidades e, com texto, as séries que casaram (`matchedSerials`, até três por cliente: ADR-27) saem de consultas restritas aos ids da página, nunca de uma junção que multiplique as linhas paginadas. Nenhum índice novo.
 - **Forma das tabelas e lock otimista:** cada aggregate é **uma tabela só**, sem tabela filha: o endereço são colunas de `locations`, e nenhuma linha tem versão fora do próprio aggregate. O save de um aggregate confere só a própria versão, e a edição a partir de uma cópia velha cai em `concurrent_update` (409).
