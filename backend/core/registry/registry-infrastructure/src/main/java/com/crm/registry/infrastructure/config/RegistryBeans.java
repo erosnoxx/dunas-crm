@@ -35,6 +35,18 @@ import com.crm.registry.infrastructure.catalog.repositories.ManufacturerReposito
 import com.crm.registry.infrastructure.catalog.persistence.jpa.ManufacturerJpaRepository;
 import com.crm.registry.infrastructure.catalog.mappers.ManufacturerMapper;
 import com.crm.registry.infrastructure.catalog.seed.CatalogSeeder;
+import com.crm.registry.application.customers.contracts.repositories.CustomerRepository;
+import com.crm.registry.application.customers.contracts.repositories.InstalledEquipmentRepository;
+import com.crm.registry.application.customers.contracts.repositories.LocationRepository;
+import com.crm.registry.infrastructure.customers.mappers.CustomerMapper;
+import com.crm.registry.infrastructure.customers.mappers.InstalledEquipmentMapper;
+import com.crm.registry.infrastructure.customers.mappers.LocationMapper;
+import com.crm.registry.infrastructure.customers.persistence.jpa.CustomerJpaRepository;
+import com.crm.registry.infrastructure.customers.persistence.jpa.InstalledEquipmentJpaRepository;
+import com.crm.registry.infrastructure.customers.persistence.jpa.LocationJpaRepository;
+import com.crm.registry.infrastructure.customers.repositories.CustomerRepositoryImpl;
+import com.crm.registry.infrastructure.customers.repositories.InstalledEquipmentRepositoryImpl;
+import com.crm.registry.infrastructure.customers.repositories.LocationRepositoryImpl;
 import jakarta.persistence.EntityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -215,6 +227,62 @@ public class RegistryBeans {
     @Bean
     public GetEquipmentModel getEquipmentModel(EquipmentModelReader equipmentModelReader) {
         return new GetEquipmentModel(equipmentModelReader);
+    }
+
+    // --- clientes: persistência ---------------------------------------------------------------
+
+    @Bean
+    public CustomerMapper customerMapper() {
+        return new CustomerMapper();
+    }
+
+    @Bean
+    public LocationMapper locationMapper() {
+        return new LocationMapper();
+    }
+
+    @Bean
+    public InstalledEquipmentMapper installedEquipmentMapper() {
+        return new InstalledEquipmentMapper();
+    }
+
+    @Bean
+    public CustomerRepository customerRepository(
+            CustomerJpaRepository jpaRepository,
+            EntityManager em,
+            CustomerMapper mapper
+    ) {
+        return new CustomerRepositoryImpl(
+                jpaRepository,
+                em,
+                mapper
+        );
+    }
+
+    @Bean
+    public LocationRepository locationRepository(
+            LocationJpaRepository jpaRepository,
+            EntityManager em,
+            LocationMapper mapper
+    ) {
+        return new LocationRepositoryImpl(
+                jpaRepository,
+                em,
+                mapper
+        );
+    }
+
+    @Bean
+    public InstalledEquipmentRepository installedEquipmentRepository(
+            InstalledEquipmentJpaRepository jpaRepository,
+            EntityManager em,
+            InstalledEquipmentMapper mapper
+    ) {
+        return new InstalledEquipmentRepositoryImpl(
+                jpaRepository,
+                em,
+                mapper
+        );
     }
 
     // --- seed ---------------------------------------------------------------------------------
