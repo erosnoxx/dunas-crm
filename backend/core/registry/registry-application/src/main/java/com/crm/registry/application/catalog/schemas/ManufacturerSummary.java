@@ -1,6 +1,6 @@
 package com.crm.registry.application.catalog.schemas;
 
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
 
 import java.util.UUID;
 

@@ -3,7 +3,7 @@ package com.crm.registry.application.catalog.usecases.commands;
 import com.crm.common.application.exceptions.ForbiddenException;
 import com.crm.registry.application.catalog.contracts.repositories.EquipmentModelRepository;
 import com.crm.registry.domain.catalog.entities.EquipmentModel;
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
 import com.crm.registry.domain.catalog.vos.ModelName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

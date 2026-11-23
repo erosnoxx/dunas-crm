@@ -14,8 +14,8 @@ import com.crm.registry.application.catalog.usecases.commands.RegisterEquipmentM
 import com.crm.registry.application.catalog.usecases.commands.UpdateEquipmentModel;
 import com.crm.registry.application.catalog.usecases.queries.GetEquipmentModel;
 import com.crm.registry.application.catalog.usecases.queries.ListEquipmentModels;
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
-import com.crm.registry.domain.catalog.vos.MeasurementUnit;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.MeasurementUnit;
 import com.crm.shared.application.schemas.response.UUIDResponse;
 import com.crm.web.iam.ActorRequestAttribute;
 import com.crm.web.iam.IamMvc;

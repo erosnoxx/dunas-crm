@@ -1,7 +1,7 @@
 package com.crm.registry.domain.catalog.entities;
 
 import com.crm.common.domain.exceptions.DomainException;
-import com.crm.registry.domain.catalog.vos.CatalogStatus;
+import com.crm.registry.domain.catalog.enums.CatalogStatus;
 import com.crm.registry.domain.catalog.vos.ManufacturerName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

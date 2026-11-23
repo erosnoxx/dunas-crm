@@ -12,7 +12,7 @@ import com.crm.iam.application.schemas.SessionResponse;
 import com.crm.iam.domain.entities.Session;
 import com.crm.iam.domain.vos.DeviceLabel;
 import com.crm.iam.domain.vos.Password;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
 import com.crm.iam.domain.vos.TokenSecret;
 import lombok.RequiredArgsConstructor;
 

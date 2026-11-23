@@ -14,7 +14,7 @@ import com.crm.iam.domain.vos.DeviceLabel;
 import com.crm.iam.domain.vos.Password;
 import com.crm.iam.domain.vos.PasswordHash;
 import com.crm.iam.domain.vos.TokenSecret;
-import com.crm.iam.domain.vos.UserStatus;
+import com.crm.iam.domain.enums.UserStatus;
 import com.crm.shared.domain.vos.contact.Email;
 
 import java.time.Clock;

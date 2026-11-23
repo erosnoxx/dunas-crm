@@ -1,6 +1,7 @@
 package com.crm.iam.infrastructure;
 
 import com.crm.common.application.ratelimit.RateLimit;
+import com.crm.iam.infrastructure.config.IamProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.bind.Binder;

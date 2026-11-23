@@ -9,7 +9,7 @@ import com.crm.iam.application.contracts.repositories.SessionRepository;
 import com.crm.iam.application.contracts.repositories.UserRepository;
 import com.crm.iam.application.contracts.services.PasswordHasher;
 import com.crm.iam.domain.vos.Password;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
 import com.crm.iam.domain.vos.TokenSecret;
 import lombok.RequiredArgsConstructor;
 

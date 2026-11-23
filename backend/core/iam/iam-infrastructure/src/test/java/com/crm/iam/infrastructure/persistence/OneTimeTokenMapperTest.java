@@ -2,7 +2,8 @@ package com.crm.iam.infrastructure.persistence;
 
 import com.crm.iam.domain.entities.OneTimeToken;
 import com.crm.iam.domain.vos.TokenHash;
-import com.crm.iam.domain.vos.TokenPurpose;
+import com.crm.iam.domain.enums.TokenPurpose;
+import com.crm.iam.infrastructure.mappers.OneTimeTokenMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
