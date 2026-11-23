@@ -48,7 +48,7 @@ public class CancelVisit {
 
 `@UseCase(transactional = false)`, em `queries`. **Não carrega aggregate**: devolve DTO/projeção. Listagem usa `Page`/`Pageable`.
 
-**Contrato de leitura.** A query não usa o `Repository` do aggregate: lê por um `<Nome>Reader` em `application.contracts.readers`, interface que devolve **projeção** (record em `application.schemas`), nunca o aggregate. A implementação `Jpa<Nome>ReaderImpl` mora na persistência do BC e monta a projeção numa consulta só, com o `EntityManager`. Cada método atende uma tela, com nome do que devolve:
+**Contrato de leitura.** A query não usa o `Repository` do aggregate: lê por um `<Nome>Reader` em `application.contracts.readers`, interface que devolve **projeção** (record em `application.schemas`), nunca o aggregate. A implementação `<Nome>ReaderImpl` mora na persistência do BC e monta a projeção numa consulta só, com o `EntityManager`. Cada método atende uma tela, com nome do que devolve:
 
 ```java
 public interface UserReader {

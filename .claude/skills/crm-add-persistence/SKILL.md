@@ -1,6 +1,6 @@
 ---
 name: crm-add-persistence
-description: Use ao persistir um aggregate no crm — migration Flyway do BC, entidade JPA, mapper domínio↔JPA, contrato `Repository`, `Criteria` com `@CriteriaField` e a implementação `Jpa<Nome>RepositoryImpl`. Invoque antes de criar qualquer SQL em `db/migration/<bc>/`, qualquer `@Entity` ou qualquer repository.
+description: Use ao persistir um aggregate no crm — migration Flyway do BC, entidade JPA, mapper domínio↔JPA, contrato `Repository`, `Criteria` com `@CriteriaField` e a implementação `<Nome>RepositoryImpl`. Invoque antes de criar qualquer SQL em `db/migration/<bc>/`, qualquer `@Entity` ou qualquer repository.
 ---
 
 # Persistência de um aggregate
@@ -50,7 +50,7 @@ Um aggregate = uma tabela raiz (mais as das entidades internas dele). Entidade i
    - `toPersistence` copia o `id` e a versão (`aggregate.getVersion().orElse(null)`: nula significa linha nova) e os campos. **Nunca** leva `createdAt`/`updatedAt` ao domínio.
 4. **Contrato** em `<bc>-application`, `application.contracts.repositories`: `interface VisitRepository extends Repository<Visit, VisitCriteria>`. Nome limpo. Acrescente método só se o use case precisar (ex. `findByEmail`); transição que duas requisições disputam por natureza é um **update condicional** no contrato, não um `save` com 409. Referência viva: `OneTimeTokenRepository.consume` (link de uso único): `@Modifying` com `where ... used_at is null`, sobe a `version` junto e devolve `boolean` (linhas afetadas = 1); quem perde recebe a resposta de negócio (`link_used`), e a instância não é salva depois.
 5. **Criteria**, em `application`: **`record`** que implementa `Criteria`, componentes anotados com `@CriteriaField("<atributo da entity>")` (aceita caminho `a.b` e `Operator`). Componente nulo ou coleção vazia é ignorado.
-6. **Spring Data** `interface VisitJpaRepository extends JpaRepository<VisitEntity, UUID>` e a **implementação** `JpaVisitRepositoryImpl extends RepositoryImpl<Visit, VisitCriteria, VisitEntity, VisitJpaRepository> implements VisitRepository` (tecnologia no início, `Impl` no fim, §10.1), passando `em`, o mapper e `VisitEntity.class` ao `super`.
+6. **Spring Data** `interface VisitJpaRepository extends JpaRepository<VisitEntity, UUID>` e a **implementação** `VisitRepositoryImpl extends RepositoryImpl<Visit, VisitCriteria, VisitEntity, VisitJpaRepository> implements VisitRepository` (tecnologia no início, `Impl` no fim, §10.1), passando `em`, o mapper e `VisitEntity.class` ao `super`.
 7. **Registro** do mapper e do repository na `<Bc>Beans` (`new`, sem `@Component`, §9). Entidade e `JpaRepository` sob `com.crm` são descobertos pela `CrmApplication`; nada a configurar.
 
 ## Comportamento que você herda (não reescreva)
@@ -72,5 +72,5 @@ Um aggregate = uma tabela raiz (mais as das entidades internas dele). Entidade i
 - [ ] Entity estende `JpaEntity<UUID>`; colunas cruas, sem VO
 - [ ] Mapper leva a versão, não leva `createdAt`/`updatedAt`
 - [ ] Contrato em `application.contracts.repositories`; `Criteria` é `record`
-- [ ] `Jpa<Nome>RepositoryImpl` estende `RepositoryImpl`; beans na `<Bc>Beans`
+- [ ] `<Nome>RepositoryImpl` estende `RepositoryImpl`; beans na `<Bc>Beans`
 - [ ] Testes de mapper e repository; `mvn test` verde

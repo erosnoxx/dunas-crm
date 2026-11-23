@@ -375,13 +375,13 @@ Contrato tem **nome limpo**; implementação tem **prefixo tecnológico** e sufi
 
 ```
 EmailSenderService     →  SmtpEmailSenderServiceImpl
-UserRepository         →  JpaUserRepositoryImpl
+UserRepository         →  UserRepositoryImpl
 EventPublisher         →  SpringEventPublisherImpl
 IntegrationEventSender →  RabbitIntegrationEventSenderImpl
 Cache                  →  RedisCacheImpl
 ```
 
-A tecnologia vai no início; `Impl` fecha o nome. A convenção só vale quando contrato e implementação estão em **camadas diferentes**. As bases genéricas de `common-infrastructure` (`RepositoryImpl`, `EntityMapper`, `JpaEntity`) mantêm nome neutro.
+A tecnologia vai no início; `Impl` fecha o nome. **A implementação JPA (a padrão do projeto) não leva prefixo**: `UserRepositoryImpl`, `UserReaderImpl`. A convenção só vale quando contrato e implementação estão em **camadas diferentes**. As bases genéricas de `common-infrastructure` (`RepositoryImpl`, `EntityMapper`, `JpaEntity`) mantêm nome neutro.
 
 ### 10.2 Idioma
 
