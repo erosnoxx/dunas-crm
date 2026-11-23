@@ -1,4 +1,4 @@
-package com.crm.registry.infrastructure.catalog.config;
+package com.crm.registry.infrastructure.config;
 
 import com.crm.registry.application.catalog.contracts.readers.EquipmentModelReader;
 import com.crm.registry.application.catalog.contracts.readers.EquipmentTypeReader;
