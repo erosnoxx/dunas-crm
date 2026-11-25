@@ -371,6 +371,7 @@ describe("vazios", () => {
     )
     expect(screen.getByLabelText("Buscar cliente")).toHaveValue("")
     expect(screen.getByLabelText("Situação")).toHaveValue("ACTIVE")
+    expect(screen.getByLabelText("Buscar cliente")).toHaveFocus()
     expect(params().toString()).toBe("")
   })
 
@@ -474,6 +475,7 @@ describe("vazios", () => {
     expect(lastCall()).toEqual({ status: "DEACTIVATED", page: 0, size: 20 })
     expect(screen.getByLabelText("Situação")).toHaveValue("DEACTIVATED")
     expect(params().get("situacao")).toBe("DEACTIVATED")
+    expect(screen.getByLabelText("Buscar cliente")).toHaveFocus()
   })
 
   it("a consulta de desativados não sai quando a lista tem cliente", async () => {
@@ -638,6 +640,14 @@ describe("web", () => {
       "md:text-body-sm",
       "md:font-semibold",
     )
+  })
+
+  it('com um só cliente diz "Mostrando 1 cliente", no singular', async () => {
+    vi.mocked(service.listCustomers).mockResolvedValue(page([HOTEL]))
+    renderScreen()
+    await screen.findByText("Hotel Fazenda Serra Azul Ltda")
+
+    expect(screen.getByText("Mostrando 1 cliente")).toBeVisible()
   })
 
   it('pagina com "Mostrando 1 a 20 de 25 clientes" e Próxima', async () => {

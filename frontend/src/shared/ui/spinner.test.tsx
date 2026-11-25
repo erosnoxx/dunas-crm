@@ -9,6 +9,7 @@ describe("Spinner", () => {
 
     const status = screen.getByRole("status")
 
+    expect(status).toHaveAttribute("aria-label", "Carregando")
     expect(status).toHaveAttribute("aria-busy", "true")
     expect(status.querySelector("svg")).toHaveAttribute("aria-hidden", "true")
   })

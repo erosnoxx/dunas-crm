@@ -17,4 +17,11 @@ describe("DocumentText", () => {
     expect(screen.getByText("CPF")).toHaveClass("bg-chip-ok")
     expect(screen.getByText("318.457.260-90")).toBeInTheDocument()
   })
+
+  it("separa o tipo do número por um espaço de verdade e não quebra o número", () => {
+    const { container } = render(<DocumentText type="CPF" value="31845726090" badge />)
+
+    expect(container.textContent).toBe("CPF 318.457.260-90")
+    expect(container.firstElementChild).toHaveClass("whitespace-nowrap")
+  })
 })

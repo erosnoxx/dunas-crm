@@ -267,7 +267,9 @@ function WebList({ filters, empty }: ListProps) {
             </div>
             <div className="flex items-center justify-between gap-4 border-t border-line px-4 py-3">
               <p className="text-label font-normal text-text-muted tabular-nums">
-                {`Mostrando ${shown.page * shown.size + 1} a ${shown.page * shown.size + customers.length} de ${shown.totalElements} clientes`}
+                {shown.totalElements === 1
+                  ? "Mostrando 1 cliente"
+                  : `Mostrando ${shown.page * shown.size + 1} a ${shown.page * shown.size + customers.length} de ${shown.totalElements} clientes`}
               </p>
               <div className="flex gap-2">
                 <Button
@@ -324,7 +326,9 @@ function MobileList({ filters, empty }: ListProps) {
           </ul>
           <div className="flex flex-col gap-3">
             <p className="text-center text-label font-normal text-text-muted tabular-nums">
-              {`Mostrando ${customers.length} de ${total} clientes`}
+              {total === 1
+                ? "Mostrando 1 cliente"
+                : `Mostrando ${customers.length} de ${total} clientes`}
             </p>
             <Button
               variant="outline"
@@ -485,13 +489,19 @@ function CustomersScreen({ canEdit }: { canEdit: boolean }) {
           filters.q === "" && filters.status === "ACTIVE" ? (
             <DefaultEmpty
               canEdit={canEdit}
-              onShowDeactivated={() => apply({ q: "", status: "DEACTIVATED" })}
+              onShowDeactivated={() => {
+                apply({ q: "", status: "DEACTIVATED" })
+                document.getElementById(`${id}-q`)?.focus()
+              }}
             />
           ) : (
             <NoResult
               filters={filters}
               canEdit={canEdit}
-              onClear={() => apply({ q: "", status: "ACTIVE" })}
+              onClear={() => {
+                apply({ q: "", status: "ACTIVE" })
+                document.getElementById(`${id}-q`)?.focus()
+              }}
             />
           )
         }

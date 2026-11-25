@@ -16,19 +16,16 @@ function DocumentText({
   badge?: boolean
 }) {
   return (
-    <span>
+    <span className="whitespace-nowrap">
       {badge ? (
-        <span className="mr-2 bg-chip-ok px-2 py-0.5 text-caption font-semibold">
+        <span className="mr-1.5 bg-chip-ok px-2 py-0.5 text-caption font-semibold">
           {type}
         </span>
       ) : (
-        <>
-          <span className="md:mr-1.5 md:text-caption md:font-semibold md:text-text-muted">
-            {type}
-          </span>
-          <span className="md:hidden"> </span>
-        </>
-      )}
+        <span className="md:mr-1 md:text-caption md:font-semibold md:text-text-muted">
+          {type}
+        </span>
+      )}{" "}
       <span>{formatDocument(value)}</span>
     </span>
   )
