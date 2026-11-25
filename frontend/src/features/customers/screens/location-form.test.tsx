@@ -451,11 +451,33 @@ describe("editar local", () => {
     expect(await screen.findByText("ficha do cliente")).toBeInTheDocument()
   })
 
-  it("o local ativo de cliente desativado se edita (ADR-30)", async () => {
+  it("o local ativo de cliente desativado se edita e salva (ADR-30)", async () => {
     vi.mocked(service.getCustomer).mockResolvedValue({ ...SILVA, status: "DEACTIVATED" })
-    renderForm("/clientes/c2/locais/l1")
+    vi.mocked(service.updateLocation).mockResolvedValue()
+    const user = renderForm("/clientes/c2/locais/l1")
 
     expect(await screen.findByLabelText("Nome do local *")).toHaveValue("Fábrica")
+    expect(button("Desativar local")).toBeInTheDocument()
+
+    await user.click(button("Salvar alterações"))
+
+    expect(await screen.findByText("ficha do cliente")).toBeInTheDocument()
+    expect(service.updateLocation).toHaveBeenCalledWith(
+      "l1",
+      expect.objectContaining({ name: "Fábrica" }),
+    )
+  })
+
+  it("o local desativado de cliente desativado se reativa (ADR-30)", async () => {
+    vi.mocked(service.getCustomer).mockResolvedValue({ ...SILVA, status: "DEACTIVATED" })
+    vi.mocked(service.reactivateLocation).mockResolvedValue()
+    const user = renderForm("/clientes/c2/locais/l3")
+
+    await user.click(await screen.findByRole("button", { name: "Reativar local" }))
+
+    await waitFor(() =>
+      expect(service.reactivateLocation).toHaveBeenCalledWith("l3", expect.anything()),
+    )
   })
 
   it("trocar de local recomeça o formulário com os valores do outro", async () => {
