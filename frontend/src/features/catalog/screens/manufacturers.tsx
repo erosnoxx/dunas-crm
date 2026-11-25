@@ -6,12 +6,12 @@ import { cn } from "@/shared/lib/cn"
 import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
+import { Spinner } from "@/shared/ui/spinner"
 
 import { useManufacturers } from "../catalog.hooks"
 import { errorMessage } from "../catalog.messages"
 import { CatalogTabs } from "../components/catalog-tabs"
 import { ManufacturerRow, ManufacturerTableHeader } from "../components/manufacturer-row"
-import { Spinner } from "../components/panel-frame"
 import { MANUFACTURER_LIST, ManufacturerPanel } from "./manufacturer-panel"
 
 /** Vazio (derivado: o mockup 7 só desenha a lista com fabricantes). */

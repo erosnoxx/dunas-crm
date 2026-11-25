@@ -7,8 +7,10 @@ import type { ApiError } from "@/shared/api/api-error"
 import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
+import { FieldError } from "@/shared/ui/field-error"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
+import { Spinner } from "@/shared/ui/spinner"
 
 import {
   useDeactivateManufacturer,
@@ -20,9 +22,8 @@ import {
 import { errorMessage, messageFor } from "../catalog.messages"
 import { manufacturerSchema, type ManufacturerValues } from "../catalog.schemas"
 import type { ManufacturerSummary } from "../catalog.service"
-import { FieldError } from "../components/model-values-fields"
 import { CatalogStatusChip } from "../components/catalog-status"
-import { PanelFrame, SaveButton, Spinner, WEB_BUTTON } from "../components/panel-frame"
+import { PanelFrame, SaveButton, WEB_BUTTON } from "../components/panel-frame"
 
 const LIST_PATH = "/catalogo/fabricantes"
 const NAME_MAX = 80

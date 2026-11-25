@@ -10,9 +10,11 @@ import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
 import { Checkbox } from "@/shared/ui/checkbox"
+import { FieldError } from "@/shared/ui/field-error"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
 import { NativeSelect } from "@/shared/ui/native-select"
+import { Spinner } from "@/shared/ui/spinner"
 
 import {
   useDeactivateEquipmentType,
@@ -25,8 +27,7 @@ import { errorMessage, LABELS, messageFor } from "../catalog.messages"
 import { equipmentTypeSchema, type EquipmentTypeValues } from "../catalog.schemas"
 import type { EquipmentTypeInput, EquipmentTypeSummary } from "../catalog.service"
 import { CatalogStatusChip } from "../components/catalog-status"
-import { FieldError } from "../components/model-values-fields"
-import { PanelFrame, SaveButton, Spinner, WEB_BUTTON } from "../components/panel-frame"
+import { PanelFrame, SaveButton, WEB_BUTTON } from "../components/panel-frame"
 
 const LIST_PATH = "/catalogo/tipos"
 const NAME_MAX = 60

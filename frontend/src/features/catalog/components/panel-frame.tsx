@@ -1,4 +1,3 @@
-import { Loader2Icon } from "lucide-react"
 import * as React from "react"
 
 import { cn } from "@/shared/lib/cn"
@@ -9,14 +8,6 @@ import { MobileHeader } from "@/shared/ui/mobile-header"
 // Botões da web (mockups 7 e 9): 44 px e 14 px peso 600; o do celular é o do rodapé fixo, 48 px e
 // 16 px. `md:font-semibold` porque o `md:text-body-sm` traz o peso 400 do token.
 const WEB_BUTTON = "self-start md:text-body-sm md:font-semibold"
-
-function Spinner() {
-  return (
-    <div role="status" aria-busy="true" className="flex justify-center py-6">
-      <Loader2Icon aria-hidden="true" className="size-6 animate-spin text-text-muted" />
-    </div>
-  )
-}
 
 /**
  * A moldura do painel de uma lista com painel ao lado (fabricantes e tipos). Na web: o painel
@@ -87,4 +78,4 @@ function SaveButton({
   )
 }
 
-export { PanelFrame, SaveButton, Spinner, WEB_BUTTON }
+export { PanelFrame, SaveButton, WEB_BUTTON }
