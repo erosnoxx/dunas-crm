@@ -7,6 +7,7 @@ const MESSAGES: Record<string, string> = {
   forbidden: "você não tem permissão para isto",
   customer_not_found: "cliente não encontrado",
   location_not_found: "local não encontrado",
+  zip_code_not_found: "CEP não encontrado",
   installed_equipment_not_found: "equipamento não encontrado",
   model_not_found: "modelo não encontrado",
   customer_document_taken: "já existe um cliente com este documento",

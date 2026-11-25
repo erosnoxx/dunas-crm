@@ -179,3 +179,19 @@ export async function listModelOptions(): Promise<ModelOption[]> {
 
   return data.content
 }
+
+/** O endereço de um CEP (ADR-34). Logradouro e bairro vêm `null` quando o CEP é geral da cidade. */
+export type ZipCodeAddress = {
+  zipCode: string
+  street: string | null
+  neighborhood: string | null
+  city: string
+  state: UF
+}
+
+/** 404 `zip_code_not_found` se o CEP não existe; 503 se o terceiro não responde. */
+export async function findZipCode(zipCode: string): Promise<ZipCodeAddress> {
+  const { data } = await httpClient.get<ZipCodeAddress>(`/zip-codes/${zipCode}`)
+
+  return data
+}

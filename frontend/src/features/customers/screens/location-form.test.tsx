@@ -14,6 +14,7 @@ import { LocationFormScreen } from "./location-form"
 vi.mock("../customers.service", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../customers.service")>()),
   getCustomer: vi.fn(),
+  findZipCode: vi.fn(),
   registerLocation: vi.fn(),
   updateLocation: vi.fn(),
   deactivateLocation: vi.fn(),
@@ -143,10 +144,119 @@ async function fillAddress(user: User, overrides: Partial<Record<string, string>
 beforeEach(() => {
   vi.resetAllMocks()
   vi.mocked(service.getCustomer).mockResolvedValue(SILVA)
+  vi.mocked(service.findZipCode).mockRejectedValue({ code: "zip_code_not_found" })
 })
 
 afterEach(() => {
   window.matchMedia = originalMatchMedia
+})
+
+describe("consulta do CEP (ADR-34)", () => {
+  const PAULISTA = {
+    zipCode: "01310100",
+    street: "Avenida Paulista",
+    neighborhood: "Bela Vista",
+    city: "São Paulo",
+    state: "SP",
+  } as const
+
+  it("CEP completo preenche o endereço, trava cidade e UF e leva o foco ao número", async () => {
+    vi.mocked(service.findZipCode).mockResolvedValue(PAULISTA)
+    const user = renderForm("/clientes/c2/locais/novo")
+
+    await user.type(await screen.findByLabelText("CEP *"), "01310100")
+
+    await waitFor(() => expect(field("Cidade *")).toHaveValue("São Paulo"))
+    expect(service.findZipCode).toHaveBeenCalledWith("01310100")
+    expect(field("Logradouro *")).toHaveValue("Avenida Paulista")
+    expect(field("Bairro *")).toHaveValue("Bela Vista")
+    expect(field("UF *")).toHaveValue("SP")
+    expect(field("Cidade *")).toHaveAttribute("readonly")
+    expect(field("UF *")).toBeDisabled()
+    expect(field("Logradouro *")).not.toHaveAttribute("readonly")
+    expect(field("Bairro *")).not.toHaveAttribute("readonly")
+    expect(field("Número *")).toHaveFocus()
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Endereço preenchido. Cidade e UF vêm do CEP e não se alteram.",
+    )
+  })
+
+  it("envia a cidade e a UF travadas", async () => {
+    vi.mocked(service.findZipCode).mockResolvedValue(PAULISTA)
+    vi.mocked(service.registerLocation).mockResolvedValue(undefined as never)
+    const user = renderForm("/clientes/c2/locais/novo")
+
+    await user.type(await screen.findByLabelText("Nome do local *"), "Casa")
+    await user.type(field("CEP *"), "01310100")
+    await waitFor(() => expect(field("UF *")).toBeDisabled())
+    await user.type(field("Número *"), "1000")
+    await user.click(button("Salvar local"))
+
+    await waitFor(() =>
+      expect(service.registerLocation).toHaveBeenCalledWith("c2", {
+        name: "Casa",
+        address: { ...PAULISTA, number: "1000", complement: null },
+      }),
+    )
+  })
+
+  it("CEP geral da cidade traz só cidade e UF: logradouro e bairro seguem livres", async () => {
+    vi.mocked(service.findZipCode).mockResolvedValue({
+      zipCode: "69900970",
+      street: null,
+      neighborhood: null,
+      city: "Rio Branco",
+      state: "AC",
+    })
+    const user = renderForm("/clientes/c2/locais/novo")
+
+    await user.type(await screen.findByLabelText("CEP *"), "69900970")
+
+    await waitFor(() => expect(field("UF *")).toHaveValue("AC"))
+    expect(field("Logradouro *")).toHaveValue("")
+    expect(field("Logradouro *")).not.toHaveAttribute("readonly")
+  })
+
+  it("CEP que não existe libera tudo e avisa", async () => {
+    const user = renderForm("/clientes/c2/locais/novo")
+
+    await user.type(await screen.findByLabelText("CEP *"), "99999999")
+
+    expect(
+      await screen.findByText("Não achamos este CEP. Preencha o endereço à mão."),
+    ).toBeInTheDocument()
+    expect(field("Cidade *")).not.toHaveAttribute("readonly")
+    expect(field("UF *")).toBeEnabled()
+  })
+
+  it("terceiro fora do ar libera tudo e avisa", async () => {
+    vi.mocked(service.findZipCode).mockRejectedValue({ code: undefined })
+    const user = renderForm("/clientes/c2/locais/novo")
+
+    await user.type(await screen.findByLabelText("CEP *"), "01310100")
+
+    expect(
+      await screen.findByText(
+        "Não deu para consultar o CEP agora. Preencha o endereço à mão.",
+      ),
+    ).toBeInTheDocument()
+    expect(field("UF *")).toBeEnabled()
+  })
+
+  it("mudar o CEP destrava cidade e UF; sem 8 dígitos não há consulta", async () => {
+    vi.mocked(service.findZipCode).mockResolvedValue(PAULISTA)
+    const user = renderForm("/clientes/c2/locais/novo")
+
+    await user.type(await screen.findByLabelText("CEP *"), "01310100")
+    await waitFor(() => expect(field("UF *")).toBeDisabled())
+    vi.mocked(service.findZipCode).mockClear()
+
+    await user.type(field("CEP *"), "{Backspace}")
+
+    expect(field("UF *")).toBeEnabled()
+    expect(field("Cidade *")).not.toHaveAttribute("readonly")
+    expect(service.findZipCode).not.toHaveBeenCalled()
+  })
 })
 
 describe("novo local", () => {
@@ -326,7 +436,7 @@ describe("novo local", () => {
     expect(screen.queryByRole("link", { name: "Cancelar" })).not.toBeInTheDocument()
     expect(field("Complemento")).toHaveAttribute("placeholder", "Opcional")
     expect(zipCode()).toHaveAccessibleDescription(
-      "O CEP não preenche o endereço: digite todos os campos.",
+      "Ao digitar o CEP, preenchemos o endereço.",
     )
     expect(field("Número *")).toHaveAccessibleDescription('Sem número, use "S/N".')
   })

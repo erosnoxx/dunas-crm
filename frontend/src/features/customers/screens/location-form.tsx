@@ -28,6 +28,7 @@ import { locationSchema, type LocationValues } from "../customers.schemas"
 import {
   type CustomerDetail,
   type LocationInput,
+  findZipCode,
   type LocationView,
   UFS,
 } from "../customers.service"
@@ -50,7 +51,15 @@ const MAX = {
 // Textos aprovados da tela 14 (linhas 86, 101 e 112); o do local desativado é o da tela 16.
 const NAME_HELP =
   'Um nome curto para achar o local na ficha, como "Casa" ou "Fazenda Boa Vista".'
-const ZIP_CODE_HELP = "O CEP não preenche o endereço: digite todos os campos."
+const ZIP_CODE_HELP = "Ao digitar o CEP, preenchemos o endereço."
+// Resultado da consulta do CEP (ADR-34), sob o campo, no celular também.
+const LOOKUP_TEXT = {
+  loading: "Buscando o endereço…",
+  found: "Endereço preenchido. Cidade e UF vêm do CEP e não se alteram.",
+  missing: "Não achamos este CEP. Preencha o endereço à mão.",
+  unavailable: "Não deu para consultar o CEP agora. Preencha o endereço à mão.",
+} as const
+type Lookup = "idle" | keyof typeof LOOKUP_TEXT
 const NUMBER_HELP = 'Sem número, use "S/N".'
 const DEACTIVATED_NOTE =
   "Local desativado: não recebe equipamento novo e não se edita até ser reativado. Os equipamentos dele ficam como estão."
@@ -135,7 +144,44 @@ function useLocationForm(
     }
   })
 
-  return { form, failure, setFailure, submit }
+  const [lookup, setLookup] = React.useState<Lookup>("idle")
+  // A resposta de um CEP já trocado não escreve no formulário; `filled` lembra se o logradouro e o
+  // bairro atuais vieram de uma consulta, para limpá-los quando o CEP novo não os traz.
+  const latest = React.useRef("")
+  const filled = React.useRef(false)
+
+  /** ADR-34: com 8 dígitos busca o endereço; achado, cidade e UF travam até o CEP mudar. */
+  const lookUp = (digits: string) => {
+    latest.current = digits
+
+    if (digits.length < 8) return setLookup("idle")
+
+    setLookup("loading")
+    findZipCode(digits).then(
+      (address) => {
+        if (latest.current !== digits) return
+
+        const fill = (name: keyof LocationFields, value: string) =>
+          form.setValue(name, value, { shouldDirty: true, shouldValidate: true })
+
+        if (address.street ?? filled.current) fill("street", address.street ?? "")
+        if (address.neighborhood ?? filled.current)
+          fill("neighborhood", address.neighborhood ?? "")
+        fill("city", address.city)
+        fill("state", address.state)
+        filled.current = true
+        setLookup("found")
+        form.setFocus("number")
+      },
+      (e: Partial<ApiError>) => {
+        if (latest.current !== digits) return
+
+        setLookup(e.code === "zip_code_not_found" ? "missing" : "unavailable")
+      },
+    )
+  }
+
+  return { form, failure, setFailure, submit, lookup, lookUp }
 }
 
 type LocationForm = ReturnType<typeof useLocationForm>
@@ -147,12 +193,15 @@ function TextField({
   label,
   help,
   placeholder,
+  locked,
 }: {
   model: LocationForm
   name: TextName
   label: string
   help?: string
   placeholder?: string
+  /** Preenchido pelo CEP: só leitura. */
+  locked?: boolean
 }) {
   const id = React.useId()
   const error = model.form.formState.errors[name]?.message
@@ -166,7 +215,9 @@ function TextField({
         type="text"
         autoComplete="off"
         maxLength={MAX[name]}
+        readOnly={locked}
         placeholder={placeholder}
+        className={locked ? "bg-nav text-text-muted" : undefined}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(error && `${id}-error`, help && `${id}-help`)}
         {...model.form.register(name)}
@@ -207,7 +258,12 @@ function ZipCodeField({ model, helpId }: { model: LocationForm; helpId: string }
         name={name}
         value={value}
         onBlur={onBlur}
-        onChange={(event) => onChange(maskZipCode(event.target.value))}
+        onChange={(event) => {
+          const masked = maskZipCode(event.target.value)
+
+          onChange(masked)
+          model.lookUp(masked.replace(/\D/g, ""))
+        }}
       />
       {error && <FieldError id={`${id}-error`}>{error}</FieldError>}
     </div>
@@ -215,7 +271,7 @@ function ZipCodeField({ model, helpId }: { model: LocationForm; helpId: string }
 }
 
 /** A UF em lista fechada com as 27 siglas (tela 14, linha 124); a vazia é "nenhuma escolhida". */
-function StateField({ model }: { model: LocationForm }) {
+function StateField({ model, locked }: { model: LocationForm; locked: boolean }) {
   const id = React.useId()
   const error = model.form.formState.errors.state?.message
 
@@ -225,6 +281,7 @@ function StateField({ model }: { model: LocationForm }) {
       <NativeSelect
         id={id}
         size="compact"
+        disabled={locked}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
         {...model.form.register("state")}
@@ -261,6 +318,7 @@ function LocationFields({
 }) {
   const isDesktop = useMediaQuery(MD_UP)
   const helpId = React.useId()
+  const locked = model.lookup === "found"
 
   return (
     <form id={id} noValidate onSubmit={model.submit} className={FORM}>
@@ -288,6 +346,10 @@ function LocationFields({
           <ZipCodeField model={model} helpId={`${helpId}-zip`} />
           <TextField model={model} name="street" label="Logradouro *" />
         </div>
+        {/* Aviso vivo: o leitor de tela ouve o resultado da consulta sem sair do CEP. */}
+        <p role="status" className="text-caption text-text-muted empty:hidden">
+          {model.lookup !== "idle" && LOOKUP_TEXT[model.lookup]}
+        </p>
         <p id={`${helpId}-zip`} className={cn(HELP, "-mt-1.5")}>
           {ZIP_CODE_HELP}
         </p>
@@ -304,8 +366,8 @@ function LocationFields({
           <div className="col-span-2 md:col-span-1">
             <TextField model={model} name="neighborhood" label="Bairro *" />
           </div>
-          <TextField model={model} name="city" label="Cidade *" />
-          <StateField model={model} />
+          <TextField model={model} name="city" label="Cidade *" locked={locked} />
+          <StateField model={model} locked={locked} />
         </div>
       </section>
       {footer}
