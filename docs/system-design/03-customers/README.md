@@ -55,6 +55,6 @@ Decisões do usuário em 2026-11-21 e as que ele delegou em 2026-11-22 (ADR-17 a
 - [x] `domain-model.md`, `usecases.md` e os pontos que eram *proposta* aprovados pelo usuário; [`open-questions.md`](open-questions.md) sem pendência que mude domínio
 - [ ] Plano de implementação em `docs/plans/`, backend e frontend juntos, e executado
 - [x] `mvn test` passa, a partir de `backend/` (inclui os testes de arquitetura e o ponta a ponta do `customers`)
-- [ ] `npm run typecheck && npm run lint && npm test && npm run build && npm run format:check` passa, a partir de `frontend/`
+- [x] `npm run typecheck && npm run lint && npm test && npm run build && npm run format:check` passa, a partir de `frontend/` (2026-11-25, na Tarefa 10)
 - [ ] Comparação mockup × resultado, tela a tela, com as divergências reportadas
 - [ ] Segundo cadastro com o mesmo CPF ou CNPJ (com ou sem pontuação) recusado com 409; segundo equipamento com a mesma série no mesmo modelo recusado com 409

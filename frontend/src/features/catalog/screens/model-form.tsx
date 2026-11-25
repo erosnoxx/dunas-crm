@@ -9,10 +9,12 @@ import { cn } from "@/shared/lib/cn"
 import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
+import { FieldError } from "@/shared/ui/field-error"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
 import { MobileHeader } from "@/shared/ui/mobile-header"
 import { NativeSelect } from "@/shared/ui/native-select"
+import { Spinner } from "@/shared/ui/spinner"
 
 import { amountText, formatAmount, parseAmount } from "../amount"
 import {
@@ -36,8 +38,7 @@ import type {
   ModelValuesInput,
 } from "../catalog.service"
 import { CatalogStatusChip } from "../components/catalog-status"
-import { FieldError, ModelValuesFields } from "../components/model-values-fields"
-import { Spinner } from "../components/panel-frame"
+import { ModelValuesFields } from "../components/model-values-fields"
 
 const LIST_PATH = "/catalogo"
 const NAME_MAX = 80

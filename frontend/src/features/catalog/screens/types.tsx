@@ -6,11 +6,11 @@ import { cn } from "@/shared/lib/cn"
 import { MD_UP, useMediaQuery } from "@/shared/lib/use-media-query"
 import { Alert } from "@/shared/ui/alert"
 import { Button } from "@/shared/ui/button"
+import { Spinner } from "@/shared/ui/spinner"
 
 import { useEquipmentTypes } from "../catalog.hooks"
 import { errorMessage } from "../catalog.messages"
 import { CatalogTabs } from "../components/catalog-tabs"
-import { Spinner } from "../components/panel-frame"
 import { TypeCards, TypeTable } from "../components/type-row"
 import { TYPE_LIST, TypePanel } from "./type-panel"
 

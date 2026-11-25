@@ -1,24 +1,11 @@
 import * as React from "react"
-import { CircleAlertIcon } from "lucide-react"
 
+import { FieldError } from "@/shared/ui/field-error"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
 
 import { LABELS } from "../catalog.messages"
 import type { EquipmentTypeSummary } from "../catalog.service"
-
-/** Erro sob o campo, como no mockup 4: ícone e texto `body-sm` em `danger-text`, não só cor. */
-function FieldError({ id, children }: { id: string; children: React.ReactNode }) {
-  return (
-    <p id={id} className="flex items-start gap-1.5 text-body-sm text-danger-text">
-      <CircleAlertIcon
-        aria-hidden="true"
-        className="mt-0.5 size-4.5 shrink-0 text-danger"
-      />
-      {children}
-    </p>
-  )
-}
 
 type ModelValuesFieldsProps = {
   /** O tipo escolhido; sem ele não há o que preencher e nada é desenhado. */
@@ -104,4 +91,4 @@ function ModelValuesFields({
   )
 }
 
-export { FieldError, ModelValuesFields }
+export { ModelValuesFields }

@@ -63,3 +63,24 @@ Canvas com 19 telas na identidade DUNAS (tema escuro, [`tokens.json`](../../../d
 - O **celular** sem barra inferior nas telas de detalhe e de formulário, e a barra do Comercial (que não vê Usuários): tela D7.
 - **Mensagens:** os textos que o mockup escreveu ("CEP incompleto: informe os 8 dígitos.", "Informe o bairro.", "CPF inválido: confira os números digitados.") são da tela e estão, com os demais, em [Mensagens da tela](../usecases.md#mensagens-da-tela) (ADR-31). O texto do erro de rede é o da tela 6.
 - Só o tema escuro. Dados de exemplo ilustrativos (CPF e CNPJ com dígitos verificadores válidos, inventados); os modelos Huawei vêm do catálogo, os da Solis e o "Fabricante B" são ilustrativos. O design system DUNAS não foi instalado no canvas: os tokens foram aplicados à mão a partir do `tokens.json`, como no catálogo.
+
+## Decisões da implementação (Tarefa 1 do plano do frontend)
+
+Pontos em que o mockup e o que existe hoje divergem, ou que o mockup não desenha. Linhas marcadas como **divergência** levam à comparação final com o mockup.
+
+| Ponto | O que o mockup mostra | O que existe hoje | Decisão |
+|---|---|---|---|
+| Ordem da navegação | "Clientes" primeiro, ícone de cartão de contato (o `ContactIcon` do `lucide-react`) | `NAV_ITEMS` com Catálogo e Usuários | Decidido: `NAV_ITEMS` com Clientes primeiro (ADR-26); a barra inferior herda a ordem (três itens para o Administrador, dois para Comercial e Técnico: D7) |
+| Página inicial | não desenhada | `/` manda o Administrador para `/usuarios` e mostra "Em construção" aos demais | Decidido: `/` redireciona **todos os papéis, o Técnico inclusive,** para `/clientes` (ADR-26; o comentário do `home.tsx` já previa que a primeira feature de negócio o substitui) |
+| Filtro de situação | tela 1: "Todos, Ativos, Desativados"; telas 2 a 6: "Ativos, Desativados, Todos" | o catálogo usa "Ativos, Desativados, Todos" | Decidido: "Ativos, Desativados, Todos" em todas (as telas 2 a 6, a maioria, e o catálogo); a tela 1 do mockup ("Todos, Ativos, Desativados") é **divergência** da comparação final; o padrão é `ACTIVE` |
+| Tabelas da web | `<table>` de verdade na lista e na ficha | o catálogo usa linhas em `grid` | Decidido: `<table>` com `thead` e uma definição de colunas só (cabeçalho e linhas alinham por construção); cartões no celular |
+| Seção recolhível | `<details>`/`<summary>` nativos na ficha do celular | nenhum componente | Decidido: o elemento nativo, estilizado na feature; nenhum componente novo |
+| Erro sob o campo e carregando | ícone + texto; indicador | `FieldError` e `Spinner` moram em `features/catalog` (uma feature não importa outra) | Decidido: mover os dois para `shared/ui/{field-error,spinner}.tsx` na Tarefa 3, e o catálogo passa a importá-los de lá (mecânico, coberto pelos testes existentes) |
+| Máscaras | CPF/CNPJ, `(00) 00000-0000`, `00000-000`, com `inputmode="numeric"` (no documento, ver a linha seguinte) | nada | Decidido: funções da feature sobre o `Input` (`size="compact"`), sem biblioteca; `inputmode="numeric"` só no telefone e no CEP |
+| CNPJ alfanumérico | dica "Digite só os números" e `inputmode="numeric"` no documento | o `Document` aceita CNPJ com letras (2026) | Decidido: o campo **não é só numérico**: sem `inputmode="numeric"` (teclado de texto), dica "Digite o CPF ou o CNPJ" (sem "só os números"). O `Document` normaliza tirando tudo que não é letra ou dígito e pondo em maiúsculas; CPF tem 11 dígitos; CNPJ tem 14 caracteres `[A-Z0-9]`, com letras só nas 12 primeiras posições (as duas últimas, dígitos verificadores, são números). A máscara aceita letras (a-z viram A-Z) nas posições do CNPJ e só dígitos no CPF (11 caracteres). **Muda texto aprovado do mockup: divergência** da comparação final |
+| Valor da característica | "12.000 BTU/h" (com milhar) na ficha e na opção do modelo | `formatAmount` do catálogo mostra "12000" | Decidido: "12000 BTU/h", como as telas do catálogo (`formatAmount`); o "12.000" do mockup é separador de milhar ilustrativo: **divergência** da comparação final |
+| Selo de situação | caractere ●/○ dentro do selo | `StatusChip` com o círculo em SVG fixo | Decidido: `StatusChip` (tom `ok`; `off` com forma `ring`), como o catálogo |
+| Telefone estrangeiro na edição | não desenhado | o `Phone` aceita qualquer E.164 (ADR-18) | Decidido: o campo mostra o número guardado como está, desabilitado, com a dica "Número de fora do Brasil: não se edita nesta tela", e o valor é reenviado sem mudança |
+| Linha da série casada, nenhum ativo, edições derivadas | D1 a D7 | — | Decidido: implementar como a spec descreve e levar à comparação final |
+
+O usuário aprovou estas decisões em 2026-11-24 ("pode partir pro front") e pode rever qualquer linha durante a execução; qualquer outra descoberta depois entra na comparação final.

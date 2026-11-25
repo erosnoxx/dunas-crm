@@ -53,6 +53,7 @@ function renderAt(path: string, role: Role) {
       ),
       children: [
         { path: "/", Component: Home },
+        { path: "/clientes", Component: () => <p>tela de clientes</p> },
         {
           path: "/usuarios",
           Component: Usuarios,
@@ -90,11 +91,11 @@ describe("rota /usuarios", () => {
   })
 
   it.each<Role>(["COMMERCIAL", "TECHNICIAN"])(
-    "%s que força a URL volta para a página inicial, sem pedir a lista",
+    "%s que força a URL volta para a página inicial (clientes), sem pedir a lista",
     async (role) => {
       renderAt("/usuarios", role)
 
-      expect(await screen.findByText("Em construção")).toBeInTheDocument()
+      expect(await screen.findByText("tela de clientes")).toBeInTheDocument()
       expect(service.listUsers).not.toHaveBeenCalled()
       expect(screen.queryByText("Paula Lima")).not.toBeInTheDocument()
     },
@@ -103,7 +104,7 @@ describe("rota /usuarios", () => {
   it("o detalhe de /usuarios/:id também é só do Administrador", async () => {
     renderAt("/usuarios/7", "COMMERCIAL")
 
-    expect(await screen.findByText("Em construção")).toBeInTheDocument()
+    expect(await screen.findByText("tela de clientes")).toBeInTheDocument()
     expect(service.listUsers).not.toHaveBeenCalled()
   })
 })
@@ -174,6 +175,6 @@ describe("rota /usuarios/convidar", () => {
   it("só o Administrador chega", async () => {
     renderAt("/usuarios/convidar", "TECHNICIAN")
 
-    expect(await screen.findByText("Em construção")).toBeInTheDocument()
+    expect(await screen.findByText("tela de clientes")).toBeInTheDocument()
   })
 })

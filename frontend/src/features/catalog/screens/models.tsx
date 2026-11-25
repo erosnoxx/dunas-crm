@@ -11,6 +11,7 @@ import { Button } from "@/shared/ui/button"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
 import { NativeSelect } from "@/shared/ui/native-select"
+import { Spinner } from "@/shared/ui/spinner"
 
 import {
   useEquipmentModels,
@@ -21,7 +22,6 @@ import { errorMessage } from "../catalog.messages"
 import type { EquipmentModelSummary, StatusFilter } from "../catalog.service"
 import { CatalogTabs } from "../components/catalog-tabs"
 import { ModelRow, ModelTableHeader } from "../components/model-row"
-import { Spinner } from "../components/panel-frame"
 
 const PAGE_SIZE = 20
 // shortcut: o filtro lista só os 100 primeiros tipos; paginar a escolha se o catálogo passar disso.

@@ -12,6 +12,28 @@ export default [
       route("convidar", "routes/usuarios.convidar.tsx"),
       route(":id", "routes/usuarios.$id.tsx"),
     ]),
+    // A lista; as estáticas de clientes (`clientes/novo`) entram antes de `clientes/:id`.
+    route("clientes", "routes/clientes._index.tsx"),
+    // Estática antes de `:id`: `/clientes/novo` não vira o cliente "novo".
+    route("clientes/novo", "routes/clientes.novo.tsx"),
+    route("clientes/:id", "routes/clientes.$id.tsx"),
+    route("clientes/:id/editar", "routes/clientes.$id.editar.tsx"),
+    // Estática antes de `:locationId`: `/clientes/:id/locais/novo` não vira o local "novo".
+    route("clientes/:id/locais/novo", "routes/clientes.$id.locais.novo.tsx"),
+    route(
+      "clientes/:id/locais/:locationId",
+      "routes/clientes.$id.locais.$locationId.tsx",
+    ),
+    // O equipamento novo nasce no local (`.../equipamentos/novo`, estática, depois do local); o
+    // salvo se abre pelo cliente, sem o local na rota (ADR-22: a edição lê da ficha).
+    route(
+      "clientes/:id/locais/:locationId/equipamentos/novo",
+      "routes/clientes.$id.locais.$locationId.equipamentos.novo.tsx",
+    ),
+    route(
+      "clientes/:id/equipamentos/:equipmentId",
+      "routes/clientes.$id.equipamentos.$equipmentId.tsx",
+    ),
     route("catalogo", "routes/catalogo._index.tsx"),
     // Estática antes de `:id`: `/catalogo/modelos/novo` não vira o modelo "novo".
     route("catalogo/modelos/novo", "routes/catalogo.modelos.novo.tsx"),
