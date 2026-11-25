@@ -118,7 +118,7 @@ describe("barra lateral", () => {
 
   it("Sair encerra a sessão sem confirmar e vai para o login", async () => {
     vi.mocked(service.logout).mockResolvedValue(undefined)
-    const user = renderAt("/", me("COMMERCIAL"))
+    const user = renderAt("/clientes", me("COMMERCIAL"))
 
     await user.click(within(await findSidebar()).getByRole("button", { name: "Sair" }))
 
@@ -127,7 +127,7 @@ describe("barra lateral", () => {
   })
 
   it("o teclado alcança todos os itens, do primeiro ao Sair", async () => {
-    const user = renderAt("/", me("ADMINISTRATOR"))
+    const user = renderAt("/clientes", me("ADMINISTRATOR"))
     const nav = await findSidebar()
     const order = [
       "Clientes",
