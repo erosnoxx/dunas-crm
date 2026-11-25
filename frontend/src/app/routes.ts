@@ -14,6 +14,9 @@ export default [
     ]),
     // A lista; as estáticas de clientes (`clientes/novo`) entram antes de `clientes/:id`.
     route("clientes", "routes/clientes._index.tsx"),
+    // Estática antes de `:id`: `/clientes/novo` não vira o cliente "novo".
+    route("clientes/novo", "routes/clientes.novo.tsx"),
+    route("clientes/:id/editar", "routes/clientes.$id.editar.tsx"),
     route("catalogo", "routes/catalogo._index.tsx"),
     // Estática antes de `:id`: `/catalogo/modelos/novo` não vira o modelo "novo".
     route("catalogo/modelos/novo", "routes/catalogo.modelos.novo.tsx"),
