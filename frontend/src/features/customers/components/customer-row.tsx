@@ -91,7 +91,7 @@ function CustomerTable({
           {COLUMNS.map((column, index) => (
             <th
               key={index}
-              className="border-b border-line px-4 py-3 text-label text-text-muted"
+              className="border-b border-line px-2 py-3 text-label xl:px-4 text-text-muted"
             >
               {column.header}
             </th>
@@ -102,7 +102,10 @@ function CustomerTable({
         {customers.map((customer) => (
           <tr key={customer.id} className="border-b border-line last:border-b-0">
             {COLUMNS.map((column, index) => (
-              <td key={index} className={cn("h-12 px-4 py-2", column.cellClassName)}>
+              <td
+                key={index}
+                className={cn("h-12 px-2 py-2 xl:px-4", column.cellClassName)}
+              >
                 {column.cell(customer, text)}
               </td>
             ))}

@@ -76,7 +76,7 @@ function EquipmentTable({
             {COLUMNS.map((column, index) => (
               <th
                 key={index}
-                className="border-b border-line px-4 py-3 text-label text-text-muted"
+                className="border-b border-line px-2 py-3 text-label xl:px-4 text-text-muted"
               >
                 {column.header}
               </th>
@@ -98,7 +98,10 @@ function EquipmentTable({
                 )}
               >
                 {COLUMNS.map((column, index) => (
-                  <td key={index} className={cn("h-14 px-4", column.cellClassName)}>
+                  <td
+                    key={index}
+                    className={cn("h-14 px-2 xl:px-4", column.cellClassName)}
+                  >
                     {column.cell(item, href)}
                   </td>
                 ))}
