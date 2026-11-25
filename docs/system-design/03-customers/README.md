@@ -8,7 +8,7 @@ O cadastro de **quem** a DUNAS atende e **do que** está instalado em cada lugar
 
 **Dentro:**
 - Cliente: cadastrar, editar, desativar e reativar. Pessoa física ou jurídica, pelo CPF ou CNPJ (o tipo vem do documento), com nome ou razão social (até 150 caracteres: ADR-20), nome fantasia opcional só para pessoa jurídica (ADR-21), um e-mail e um telefone, **pelo menos um dos dois** (ADR-16). Telefone digitado com máscara brasileira e guardado em E.164 (ADR-18). Documento único no cadastro e imutável (ADR-3, ADR-12), com o erro de digitação prevenido no formulário (ADR-24); o documento repetido leva ao cliente existente (ADR-23).
-- Local: cadastrar no cliente, editar, desativar e reativar. Um nome curto ("Casa", "Fazenda Boa Vista") e o endereço em campos, digitado à mão, com o CEP conferido só no formato (ADR-4, ADR-19).
+- Local: cadastrar no cliente, editar, desativar e reativar. Um nome curto ("Casa", "Fazenda Boa Vista") e o endereço em campos, preenchido pelo CEP quando o CEP é achado e digitado à mão quando não é; o servidor confere o CEP só no formato (ADR-19, ADR-34).
 - Equipamento instalado: cadastrar no local, editar, desativar e reativar. Um modelo do catálogo, o número de série (único por modelo, editável para corrigir digitação: ADR-17) e a data de instalação opcional; uma linha por unidade (ADR-5).
 - Lista de clientes com busca por texto (nome, nome fantasia, documento, cidade de um local, número de série de um equipamento: ADR-13, ADR-21) e filtro de situação, paginada como o catálogo; ficha do cliente com um bloco por local e os equipamentos dentro, sem paginação (ADR-22).
 - "Clientes" como primeiro item do menu e da barra inferior (ADR-26).
@@ -17,7 +17,7 @@ O cadastro de **quem** a DUNAS atende e **do que** está instalado em cada lugar
 
 **Fora (features futuras ou sem demanda):**
 - **Contatos múltiplos** por cliente (pessoa de contato, cargo, vários telefones): decisão do usuário, um e-mail e um telefone (ADR-2).
-- **Consulta automática de CEP** (preencher o endereço a partir do CEP): seria integração com terceiro, com Translator ([`architecture.md`](../../rules/architecture.md) §4.3); fica para quando houver demanda (ADR-4).
+- **Consulta automática de CEP:** entrou depois (ADR-34), por integração com a BrasilAPI atrás de contrato e Translator ([`architecture.md`](../../rules/architecture.md) §4.3).
 - **Garantia, foto, nota fiscal e histórico do equipamento** (troca, manutenção feita): decisão do usuário (ADR-9).
 - **Mover um equipamento de local ou trocar o modelo dele:** o local e o modelo não mudam depois do cadastro (ADR-5); mover fica para quando o caso aparecer (ADR-14), sem `MoveInstalledEquipment` nesta versão.
 - **Corrigir o documento de um cliente:** o documento é imutável, nem o Administrador o corrige (ADR-12); o erro se previne no cadastro (ADR-24). Gatilho: o primeiro erro notado depois de instalar equipamentos, que pede transferir locais e equipamentos entre clientes, decidido com o ADR-14.

@@ -61,6 +61,8 @@ import com.crm.registry.application.customers.usecases.commands.RegisterLocation
 import com.crm.registry.application.customers.usecases.commands.UpdateCustomer;
 import com.crm.registry.application.customers.usecases.commands.UpdateInstalledEquipment;
 import com.crm.registry.application.customers.usecases.commands.UpdateLocation;
+import com.crm.registry.application.customers.contracts.services.ZipCodeLookupService;
+import com.crm.registry.application.customers.usecases.queries.FindAddressByZipCode;
 import com.crm.registry.application.customers.usecases.queries.GetCustomer;
 import com.crm.registry.application.customers.usecases.queries.ListCustomers;
 import jakarta.persistence.EntityManager;
@@ -402,6 +404,11 @@ public class RegistryBeans {
     @Bean
     public GetCustomer getCustomer(CustomerReader customerReader) {
         return new GetCustomer(customerReader);
+    }
+
+    @Bean
+    public FindAddressByZipCode findAddressByZipCode(ZipCodeLookupService zipCodeLookupService) {
+        return new FindAddressByZipCode(zipCodeLookupService);
     }
 
     // --- seed ---------------------------------------------------------------------------------

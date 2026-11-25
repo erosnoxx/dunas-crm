@@ -331,3 +331,7 @@ Achados novos desta comparação, que não estavam nas decisões delegadas:
 | 3 | **Tabelas em 1024:** a da lista (802 px de mínimo) e as da ficha (735 a 809) não cabem nos 726 px. "Abrir", "Editar" e "Situação" só aparecem rolando dentro da tabela. A guarda funciona e a página não estoura | baixa | **resolvido**: respiro de célula 8 px abaixo de `xl` (16 em `xl`), que tira ~128 px das tabelas. Conferido por classe e teste, não medido em navegador |
 | 4 | "Mostrando 1 de 1 clientes" e "Mostrando 1 a 1 de 1 clientes": plural com um. A mesma frase existe em Usuários ("1 usuários") | baixa | trocar por "Mostrando 1 cliente" quando o total for 1 |
 | 5 | Depois de "Limpar busca e filtros" e de "Ver desativados", o foco vai para o `body`. Era uma pendência da revisão da Tarefa 5 e foi confirmado no navegador | baixa (teclado) | levar o foco para o campo de busca |
+
+## Consulta de CEP (ADR-34)
+
+As telas 14 e 15 foram desenhadas sem consulta de CEP. A dica do CEP passou de "O CEP não preenche o endereço: digite todos os campos." para "Ao digitar o CEP, preenchemos o endereço.", e há um aviso vivo sob o CEP com o resultado da consulta (também no celular). Cidade e UF ficam só leitura depois de preenchidas; o resto do layout não muda.

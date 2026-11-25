@@ -117,6 +117,7 @@ Contrato público ([`architecture.md`](../../rules/architecture.md) §7.3). Cód
 | `forbidden` | 403 | você não tem permissão para isto | Técnico tentando escrever |
 | `customer_not_found` | 404 | cliente não encontrado | id inexistente |
 | `location_not_found` | 404 | local não encontrado | id inexistente |
+| `zip_code_not_found` | 404 | CEP não encontrado | CEP que a BrasilAPI não conhece (ADR-34) |
 | `installed_equipment_not_found` | 404 | equipamento não encontrado | id inexistente |
 | `model_not_found` | 404 | modelo não encontrado | instalar com modelo inexistente (código do catálogo) |
 | `customer_document_taken` | 409 | já existe um cliente com este documento | CPF ou CNPJ repetido, inclusive de cliente desativado |
@@ -204,4 +205,4 @@ Nenhum (ver [`domain-model.md`](domain-model.md#domain-events-e-integration-even
 - **Corrigir o documento** de um cliente, nem pelo Administrador (ADR-3, ADR-12); o caminho é prevenir no cadastro (ADR-24). **Mover um equipamento** de local (ADR-14) ou **trocar o modelo** dele (ADR-5).
 - **Lista geral de equipamentos** (todos os clientes, por modelo ou por série): a série acha o **cliente**, na busca da lista de clientes (ADR-13).
 - **Paginação da ficha** (ADR-22) e **telefone estrangeiro digitável** na tela (ADR-18), com os gatilhos registrados nos ADRs.
-- **Contatos múltiplos, consulta de CEP, garantia, foto, histórico, importação em lote, junção de duplicados** (README da feature, ADR-25).
+- **Contatos múltiplos, garantia, foto, histórico, importação em lote, junção de duplicados** (README da feature, ADR-25).
