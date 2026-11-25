@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { PackageIcon, UsersIcon } from "lucide-react"
+import { ContactIcon, PackageIcon, UsersIcon } from "lucide-react"
 import { NavLink, useLocation } from "react-router"
 
 import { CHANGE_PASSWORD_PATH } from "@/features/iam/guards"
@@ -11,10 +11,16 @@ import { AccountMenu, UserAvatar } from "./account-menu"
 import { BottomNav, type NavItem } from "./bottom-nav"
 
 /**
- * Itens de trabalho, na barra lateral e na inferior. Catálogo é de todos os papéis (o Técnico só
- * consulta, ADR-6); Usuários é só do Administrador (ADR-5).
+ * Itens de trabalho, na barra lateral e na inferior. Clientes vem primeiro (ADR-26), de todos os
+ * papéis; Catálogo também (o Técnico só consulta, ADR-6); Usuários é só do Administrador (ADR-5).
  */
 const NAV_ITEMS: NavItem[] = [
+  {
+    to: "/clientes",
+    label: "Clientes",
+    icon: ContactIcon,
+    roles: ["ADMINISTRATOR", "COMMERCIAL", "TECHNICIAN"],
+  },
   {
     to: "/catalogo",
     label: "Catálogo",
@@ -44,6 +50,7 @@ const OWN_HEADER = [CHANGE_PASSWORD_PATH, "/conta/sessoes"]
  * as listas (`/catalogo/fabricantes`, `/catalogo/tipos`) com as barras da casca.
  */
 const OWN_HEADER_PREFIXES = [
+  "/clientes/",
   "/usuarios/",
   "/catalogo/modelos/",
   "/catalogo/fabricantes/",

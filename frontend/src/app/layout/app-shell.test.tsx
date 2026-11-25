@@ -36,6 +36,8 @@ function renderAt(path: string, user: CurrentUser) {
       children: [
         { path: "/", Component: Home },
         { path: "/usuarios", Component: () => <p>tela de usuários</p> },
+        { path: "/clientes", Component: () => <p>tela de clientes</p> },
+        { path: "/clientes/:id", Component: () => <p>tela da ficha</p> },
         { path: "/catalogo", Component: () => <p>tela do catálogo</p> },
         { path: "/catalogo/fabricantes", Component: () => <p>tela de fabricantes</p> },
         { path: "/catalogo/tipos/novo", Component: () => <p>tela de novo tipo</p> },
@@ -127,7 +129,14 @@ describe("barra lateral", () => {
   it("o teclado alcança todos os itens, do primeiro ao Sair", async () => {
     const user = renderAt("/", me("ADMINISTRATOR"))
     const nav = await findSidebar()
-    const order = ["Catálogo", "Usuários", "Minhas sessões", "Trocar senha", "Sair"]
+    const order = [
+      "Clientes",
+      "Catálogo",
+      "Usuários",
+      "Minhas sessões",
+      "Trocar senha",
+      "Sair",
+    ]
 
     // O avatar da barra superior vem antes na ordem do documento.
     await user.tab()
@@ -323,6 +332,47 @@ describe("item Catálogo", () => {
   it("um formulário de tipo (/catalogo/tipos/novo) também não tem as barras do celular", async () => {
     renderAt("/catalogo/tipos/novo", me("COMMERCIAL"))
     await screen.findByText("tela de novo tipo")
+
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("navigation", { name: "Principal no celular" }),
+    ).not.toBeInTheDocument()
+  })
+})
+
+describe("item Clientes", () => {
+  it.each<[Role, string[]]>([
+    ["ADMINISTRATOR", ["Clientes", "Catálogo", "Usuários"]],
+    ["COMMERCIAL", ["Clientes", "Catálogo"]],
+    ["TECHNICIAN", ["Clientes", "Catálogo"]],
+  ])("%s vê Clientes primeiro, na barra lateral e na inferior", async (role, names) => {
+    renderAt("/catalogo", me(role))
+
+    for (const nav of [await findSidebar(), bottomBar()]) {
+      const links = within(nav)
+        .getAllByRole("link")
+        .map((link) => link.textContent)
+        .filter((text) => names.includes(text ?? ""))
+
+      expect(links).toEqual(names)
+      expect(within(nav).getByRole("link", { name: "Clientes" })).toHaveAttribute(
+        "href",
+        "/clientes",
+      )
+    }
+  })
+
+  it("/clientes tem o título Clientes e mantém as duas barras", async () => {
+    renderAt("/clientes", me("COMMERCIAL"))
+    await findSidebar()
+
+    expect(within(screen.getByRole("banner")).getByText("Clientes")).toBeInTheDocument()
+    expect(bottomBar()).toBeInTheDocument()
+  })
+
+  it("/clientes/123 tem cabeçalho próprio: sem barra superior nem inferior", async () => {
+    renderAt("/clientes/123", me("ADMINISTRATOR"))
+    await screen.findByText("tela da ficha")
 
     expect(screen.queryByRole("banner")).not.toBeInTheDocument()
     expect(

@@ -31,7 +31,7 @@ function renderHome(role: Role) {
       ),
       path: "/",
     },
-    { path: "/usuarios", Component: () => <p>tela de usuários</p> },
+    { path: "/clientes", Component: () => <p>tela de clientes</p> },
   ])
 
   render(<Stub initialEntries={["/"]} />)
@@ -40,26 +40,12 @@ function renderHome(role: Role) {
 beforeEach(() => vi.resetAllMocks())
 
 describe("rota /", () => {
-  it("leva o Administrador para os usuários", async () => {
-    renderHome("ADMINISTRATOR")
-
-    expect(await screen.findByText("tela de usuários")).toBeInTheDocument()
-  })
-
-  it.each<Role>(["COMMERCIAL", "TECHNICIAN"])(
-    "%s vê a página inicial provisória com o texto aprovado",
+  it.each<Role>(["ADMINISTRATOR", "COMMERCIAL", "TECHNICIAN"])(
+    "leva %s para os clientes",
     async (role) => {
       renderHome(role)
 
-      expect(
-        await screen.findByRole("heading", { level: 1, name: "Início" }),
-      ).toBeInTheDocument()
-      expect(screen.getByRole("heading", { name: "Em construção" })).toBeInTheDocument()
-      expect(
-        screen.getByText(
-          "As telas de trabalho chegam com as próximas funcionalidades. Por enquanto, aqui você acessa a sua conta e as suas sessões.",
-        ),
-      ).toBeInTheDocument()
+      expect(await screen.findByText("tela de clientes")).toBeInTheDocument()
     },
   )
 })
