@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronLeftIcon, ChevronRightIcon, LockIcon } from "lucide-react"
+import { ChevronRightIcon, LockIcon } from "lucide-react"
 import * as React from "react"
 import { useController, useForm, useWatch } from "react-hook-form"
 import { Link, Navigate, useNavigate, useParams } from "react-router"
@@ -12,13 +12,14 @@ import { Button } from "@/shared/ui/button"
 import { FieldError } from "@/shared/ui/field-error"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
-import { MobileHeader } from "@/shared/ui/mobile-header"
 import { Spinner } from "@/shared/ui/spinner"
 
+import { type Back, type Failure, Frame, WEB_BUTTON } from "../components/form-frame"
 import { useCustomer, useRegisterCustomer, useUpdateCustomer } from "../customers.hooks"
 import { errorMessage } from "../customers.messages"
 import { customerSchema, type CustomerValues } from "../customers.schemas"
 import type { CustomerDetail, CustomerInput } from "../customers.service"
+import { describedBy } from "../display"
 import { documentTypeOf, formatDocument, normalizeDocument } from "../document"
 import { formatPhone, isBrazilian, maskPhone, toE164 } from "../phone"
 
@@ -50,79 +51,12 @@ const FORM =
 const FIELD = "flex flex-col gap-1.5"
 // `.help` e `.lock` (tela 7, linhas 33 e 34): 12/16 `text-muted`, no peso do corpo.
 const HELP = "text-caption font-normal text-text-muted"
-// Botões da web (tela 7, linhas 44 e 45): 44 px e 14 px peso 600; o do celular é o do rodapé fixo,
-// 48 px e 16 px (tela 8, linha 37). `md:font-semibold` porque o `md:text-body-sm` traz o peso 400.
-const WEB_BUTTON = "md:text-body-sm md:font-semibold"
-
-type Failure = Partial<ApiError> | null
-type Back = { to: string; label: string }
-
 // `contact` não é campo: é o caminho do erro "pelo menos um contato" (customers.schemas.ts), que
 // sai no topo da seção Contato.
 type FormValues = CustomerValues & { contact?: string }
 
 const isCompany = (document: string) => documentTypeOf(document) === "CNPJ"
 const resolveCustomer = zodResolver(customerSchema)
-
-/** O `aria-describedby` dos ids presentes, ou nada. */
-const describedBy = (...ids: (string | false | undefined)[]) =>
-  ids.filter(Boolean).join(" ") || undefined
-
-/**
- * A moldura das duas telas. Na web: o link de volta e o título em `display-lg` (tela 7, linhas
- * 25 a 27). No celular: o cabeçalho próprio (tela 8, linhas 17 a 19) e o salvar no rodapé fixo
- * (linhas 36 e 37), com a folga dele no fim do conteúdo.
- */
-function Frame({
-  back,
-  title,
-  mobileAction,
-  children,
-}: {
-  back: Back
-  title: string
-  mobileAction?: React.ReactNode
-  children: React.ReactNode
-}) {
-  const isDesktop = useMediaQuery(MD_UP)
-
-  if (isDesktop)
-    return (
-      <main className="flex flex-col gap-5 p-8">
-        <div>
-          <Link
-            to={back.to}
-            className="inline-flex min-h-11 items-center gap-1.5 text-body-sm font-semibold text-text-muted"
-          >
-            <ChevronLeftIcon aria-hidden="true" strokeWidth={2.5} className="size-4.5" />
-            {back.label}
-          </Link>
-          <h1 className="text-display-lg">{title}</h1>
-        </div>
-        {children}
-      </main>
-    )
-
-  return (
-    <>
-      <MobileHeader to={back.to} title={title} />
-      <main
-        className={
-          mobileAction
-            ? "flex flex-col gap-4 px-4 pt-5 pb-24"
-            : "flex flex-col gap-4 p-4 pt-5"
-        }
-      >
-        {children}
-      </main>
-      {mobileAction && (
-        <div className="fixed inset-x-0 bottom-0 border-t border-line bg-nav px-4 py-3">
-          {mobileAction}
-        </div>
-      )}
-    </>
-  )
-}
 
 type Send = (input: CustomerInput, values: CustomerValues) => Promise<void>
 

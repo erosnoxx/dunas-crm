@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronLeftIcon } from "lucide-react"
 import * as React from "react"
 import { type Resolver, useController, useForm } from "react-hook-form"
 import { Link, Navigate, useNavigate, useParams } from "react-router"
@@ -12,11 +11,11 @@ import { Button } from "@/shared/ui/button"
 import { FieldError } from "@/shared/ui/field-error"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
-import { MobileHeader } from "@/shared/ui/mobile-header"
 import { NativeSelect } from "@/shared/ui/native-select"
 import { Spinner } from "@/shared/ui/spinner"
 
 import { CustomerStatusChip } from "../components/customer-status"
+import { type Back, type Failure, Frame, WEB_BUTTON } from "../components/form-frame"
 import {
   useCustomer,
   useDeactivateLocation,
@@ -32,6 +31,7 @@ import {
   type LocationView,
   UFS,
 } from "../customers.service"
+import { describedBy } from "../display"
 import { formatZipCode, maskZipCode } from "../zip-code"
 
 const customerPath = (id: string) => `/clientes/${id}`
@@ -68,14 +68,6 @@ const HELP = "hidden text-caption font-normal text-text-muted md:block"
 // O painel "Situação" do modelo no catálogo (Modelo-web.dc.html, linhas 28, 29 e 104): 24 de
 // respiro e 20 entre os itens, 340 px, ao lado do formulário com 24 entre os dois.
 const PANEL = "flex flex-col gap-3.5 border border-line bg-panel p-4 md:gap-5 md:p-6"
-// Botões da web (tela 14, linhas 39 e 40): 44 px e 14 px peso 600; o do celular é o do rodapé
-// fixo, 48 px e 16 px (tela 15, linha 33). `md:font-semibold` porque o `md:text-body-sm` traz o
-// peso 400.
-const WEB_BUTTON = "md:text-body-sm md:font-semibold"
-
-type Failure = Partial<ApiError> | null
-type Back = { to: string; label: string }
-
 // O formulário guarda texto: a UF vazia é o "nenhuma escolhida" que o schema recusa.
 type LocationFields = Record<keyof LocationValues, string>
 
@@ -105,66 +97,6 @@ const fieldsOf = (location: LocationView): LocationFields => ({
 
 const customerText = (customer: CustomerDetail) =>
   customer.tradeName ? `${customer.name} (${customer.tradeName})` : customer.name
-
-/** O `aria-describedby` dos ids presentes, ou nada. */
-const describedBy = (...ids: (string | false | undefined)[]) =>
-  ids.filter(Boolean).join(" ") || undefined
-
-/**
- * A moldura das telas do local. Na web: o link de volta com o nome do cliente e o título em
- * `display-lg` (tela 14, linhas 25 a 27 e 74 a 78). No celular: o cabeçalho próprio (tela 15,
- * linhas 17 a 19 e 37 a 42) e a ação no rodapé fixo (linhas 32, 33 e 95), com a folga dela no fim.
- */
-function Frame({
-  back,
-  title,
-  mobileAction,
-  children,
-}: {
-  back: Back
-  title?: string
-  mobileAction?: React.ReactNode
-  children: React.ReactNode
-}) {
-  const isDesktop = useMediaQuery(MD_UP)
-
-  if (isDesktop)
-    return (
-      <main className="flex flex-col gap-5 p-8">
-        <div>
-          <Link
-            to={back.to}
-            className="inline-flex min-h-11 items-center gap-1.5 text-body-sm font-semibold text-text-muted"
-          >
-            <ChevronLeftIcon aria-hidden="true" strokeWidth={2.5} className="size-4.5" />
-            {back.label}
-          </Link>
-          {title && <h1 className="text-display-lg">{title}</h1>}
-        </div>
-        {children}
-      </main>
-    )
-
-  return (
-    <>
-      <MobileHeader to={back.to} title={title} />
-      <main
-        className={
-          mobileAction
-            ? "flex flex-col gap-4 px-4 pt-5 pb-24"
-            : "flex flex-col gap-4 p-4 pt-5"
-        }
-      >
-        {children}
-      </main>
-      {mobileAction && (
-        <div className="fixed inset-x-0 bottom-0 border-t border-line bg-nav px-4 py-3">
-          {mobileAction}
-        </div>
-      )}
-    </>
-  )
-}
 
 const backTo = (customer: CustomerDetail): Back => ({
   to: customerPath(customer.id),

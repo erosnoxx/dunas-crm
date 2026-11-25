@@ -20,6 +20,10 @@ export function applyMask(chars: string, pattern: string): string {
   return result
 }
 
+/** O `aria-describedby` dos ids presentes, ou nada. */
+export const describedBy = (...ids: (string | false | undefined)[]) =>
+  ids.filter(Boolean).join(" ") || undefined
+
 /** "2025-03-12" (como a API manda a data) vira "12/03/2025". */
 export function formatDate(value: string): string {
   const [year, month, day] = value.split("-")
