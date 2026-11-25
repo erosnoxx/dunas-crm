@@ -1,4 +1,4 @@
-package com.crm.registry.infrastructure.catalog.config;
+package com.crm.registry.infrastructure.config;
 
 import com.crm.registry.application.catalog.contracts.readers.EquipmentModelReader;
 import com.crm.registry.application.catalog.contracts.readers.EquipmentTypeReader;
@@ -35,9 +35,39 @@ import com.crm.registry.infrastructure.catalog.repositories.ManufacturerReposito
 import com.crm.registry.infrastructure.catalog.persistence.jpa.ManufacturerJpaRepository;
 import com.crm.registry.infrastructure.catalog.mappers.ManufacturerMapper;
 import com.crm.registry.infrastructure.catalog.seed.CatalogSeeder;
+import com.crm.registry.application.customers.contracts.readers.CustomerReader;
+import com.crm.registry.application.customers.contracts.repositories.CustomerRepository;
+import com.crm.registry.application.customers.contracts.repositories.InstalledEquipmentRepository;
+import com.crm.registry.application.customers.contracts.repositories.LocationRepository;
+import com.crm.registry.infrastructure.customers.mappers.CustomerMapper;
+import com.crm.registry.infrastructure.customers.mappers.InstalledEquipmentMapper;
+import com.crm.registry.infrastructure.customers.mappers.LocationMapper;
+import com.crm.registry.infrastructure.customers.persistence.jpa.CustomerJpaRepository;
+import com.crm.registry.infrastructure.customers.persistence.jpa.InstalledEquipmentJpaRepository;
+import com.crm.registry.infrastructure.customers.persistence.jpa.LocationJpaRepository;
+import com.crm.registry.infrastructure.customers.readers.CustomerReaderImpl;
+import com.crm.registry.infrastructure.customers.repositories.CustomerRepositoryImpl;
+import com.crm.registry.infrastructure.customers.repositories.InstalledEquipmentRepositoryImpl;
+import com.crm.registry.infrastructure.customers.repositories.LocationRepositoryImpl;
+import com.crm.registry.application.customers.usecases.commands.DeactivateCustomer;
+import com.crm.registry.application.customers.usecases.commands.DeactivateInstalledEquipment;
+import com.crm.registry.application.customers.usecases.commands.DeactivateLocation;
+import com.crm.registry.application.customers.usecases.commands.InstallEquipment;
+import com.crm.registry.application.customers.usecases.commands.ReactivateCustomer;
+import com.crm.registry.application.customers.usecases.commands.ReactivateInstalledEquipment;
+import com.crm.registry.application.customers.usecases.commands.ReactivateLocation;
+import com.crm.registry.application.customers.usecases.commands.RegisterCustomer;
+import com.crm.registry.application.customers.usecases.commands.RegisterLocation;
+import com.crm.registry.application.customers.usecases.commands.UpdateCustomer;
+import com.crm.registry.application.customers.usecases.commands.UpdateInstalledEquipment;
+import com.crm.registry.application.customers.usecases.commands.UpdateLocation;
+import com.crm.registry.application.customers.usecases.queries.GetCustomer;
+import com.crm.registry.application.customers.usecases.queries.ListCustomers;
 import jakarta.persistence.EntityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.Clock;
 
 /**
  * Registra todos os beans do BC {@code registry} (architecture.md §9): sem {@code @Component} nem
@@ -215,6 +245,163 @@ public class RegistryBeans {
     @Bean
     public GetEquipmentModel getEquipmentModel(EquipmentModelReader equipmentModelReader) {
         return new GetEquipmentModel(equipmentModelReader);
+    }
+
+    // --- clientes: persistência ---------------------------------------------------------------
+
+    @Bean
+    public CustomerMapper customerMapper() {
+        return new CustomerMapper();
+    }
+
+    @Bean
+    public LocationMapper locationMapper() {
+        return new LocationMapper();
+    }
+
+    @Bean
+    public InstalledEquipmentMapper installedEquipmentMapper() {
+        return new InstalledEquipmentMapper();
+    }
+
+    @Bean
+    public CustomerRepository customerRepository(
+            CustomerJpaRepository jpaRepository,
+            EntityManager em,
+            CustomerMapper mapper
+    ) {
+        return new CustomerRepositoryImpl(
+                jpaRepository,
+                em,
+                mapper
+        );
+    }
+
+    @Bean
+    public LocationRepository locationRepository(
+            LocationJpaRepository jpaRepository,
+            EntityManager em,
+            LocationMapper mapper
+    ) {
+        return new LocationRepositoryImpl(
+                jpaRepository,
+                em,
+                mapper
+        );
+    }
+
+    @Bean
+    public InstalledEquipmentRepository installedEquipmentRepository(
+            InstalledEquipmentJpaRepository jpaRepository,
+            EntityManager em,
+            InstalledEquipmentMapper mapper
+    ) {
+        return new InstalledEquipmentRepositoryImpl(
+                jpaRepository,
+                em,
+                mapper
+        );
+    }
+
+    @Bean
+    public CustomerReader customerReader(EntityManager em) {
+        return new CustomerReaderImpl(em);
+    }
+
+    // --- clientes: commands -------------------------------------------------------------------
+
+    @Bean
+    public RegisterCustomer registerCustomer(CustomerRepository customerRepository) {
+        return new RegisterCustomer(customerRepository);
+    }
+
+    @Bean
+    public UpdateCustomer updateCustomer(CustomerRepository customerRepository) {
+        return new UpdateCustomer(customerRepository);
+    }
+
+    @Bean
+    public DeactivateCustomer deactivateCustomer(CustomerRepository customerRepository) {
+        return new DeactivateCustomer(customerRepository);
+    }
+
+    @Bean
+    public ReactivateCustomer reactivateCustomer(CustomerRepository customerRepository) {
+        return new ReactivateCustomer(customerRepository);
+    }
+
+    @Bean
+    public RegisterLocation registerLocation(
+            CustomerRepository customerRepository,
+            LocationRepository locationRepository
+    ) {
+        return new RegisterLocation(customerRepository, locationRepository);
+    }
+
+    @Bean
+    public UpdateLocation updateLocation(LocationRepository locationRepository) {
+        return new UpdateLocation(locationRepository);
+    }
+
+    @Bean
+    public DeactivateLocation deactivateLocation(LocationRepository locationRepository) {
+        return new DeactivateLocation(locationRepository);
+    }
+
+    @Bean
+    public ReactivateLocation reactivateLocation(LocationRepository locationRepository) {
+        return new ReactivateLocation(locationRepository);
+    }
+
+    @Bean
+    public InstallEquipment installEquipment(
+            InstalledEquipmentRepository installedEquipmentRepository,
+            LocationRepository locationRepository,
+            CustomerRepository customerRepository,
+            EquipmentModelRepository equipmentModelRepository,
+            Clock clock
+    ) {
+        return new InstallEquipment(
+                installedEquipmentRepository,
+                locationRepository,
+                customerRepository,
+                equipmentModelRepository,
+                clock
+        );
+    }
+
+    @Bean
+    public UpdateInstalledEquipment updateInstalledEquipment(
+            InstalledEquipmentRepository installedEquipmentRepository,
+            Clock clock
+    ) {
+        return new UpdateInstalledEquipment(installedEquipmentRepository, clock);
+    }
+
+    @Bean
+    public DeactivateInstalledEquipment deactivateInstalledEquipment(
+            InstalledEquipmentRepository installedEquipmentRepository
+    ) {
+        return new DeactivateInstalledEquipment(installedEquipmentRepository);
+    }
+
+    @Bean
+    public ReactivateInstalledEquipment reactivateInstalledEquipment(
+            InstalledEquipmentRepository installedEquipmentRepository
+    ) {
+        return new ReactivateInstalledEquipment(installedEquipmentRepository);
+    }
+
+    // --- clientes: queries --------------------------------------------------------------------
+
+    @Bean
+    public ListCustomers listCustomers(CustomerReader customerReader) {
+        return new ListCustomers(customerReader);
+    }
+
+    @Bean
+    public GetCustomer getCustomer(CustomerReader customerReader) {
+        return new GetCustomer(customerReader);
     }
 
     // --- seed ---------------------------------------------------------------------------------

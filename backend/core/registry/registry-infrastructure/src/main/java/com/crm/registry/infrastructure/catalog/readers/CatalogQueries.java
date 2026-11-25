@@ -14,7 +14,7 @@ import java.util.Set;
  * Peças de JPQL que as três listas do catálogo repetem: filtro de situação, texto do LIKE,
  * ordenação e montagem da página.
  */
-final class CatalogQueries {
+public final class CatalogQueries {
 
     /** Campos que as listas aceitam para ordenar; o nome vem do cliente, então nunca entra solto na consulta. */
     private static final Set<String> SORTABLE = Set.of("name", "status");
@@ -36,12 +36,12 @@ final class CatalogQueries {
         parameters.put("status", CatalogStatus.valueOf(status.name()));
     }
 
-    static boolean hasText(String text) {
+    public static boolean hasText(String text) {
         return text != null && !text.isBlank();
     }
 
     /** Padrão "contém", sem caixa, com {@code %}, {@code _} e a barra valendo como caracteres literais. */
-    static String containing(String text) {
+    public static String containing(String text) {
         var escaped = text.trim().toLowerCase(Locale.ROOT)
                 .replace("\\", "\\\\")
                 .replace("%", "\\%")
@@ -50,21 +50,21 @@ final class CatalogQueries {
         return "%" + escaped + "%";
     }
 
-    static String where(List<String> conditions) {
+    public static String where(List<String> conditions) {
         if (conditions.isEmpty())
             return "";
 
         return "where " + String.join(" and ", conditions) + " ";
     }
 
-    static String orderBy(String alias, Pageable pageable) {
+    public static String orderBy(String alias, Pageable pageable) {
         var field = pageable.sortBy() != null && SORTABLE.contains(pageable.sortBy()) ? pageable.sortBy() : "name";
         var direction = "DESC".equalsIgnoreCase(pageable.sortDirection()) ? "desc" : "asc";
 
         return " order by " + alias + "." + field + " " + direction + ", " + alias + ".id";
     }
 
-    static <T> Page<T> page(
+    public static <T> Page<T> page(
             List<T> content,
             Pageable pageable,
             long total
