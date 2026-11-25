@@ -18,6 +18,12 @@ export default [
     route("clientes/novo", "routes/clientes.novo.tsx"),
     route("clientes/:id", "routes/clientes.$id.tsx"),
     route("clientes/:id/editar", "routes/clientes.$id.editar.tsx"),
+    // Estática antes de `:locationId`: `/clientes/:id/locais/novo` não vira o local "novo".
+    route("clientes/:id/locais/novo", "routes/clientes.$id.locais.novo.tsx"),
+    route(
+      "clientes/:id/locais/:locationId",
+      "routes/clientes.$id.locais.$locationId.tsx",
+    ),
     route("catalogo", "routes/catalogo._index.tsx"),
     // Estática antes de `:id`: `/catalogo/modelos/novo` não vira o modelo "novo".
     route("catalogo/modelos/novo", "routes/catalogo.modelos.novo.tsx"),
