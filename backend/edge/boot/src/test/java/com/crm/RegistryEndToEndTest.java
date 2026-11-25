@@ -36,8 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
                 "CRM_ADMIN_NAME=Administradora Inicial",
-                "CRM_ADMIN_EMAIL=" + RegistryEndToEndTest.ADMIN_EMAIL,
-                "CRM_ADMIN_PASSWORD=" + RegistryEndToEndTest.ADMIN_INITIAL_PASSWORD,
+                "CRM_ADMIN_EMAIL=" + EndToEndAccounts.ADMIN_EMAIL,
+                "CRM_ADMIN_PASSWORD=" + EndToEndAccounts.ADMIN_INITIAL_PASSWORD,
                 "spring.mail.host=localhost",
                 "crm.email.from=nao-responda@dunas.test",
                 "management.health.rabbit.enabled=false",
@@ -49,11 +49,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("Catálogo ponta a ponta no servidor real")
 class RegistryEndToEndTest {
-
-    static final String ADMIN_EMAIL = "admin@dunas.test";
-    static final String ADMIN_INITIAL_PASSWORD = "Inicial#2026";
-    static final String ADMIN_PASSWORD = "Trocada#2026";
-    static final String TECHNICIAN_PASSWORD = "Tecnico#2026";
 
     @ServiceConnection
     static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:16");
@@ -79,9 +74,9 @@ class RegistryEndToEndTest {
     @Order(1)
     @DisplayName("fluxo completo: cadastra, busca, desativa e reativa, e o Técnico só consulta")
     void fullFlow() {
-        var admin = adminBrowser();
+        var admin = accounts().admin();
 
-        var anonymous = browser("anonimo").get("/catalog/equipment-models");
+        var anonymous = accounts().browser("anonimo").get("/catalog/equipment-models");
 
         assertThat(anonymous.status()).isEqualTo(401);
         assertThat(anonymous.code()).isEqualTo("session_invalid");
@@ -128,7 +123,7 @@ class RegistryEndToEndTest {
         assertThat(admin.post("/catalog/equipment-models/" + modelId + "/reactivation", Map.of()).status()).isEqualTo(204);
         assertThat(admin.get("/catalog/equipment-models?text=sun2000").body().get("content")).hasSize(1);
 
-        var technician = technicianBrowser(admin, "tecnico.catalogo@dunas.test");
+        var technician = accounts().technician(admin, "tecnico.catalogo@dunas.test");
 
         assertThat(technician.get("/catalog/equipment-models?text=sun2000").status()).isEqualTo(200);
         assertThat(technician.get("/catalog/equipment-types").status()).isEqualTo(200);
@@ -154,7 +149,7 @@ class RegistryEndToEndTest {
     @Order(2)
     @DisplayName("tipo com modelo: trocar a unidade é 422 characteristic_locked e o tipo não muda")
     void lockedCharacteristic() {
-        var admin = adminBrowser();
+        var admin = accounts().admin();
         var manufacturerId = createManufacturer(admin, "Solis Trava");
         var typeId = createType(admin, "Inversor Trava", "Potência", "KILOWATT");
 
@@ -175,7 +170,7 @@ class RegistryEndToEndTest {
     @Order(3)
     @DisplayName("renomear a característica do tipo duas vezes seguidas é 204 nas duas")
     void characteristicRenamedTwice() {
-        var admin = adminBrowser();
+        var admin = accounts().admin();
         var typeId = createType(admin, "Inversor Renomeia", "Potência", "KILOWATT");
 
         var first = admin.put("/catalog/equipment-types/" + typeId, typeBody("Inversor Renomeia", "Potência nominal", "KILOWATT"));
@@ -190,7 +185,7 @@ class RegistryEndToEndTest {
     @Order(4)
     @DisplayName("status desconhecido nas listas é 400")
     void unknownStatusIsBadRequest() {
-        var admin = adminBrowser();
+        var admin = accounts().admin();
 
         assertThat(admin.get("/catalog/equipment-models?status=FOO").status()).isEqualTo(400);
         assertThat(admin.get("/catalog/equipment-types?status=FOO").status()).isEqualTo(400);
@@ -198,44 +193,6 @@ class RegistryEndToEndTest {
     }
 
     // --- apoio ---------------------------------------------------------------------------------
-
-    /** O Administrador logado e com a senha já trocada, seja qual for a ordem dos cenários. */
-    private Browser adminBrowser() {
-        var admin = browser("admin-pc");
-
-        admin.get("/auth/me");
-
-        if (admin.post("/auth/login", Map.of("email", ADMIN_EMAIL, "password", ADMIN_PASSWORD)).status() == 200)
-            return admin;
-
-        admin.post("/auth/login", Map.of("email", ADMIN_EMAIL, "password", ADMIN_INITIAL_PASSWORD));
-        admin.put("/auth/password", Map.of("currentPassword", ADMIN_INITIAL_PASSWORD, "newPassword", ADMIN_PASSWORD));
-
-        return admin;
-    }
-
-    /** Convida um Técnico pelo fluxo do IAM e devolve o navegador dele, já com a sessão do aceite. */
-    private Browser technicianBrowser(
-            Browser admin,
-            String email
-    ) {
-        var invite = admin.post("/users", Map.of("name", "Tecnico Catalogo", "email", email, "role", "TECHNICIAN"));
-
-        assertThat(invite.status()).isEqualTo(201);
-
-        var technician = browser("tech-phone");
-
-        technician.get("/auth/me");
-
-        var accepted = technician.post(
-                "/auth/invitation/accept",
-                Map.of("token", emails.linkTokenSentTo(email), "password", TECHNICIAN_PASSWORD)
-        );
-
-        assertThat(accepted.status()).isEqualTo(200);
-
-        return technician;
-    }
 
     private UUID createManufacturer(
             Browser admin,
@@ -304,7 +261,7 @@ class RegistryEndToEndTest {
         return UUID.fromString(typeOf(admin, typeId).get("characteristics").get(0).get("id").asText());
     }
 
-    private Browser browser(String device) {
-        return new Browser(http, port, secrets, device);
+    private EndToEndAccounts accounts() {
+        return new EndToEndAccounts(http, port, secrets, emails);
     }
 }
