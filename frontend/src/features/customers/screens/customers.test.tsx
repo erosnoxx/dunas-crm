@@ -336,9 +336,14 @@ describe("busca e situação na URL", () => {
 
 describe("vazios", () => {
   it('sem resultado mostra o termo, e "Limpar busca e filtros" refaz a consulta (tela 3)', async () => {
-    vi.mocked(service.listCustomers).mockImplementation(async (input) =>
-      input.text ? page([]) : page(FIRST),
-    )
+    // A lista padrão fica pendente: o vazio anterior (placeholder) não pode virar o vazio padrão.
+    let release!: () => void
+    const pending = new Promise<void>((resolve) => (release = resolve))
+    vi.mocked(service.listCustomers).mockImplementation(async (input) => {
+      if (input.text) return page([])
+      await pending
+      return page(FIRST)
+    })
     const user = renderScreen({ url: "/clientes?q=HV9910042&situacao=DEACTIVATED" })
 
     expect(
@@ -352,8 +357,18 @@ describe("vazios", () => {
 
     await user.click(screen.getByRole("button", { name: "Limpar busca e filtros" }))
 
+    await waitFor(() =>
+      expect(lastCall()).toEqual({ status: "ACTIVE", page: 0, size: 20 }),
+    )
+    expect(screen.getByRole("status")).toHaveAttribute("aria-busy", "true")
+    expect(screen.queryByRole("heading", { level: 2 })).not.toBeInTheDocument()
+
+    release()
+
     expect(await screen.findByText("Ana Paula Ribeiro")).toBeVisible()
-    expect(lastCall()).toEqual({ status: "ACTIVE", page: 0, size: 20 })
+    expect(service.listCustomers).not.toHaveBeenCalledWith(
+      expect.objectContaining({ size: 1 }),
+    )
     expect(screen.getByLabelText("Buscar cliente")).toHaveValue("")
     expect(screen.getByLabelText("Situação")).toHaveValue("ACTIVE")
     expect(params().toString()).toBe("")
@@ -392,6 +407,40 @@ describe("vazios", () => {
       page: 0,
       size: 1,
     })
+  })
+
+  it('falha na contagem dos desativados: o aviso da tela 6, e "Tentar de novo" refaz a contagem', async () => {
+    let countFails = true
+    vi.mocked(service.listCustomers).mockImplementation(async ({ status, size }) => {
+      if (status !== "DEACTIVATED") return page([], 0, size)
+      if (countFails) throw { status: 403, code: "forbidden", message: "Forbidden" }
+      return page([HOTEL], 0, size)
+    })
+    const countCalls = () =>
+      vi.mocked(service.listCustomers).mock.calls.filter(([input]) => input.size === 1)
+        .length
+    const user = renderScreen()
+
+    const alert = await screen.findByRole("alert")
+
+    expect(
+      within(alert).getByRole("heading", {
+        name: "Não foi possível carregar os clientes",
+      }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText("Nenhum cliente cadastrado")).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("link", { name: "Cadastrar o primeiro cliente" }),
+    ).not.toBeInTheDocument()
+    const before = countCalls()
+    countFails = false
+
+    await user.click(screen.getByRole("button", { name: "Tentar de novo" }))
+
+    expect(
+      await screen.findByRole("heading", { name: "Nenhum cliente ativo" }),
+    ).toBeInTheDocument()
+    expect(countCalls()).toBe(before + 1)
   })
 
   it("Técnico no vazio padrão: sem Cadastrar o primeiro cliente", async () => {

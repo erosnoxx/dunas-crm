@@ -173,6 +173,11 @@ function DefaultEmpty({
   const deactivated = useDeactivatedCount(true)
 
   if (deactivated.isPending) return <Spinner />
+  // Sem a contagem não se sabe qual vazio é: "nenhum cadastrado" seria falso com todos desativados.
+  if (deactivated.error)
+    return (
+      <LoadError error={deactivated.error} onRetry={() => void deactivated.refetch()} />
+    )
 
   if (deactivated.data)
     return (
@@ -208,14 +213,18 @@ type BodyProps = {
   customers: CustomerSummary[] | undefined
   error: unknown
   onRetry: () => void
+  /** A lista na tela é a do filtro anterior (`keepPreviousData`), enquanto a nova não chega. */
+  placeholder: boolean
   empty: React.ReactNode
   children: (customers: CustomerSummary[]) => React.ReactNode
 }
 
 /** Erro, carregando, vazio ou os clientes. */
-function Body({ customers, error, onRetry, empty, children }: BodyProps) {
+function Body({ customers, error, onRetry, placeholder, empty, children }: BodyProps) {
   if (error) return <LoadError error={error} onRetry={onRetry} />
   if (!customers) return <Spinner />
+  // O vazio anterior não vale para o filtro novo (e não pode disparar a contagem do ADR-28).
+  if (customers.length === 0 && placeholder) return <Spinner />
   if (customers.length === 0) return empty
 
   return children(customers)
@@ -243,6 +252,7 @@ function WebList({ filters, empty }: ListProps) {
       customers={shown?.content}
       error={query.error}
       onRetry={() => void query.refetch()}
+      placeholder={query.isPlaceholderData}
       empty={empty}
     >
       {(customers) =>
@@ -295,6 +305,7 @@ function MobileList({ filters, empty }: ListProps) {
       customers={pages?.flatMap((page) => page.content)}
       error={query.error}
       onRetry={() => void query.refetch()}
+      placeholder={query.isPlaceholderData}
       empty={empty}
     >
       {(customers) => (
