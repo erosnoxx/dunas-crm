@@ -112,6 +112,10 @@ describe("LocationBlock, web", () => {
     ).toHaveTextContent("1 equipamento ativo")
     expect(screen.getByRole("table")).toBeInTheDocument()
     expect(document.querySelector("details")).toBeNull()
+    expect(
+      screen.getByRole("heading", { level: 3, name: /Fábrica/ }).parentElement
+        ?.parentElement,
+    ).toHaveClass("flex-wrap")
   })
 
   it("local ativo: 'Editar local' e 'Novo equipamento' para quem edita", async () => {

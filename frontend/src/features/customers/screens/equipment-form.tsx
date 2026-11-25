@@ -365,7 +365,7 @@ function FormPage({
   return (
     <Frame back={back} title={title} mobileAction={!isDesktop && save}>
       {isDesktop && aside ? (
-        <div className="flex items-start gap-6">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-start">
           {form}
           {aside}
         </div>
@@ -435,7 +435,10 @@ function NewEquipment({
 /** O painel "Situação" ao lado, na web (D5, D6), como o do modelo do catálogo. */
 function StatusAside({ children }: { children: React.ReactNode }) {
   return (
-    <aside aria-label="Situação do equipamento" className={cn(PANEL, "w-85 shrink-0")}>
+    <aside
+      aria-label="Situação do equipamento"
+      className={cn(PANEL, "md:max-w-160 xl:w-85 xl:shrink-0")}
+    >
       <h2 className="text-label text-text-muted">Situação</h2>
       {children}
     </aside>
@@ -571,7 +574,10 @@ function DeactivatedEquipment({ customer, location, equipment }: Props) {
   )
   // `.panel`, `.k`, `.v` e `.num` da tela 19 (linhas 32 a 35 e 85 a 90).
   const data = (
-    <section aria-label="Dados do equipamento" className={cn(PANEL, "md:w-160")}>
+    <section
+      aria-label="Dados do equipamento"
+      className={cn(PANEL, "md:w-160 md:max-w-full")}
+    >
       <dl className="flex flex-col gap-3.5 md:gap-5">
         {fields.map(([key, value]) => (
           <div key={key}>
@@ -589,7 +595,7 @@ function DeactivatedEquipment({ customer, location, equipment }: Props) {
     return (
       <Frame back={backTo(customer)} title={title}>
         {alert}
-        <div className="flex items-start gap-6">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-start">
           {data}
           <StatusAside>
             {chip(equipment)}

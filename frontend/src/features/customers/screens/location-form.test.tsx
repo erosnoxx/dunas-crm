@@ -538,6 +538,8 @@ describe("editar local", () => {
       "text-display-lg",
     )
     const status = await screen.findByRole("complementary", { name: "Situação do local" })
+    expect(status).toHaveClass("md:max-w-160", "xl:w-85", "xl:shrink-0")
+    expect(status.parentElement).toHaveClass("flex-col", "xl:flex-row", "xl:items-start")
     expect(within(status).getByText("Ativo")).toBeInTheDocument()
     expect(within(status).getByText(/^Desativar marca o local/)).toBeInTheDocument()
     expect(
@@ -599,6 +601,12 @@ describe("local desativado", () => {
     renderForm("/clientes/c2/locais/l3")
 
     const status = await screen.findByRole("complementary", { name: "Situação do local" })
+    expect(status).toHaveClass("md:max-w-160", "xl:w-85", "xl:shrink-0")
+    expect(status.parentElement).toHaveClass("flex-col", "xl:flex-row", "xl:items-start")
+    expect(screen.getByRole("region", { name: "Dados do local" })).toHaveClass(
+      "md:w-160",
+      "md:max-w-full",
+    )
     expect(within(status).getByText("Desativado")).toBeInTheDocument()
     expect(
       within(status).getByRole("button", { name: "Reativar local" }),

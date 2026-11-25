@@ -373,7 +373,7 @@ function FormPage({
   return (
     <Frame back={back} title={title} mobileAction={!isDesktop && save}>
       {isDesktop && aside ? (
-        <div className="flex items-start gap-6">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-start">
           {fields}
           {aside}
         </div>
@@ -406,7 +406,10 @@ function NewLocation({ customer }: { customer: CustomerDetail }) {
 /** O painel "Situação" ao lado, na web (D3, D6), como o do modelo do catálogo. */
 function StatusAside({ children }: { children: React.ReactNode }) {
   return (
-    <aside aria-label="Situação do local" className={cn(PANEL, "w-85 shrink-0")}>
+    <aside
+      aria-label="Situação do local"
+      className={cn(PANEL, "md:max-w-160 xl:w-85 xl:shrink-0")}
+    >
       <h2 className="text-label text-text-muted">Situação</h2>
       {children}
     </aside>
@@ -527,7 +530,7 @@ function DeactivatedLocation({
   )
   // `.panel`, `.k` e `.v` da tela 19 (linhas 32 a 34 e 85 a 90).
   const data = (
-    <section aria-label="Dados do local" className={cn(PANEL, "md:w-160")}>
+    <section aria-label="Dados do local" className={cn(PANEL, "md:w-160 md:max-w-full")}>
       <dl className="flex flex-col gap-3.5 md:gap-5">
         {fields.map(([key, value]) => (
           <div key={key}>
@@ -544,7 +547,7 @@ function DeactivatedLocation({
     return (
       <Frame back={backTo(customer)} title={location.name}>
         {alert}
-        <div className="flex items-start gap-6">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-start">
           {data}
           <StatusAside>
             {chip(location)}

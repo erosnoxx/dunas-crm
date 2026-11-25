@@ -218,7 +218,7 @@ function CustomerData({
       aria-label="Dados do cliente"
       className="flex flex-col gap-3.5 border border-line bg-panel p-4 md:px-6 md:py-5"
     >
-      <dl className="flex flex-col gap-3.5 md:grid md:grid-cols-3 md:gap-6">
+      <dl className="flex flex-col gap-3.5 md:grid md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         {fields.map(([label, value]) => (
           <div key={label} className="min-w-0">
             <dt className="text-label text-text-muted">{label}</dt>
@@ -318,7 +318,7 @@ function Detail({
   // Web (tela 9, linhas 98 a 107): nome em `display-lg`, nome fantasia e selo 6 px abaixo, ações à
   // direita. Celular (tela 10, linhas 68 a 72): nome, nome fantasia e selo empilhados.
   const head = isDesktop ? (
-    <div className="flex items-end justify-between gap-6">
+    <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
       <div>
         <h1 className="text-display-lg">{customer.name}</h1>
         <div className="mt-1.5 flex items-center gap-3">

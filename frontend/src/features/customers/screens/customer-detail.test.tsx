@@ -135,6 +135,13 @@ describe("ficha, web", () => {
     expect(screen.getByText("Padaria Boa Vista")).toBeInTheDocument()
     const data = screen.getByRole("region", { name: "Dados do cliente" })
     expect(within(data).getByText("CNPJ")).toBeInTheDocument()
+    expect(within(data).getByText("34.218.765/0001-14").parentElement).toHaveClass(
+      "whitespace-nowrap",
+    )
+    expect(data.querySelector("dl")).toHaveClass("md:grid-cols-2", "lg:grid-cols-3")
+    expect(
+      screen.getByRole("heading", { level: 1 }).parentElement?.parentElement,
+    ).toHaveClass("flex-wrap", "gap-y-3")
     expect(within(data).getByText("34.218.765/0001-14")).toBeInTheDocument()
     expect(within(data).getByText("Não pode ser alterado.")).toBeInTheDocument()
     expect(within(data).getByText("compras@padariaboavista.com.br")).toBeInTheDocument()

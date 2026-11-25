@@ -691,6 +691,8 @@ describe("editar equipamento", () => {
       await screen.findByRole("heading", { level: 1, name: "SUN2000-5KTL-L1" }),
     ).toHaveClass("text-display-lg")
     const status = screen.getByRole("complementary", { name: "Situação do equipamento" })
+    expect(status).toHaveClass("md:max-w-160", "xl:w-85", "xl:shrink-0")
+    expect(status.parentElement).toHaveClass("flex-col", "xl:flex-row", "xl:items-start")
     expect(within(status).getByText("Ativo")).toBeInTheDocument()
     expect(within(status).getByText(/^Desativar marca o equipamento/)).toBeInTheDocument()
     expect(
@@ -835,6 +837,12 @@ describe("equipamento desativado", () => {
     const status = await screen.findByRole("complementary", {
       name: "Situação do equipamento",
     })
+    expect(status).toHaveClass("md:max-w-160", "xl:w-85", "xl:shrink-0")
+    expect(status.parentElement).toHaveClass("flex-col", "xl:flex-row", "xl:items-start")
+    expect(screen.getByRole("region", { name: "Dados do equipamento" })).toHaveClass(
+      "md:w-160",
+      "md:max-w-full",
+    )
     expect(within(status).getByText("Desativado")).toBeInTheDocument()
     expect(
       within(status).getByRole("button", { name: "Reativar equipamento" }),

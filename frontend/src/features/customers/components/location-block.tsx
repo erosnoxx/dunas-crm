@@ -97,7 +97,7 @@ function LocationBlock({
   if (isDesktop)
     return (
       <section aria-labelledby={titleId} className="border border-line bg-panel">
-        <div className="flex items-start justify-between gap-4 border-line px-5 py-4 not-last:border-b">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-line px-5 py-4 not-last:border-b">
           <div>
             <h3
               id={titleId}
