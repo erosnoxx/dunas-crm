@@ -24,6 +24,16 @@ export default [
       "clientes/:id/locais/:locationId",
       "routes/clientes.$id.locais.$locationId.tsx",
     ),
+    // O equipamento novo nasce no local (`.../equipamentos/novo`, estática, depois do local); o
+    // salvo se abre pelo cliente, sem o local na rota (ADR-22: a edição lê da ficha).
+    route(
+      "clientes/:id/locais/:locationId/equipamentos/novo",
+      "routes/clientes.$id.locais.$locationId.equipamentos.novo.tsx",
+    ),
+    route(
+      "clientes/:id/equipamentos/:equipmentId",
+      "routes/clientes.$id.equipamentos.$equipmentId.tsx",
+    ),
     route("catalogo", "routes/catalogo._index.tsx"),
     // Estática antes de `:id`: `/catalogo/modelos/novo` não vira o modelo "novo".
     route("catalogo/modelos/novo", "routes/catalogo.modelos.novo.tsx"),
