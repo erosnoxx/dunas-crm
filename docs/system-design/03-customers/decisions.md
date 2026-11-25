@@ -282,3 +282,11 @@ Com texto ou com outro filtro, o vazio é o da tela 3 ("Nenhum cliente encontrad
 **Decisão:** o usuário aprovou os mockups em 2026-11-22 e delegou o restante ao controlador ("tome sozinho as decisões usando o bom senso"). Todos os pontos *proposta* e os limites de `domain-model.md` e `usecases.md` ficam **aceitos como escritos**. Mudar qualquer um vira um ADR novo.
 
 **Consequência:** a spec vale como escrita; ninguém precisa reabrir esses pontos antes do plano.
+
+## ADR-34: consulta automática de CEP
+
+**Contexto:** ADR-4 e ADR-19 deixaram a consulta de CEP fora; o usuário pediu a busca automática (2026-11-25), com cidade e UF travadas depois de preenchidas e o máximo de campos preenchidos sozinhos.
+
+**Decisão:** decisão do usuário (2026-11-25): a consulta é **do backend**, por integração com terceiro: contrato `ZipCodeLookupService` (`registry.application.customers.contracts.services`), pacote `registry.infrastructure.integrations.brasilapi` com Client, Translator e DTOs ([`architecture.md`](../../rules/architecture.md) §4.3). Provedor **BrasilAPI** (`/api/cep/v2/{cep}`, sem chave). Endpoint `GET /zip-codes/{cep}`, caso de uso `FindAddressByZipCode`, só Administrador e Comercial (os que cadastram local). Resposta: CEP (8 dígitos), `street` e `neighborhood` (nulos num CEP geral da cidade), `city`, `state`. Falhas: CEP desconhecido é 404 `zip_code_not_found`; terceiro fora do ar é 503 (`ExternalServiceException`), depois de uma repetição só para falha transitória. No formulário do local, com 8 dígitos a tela consulta, preenche logradouro, bairro, cidade e UF e leva o foco ao número; **cidade e UF ficam só leitura até o CEP mudar**; logradouro e bairro continuam editáveis. CEP desconhecido ou terceiro fora do ar **libera todos os campos** com um aviso curto: o cadastro nunca depende do terceiro.
+
+**Consequência:** o servidor **não** reconfere cidade e UF contra o CEP: a trava é da tela, e o `ZipCode` segue validando só o formato (ADR-19). Na edição de um local existente nada trava até o CEP ser alterado e achado. O domínio não muda. Resposta sem cidade ou UF vale como CEP desconhecido. Sem cache nesta versão.
