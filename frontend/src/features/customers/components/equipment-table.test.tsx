@@ -109,6 +109,6 @@ describe("EquipmentTable", () => {
   it("a tabela fica dentro da guarda de rolagem horizontal", async () => {
     const table = await renderTable(true)
 
-    expect(table.parentElement).toHaveClass("overflow-x-auto")
+    expect(table.parentElement).toHaveClass("relative", "overflow-x-auto")
   })
 })

@@ -64,7 +64,8 @@ const COLUMNS: Column[] = [
     cell: (customer) => (
       <Link
         to={`/clientes/${customer.id}`}
-        className="inline-flex min-h-11 items-center font-semibold text-brand-text"
+        // Alvo de 44 px dentro do `td` de 48 (Main.dc.html:36): a margem negativa come o respiro de 8.
+        className="-my-1.5 inline-flex min-h-11 items-center font-semibold text-brand-text"
       >
         Abrir
       </Link>

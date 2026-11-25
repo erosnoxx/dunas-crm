@@ -619,7 +619,10 @@ describe("web", () => {
       "text-display-lg",
       "max-md:sr-only",
     )
-    expect(screen.getByRole("table").parentElement).toHaveClass("overflow-x-auto")
+    expect(screen.getByRole("table").parentElement).toHaveClass(
+      "relative",
+      "overflow-x-auto",
+    )
 
     const search = screen.getByLabelText("Buscar cliente")
     expect(search.parentElement?.parentElement).toHaveClass("md:flex-wrap")
@@ -629,7 +632,7 @@ describe("web", () => {
     )
     expect(
       within(row("Ana Paula Ribeiro")).getByRole("link", { name: "Abrir" }),
-    ).toHaveClass("min-h-11")
+    ).toHaveClass("min-h-11", "-my-1.5")
     expect(screen.getByRole("link", { name: "Novo cliente" })).toHaveClass(
       "md:min-h-11",
       "md:text-body-sm",

@@ -261,7 +261,8 @@ function WebList({ filters, empty }: ListProps) {
             aria-label="Lista de clientes"
             className="min-w-0 border border-line bg-panel"
           >
-            <div className="overflow-x-auto">
+            {/* `relative`: o "Ações" `sr-only` (absoluto) do cabeçalho rola junto, sem alargar a página. */}
+            <div className="relative overflow-x-auto">
               <CustomerTable customers={customers} text={filters.q} />
             </div>
             <div className="flex items-center justify-between gap-4 border-t border-line px-4 py-3">

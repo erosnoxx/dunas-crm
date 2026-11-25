@@ -68,7 +68,8 @@ function EquipmentTable({
   customerId: string
 }) {
   return (
-    <div className="overflow-x-auto">
+    // `relative`: o "Ações" `sr-only` (absoluto) do cabeçalho rola junto, sem alargar a página.
+    <div className="relative overflow-x-auto">
       <table className="w-full border-collapse text-left">
         <thead>
           <tr>
