@@ -1,0 +1,14 @@
+version: 2
+
+secret:
+  # Caminhos de teste, em todo o monorepo: credencial/token/chave aqui é sempre fixture, nunca
+  # segredo real. Pensado pra não exigir manutenção a cada bounded context/feature novos.
+  ignored_paths:
+    - "backend/**/src/test/**" # testes Java (todo módulo Maven: common, shared-kernel, core/*, web, boot)
+    - "frontend/src/test/**" # utilitários/setup de teste do frontend
+    - "frontend/**/*.test.ts"
+    - "frontend/**/*.test.tsx"
+    - "frontend/**/*.spec.ts"
+    - "frontend/**/*.spec.tsx"
+    - "**/__tests__/**"
+    - "**/__mocks__/**"

@@ -23,8 +23,8 @@ import java.util.Optional;
  * </ul>
  *
  * <p>A chave só aceita letras, dígitos, {@code / _ . -}, sem {@code ..} e sem barra no começo.
- * Chave fora disso é recusada com {@link IllegalArgumentException}: ela vem de montagem nossa, e
- * um valor ruim aqui é bug, não entrada de usuário.
+ * Chave fora disso é recusada com {@link com.crm.common.application.exceptions.InternalServerErrorException}:
+ * ela vem de montagem nossa, e um valor ruim aqui é bug, não entrada de usuário.
  */
 public interface FileStorage {
 

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Ficha do cliente, celular, sem locais</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1220;color:#E8EDF5;font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:24px}
+h1,h2,p{margin:0}
+.phone{width:390px;height:844px;display:flex;flex-direction:column;background:#0B1220;overflow:hidden}
+.top{height:64px;box-sizing:border-box;display:flex;align-items:center;gap:4px;padding:0 8px;background:#0F1729;border-bottom:1px solid #26324A;flex-shrink:0}
+.bk{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#E8EDF5;text-decoration:none}
+.ttl{flex:1;font-family:"Chakra Petch",system-ui,sans-serif;font-size:24px;line-height:28px;font-weight:600}
+.body{flex:1;min-height:0;overflow:hidden;padding:20px 16px;display:flex;flex-direction:column;gap:16px}
+.name{font-family:"Chakra Petch",system-ui,sans-serif;font-size:22px;line-height:28px;font-weight:600}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:3px 10px;background:#1B2A44;white-space:nowrap}
+.panel{background:#131C2E;border:1px solid #26324A;padding:16px;display:flex;flex-direction:column;gap:14px}
+.k{font-size:13px;line-height:18px;font-weight:600;color:#9AA7BD}
+.v{font-size:16px}
+.doc{font-variant-numeric:tabular-nums}
+.badge{font-size:12px;line-height:16px;font-weight:600;background:#1B2A44;padding:2px 8px;margin-right:8px}
+.lock{display:flex;gap:6px;align-items:flex-start;font-size:12px;line-height:16px;color:#9AA7BD;margin-top:4px}
+.lock svg{flex-shrink:0}
+.links{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #26324A;padding-top:4px}
+.open{color:#FF7E00;font-weight:600;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+.dng{display:inline-flex;align-items:center;min-height:44px;color:#FFA3A3;font-weight:600;font-size:14px;text-decoration:none}
+.lh{display:flex;align-items:baseline;gap:10px;margin-top:8px}
+.lh h2{font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;line-height:24px;font-weight:600}
+.empty{padding:24px 16px;background:#131C2E;border:1px solid #26324A;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.empty h2{font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;line-height:24px;font-weight:600}
+.empty p{font-size:14px;line-height:20px;color:#9AA7BD}
+.act{padding:12px 16px;background:#0F1729;border-top:1px solid #26324A;flex-shrink:0}
+.btn{height:48px;width:100%;border:0;background:#FF7E00;color:#0B1220;font:600 16px "IBM Plex Sans",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+</style>
+</helmet>
+<div class="phone">
+  <header class="top">
+    <a class="bk" href="Clientes-celular.dc.html" aria-label="Voltar para Clientes">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    <p class="ttl">Cliente</p>
+  </header>
+
+  <div class="body">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h1 class="name">Mariana Tavares Lopes</h1>
+      <span class="st" style="align-self:flex-start"><span aria-hidden="true">●</span>Ativo</span>
+    </div>
+
+    <section class="panel" aria-label="Dados do cliente">
+      <div>
+        <div class="k">Documento</div>
+        <div class="v doc"><span class="badge">CPF</span>265.903.118-54</div>
+        <p class="lock"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Não pode ser alterado.</p>
+      </div>
+      <div><div class="k">E-mail</div><div class="v" style="color:#9AA7BD">Não informado</div></div>
+      <div><div class="k">Telefone</div><div class="v doc">(19) 98754-2210</div></div>
+      <div class="links">
+        <a class="open" href="#">Editar cliente</a>
+        <a class="dng" href="#">Desativar cliente</a>
+      </div>
+    </section>
+
+    <div class="lh"><h2>Locais</h2></div>
+    <section class="empty">
+      <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9AA7BD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12s-8-7-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      <h2>Nenhum local cadastrado</h2>
+      <p>Cadastre o endereço onde há instalação, como "Casa" ou "Fazenda Boa Vista". Os equipamentos são cadastrados dentro de cada local.</p>
+    </section>
+  </div>
+
+  <div class="act">
+    <a class="btn" href="Novo-local-celular-erros.dc.html">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Cadastrar o primeiro local
+    </a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

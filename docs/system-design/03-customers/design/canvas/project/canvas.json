@@ -1,0 +1,31 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-11-22T12:00:00Z" },
+  "title": "Clientes: mockups da feature 03-customers",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 1280, "h": 820, "title": "1. Clientes, web" },
+    "Clientes-celular.dc.html": { "x": 1360, "y": 0, "w": 390, "h": 844, "title": "2. Clientes, celular" },
+    "Clientes-celular-sem-resultado.dc.html": { "x": 1830, "y": 0, "w": 390, "h": 844, "title": "3. Clientes, celular, sem resultado" },
+    "Clientes-web-vazio.dc.html": { "x": 0, "y": 964, "w": 1280, "h": 820, "title": "4. Clientes, web, nenhum cadastrado" },
+    "Clientes-celular-tecnico.dc.html": { "x": 2300, "y": 0, "w": 390, "h": 844, "title": "5. Clientes, celular, Técnico (só consulta)" },
+    "Clientes-web-erro.dc.html": { "x": 1360, "y": 964, "w": 1280, "h": 820, "title": "6. Clientes, web, erro de carregamento" },
+    "Cliente-formulario-web.dc.html": { "x": 0, "y": 1928, "w": 1280, "h": 820, "title": "7. Novo cliente, web (Tweaks: novo ou editar)" },
+    "Novo-cliente-celular-erros.dc.html": { "x": 1360, "y": 1928, "w": 390, "h": 844, "title": "8. Novo cliente, celular, com erro (Tweaks: qual erro)" },
+    "Ficha-web.dc.html": { "x": 0, "y": 2916, "w": 1280, "h": 1320, "title": "9. Ficha do cliente, web" },
+    "Ficha-celular.dc.html": { "x": 1360, "y": 2916, "w": 390, "h": 1640, "title": "10. Ficha do cliente, celular (página inteira)" },
+    "Ficha-celular-sem-locais.dc.html": { "x": 1830, "y": 2916, "w": 390, "h": 844, "title": "11. Ficha do cliente, celular, sem locais" },
+    "Ficha-web-cliente-desativado.dc.html": { "x": 0, "y": 4700, "w": 1280, "h": 900, "title": "12. Ficha do cliente desativado, web" },
+    "Ficha-celular-tecnico.dc.html": { "x": 2300, "y": 2916, "w": 390, "h": 844, "title": "13. Ficha do cliente, celular, Técnico (só consulta)" },
+    "Novo-local-web.dc.html": { "x": 0, "y": 5744, "w": 1280, "h": 820, "title": "14. Novo local, web" },
+    "Novo-local-celular-erros.dc.html": { "x": 1360, "y": 5744, "w": 390, "h": 844, "title": "15. Novo local, celular, com erro" },
+    "Local-desativado-celular.dc.html": { "x": 1830, "y": 5744, "w": 390, "h": 844, "title": "16. Local desativado na ficha, celular" },
+    "Novo-equipamento-web.dc.html": { "x": 0, "y": 6732, "w": 1280, "h": 820, "title": "17. Novo equipamento, web" },
+    "Novo-equipamento-celular-erros.dc.html": { "x": 1360, "y": 6732, "w": 390, "h": 844, "title": "18. Novo equipamento, celular, com erro" },
+    "Equipamento-celular.dc.html": { "x": 1830, "y": 6732, "w": 390, "h": 844, "title": "19. Equipamento, celular (Desativar e Reativar funcionam)", "is_interactive": true }
+  },
+  "order": ["Main.dc.html", "Clientes-celular.dc.html", "Clientes-celular-sem-resultado.dc.html", "Clientes-web-vazio.dc.html", "Clientes-celular-tecnico.dc.html", "Clientes-web-erro.dc.html", "Cliente-formulario-web.dc.html", "Novo-cliente-celular-erros.dc.html", "Ficha-web.dc.html", "Ficha-celular.dc.html", "Ficha-celular-sem-locais.dc.html", "Ficha-web-cliente-desativado.dc.html", "Ficha-celular-tecnico.dc.html", "Novo-local-web.dc.html", "Novo-local-celular-erros.dc.html", "Local-desativado-celular.dc.html", "Novo-equipamento-web.dc.html", "Novo-equipamento-celular-erros.dc.html", "Equipamento-celular.dc.html"],
+  "notes": {},
+  "designSystems": []
+}

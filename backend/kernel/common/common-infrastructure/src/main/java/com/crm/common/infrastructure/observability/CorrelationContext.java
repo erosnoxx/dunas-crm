@@ -70,10 +70,12 @@ public final class CorrelationContext {
     }
 
     private static void put(String key, String value) {
-        if (value == null)
+        if (value == null) {
             MDC.remove(key);
-        else
-            MDC.put(key, value);
+            return;
+        }
+
+        MDC.put(key, value);
     }
 
     /** Fechar nunca lança: o {@code close} roda no {@code finally} de quem trabalha. */

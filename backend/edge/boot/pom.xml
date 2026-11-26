@@ -47,6 +47,19 @@
         </dependency>
 
         <dependency>
+            <groupId>com.crm</groupId>
+            <artifactId>registry-infrastructure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- so a cadeia de seguranca (com.crm.boot.security) usa: e a excecao declarada em architecture.md 4.1 -->
+        <dependency>
+            <groupId>com.crm</groupId>
+            <artifactId>iam-application</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
@@ -99,6 +112,19 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ponta a ponta (IamEndToEndTest): Postgres e Redis reais; exige Docker -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
 

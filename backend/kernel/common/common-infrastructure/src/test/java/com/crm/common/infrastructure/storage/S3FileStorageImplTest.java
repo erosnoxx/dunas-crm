@@ -1,5 +1,6 @@
 package com.crm.common.infrastructure.storage;
 
+import com.crm.common.application.exceptions.InternalServerErrorException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -79,17 +80,17 @@ class S3FileStorageImplTest {
     @ValueSource(strings = {"", "/abs", "a//b", "../etc/passwd", "a/../b", "a b", "a?x=1", "a\nb"})
     @DisplayName("recusa chave com traversal, barra solta, espaço ou quebra de linha")
     void rejectsUnsafeKeys(String key) {
-        assertThatThrownBy(() -> storage.publicUrl(key)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> storage.publicUrl(key)).isInstanceOf(InternalServerErrorException.class);
         assertThatThrownBy(() -> storage.prepareUpload(key, "image/png", Duration.ofMinutes(1)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InternalServerErrorException.class);
     }
 
     @Test
     @DisplayName("recusa chave nula, chave longa demais e contentType vazio")
     void rejectsNullLongAndBlank() {
-        assertThatThrownBy(() -> storage.publicUrl(null)).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> storage.publicUrl("a".repeat(201))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> storage.publicUrl(null)).isInstanceOf(InternalServerErrorException.class);
+        assertThatThrownBy(() -> storage.publicUrl("a".repeat(201))).isInstanceOf(InternalServerErrorException.class);
         assertThatThrownBy(() -> storage.prepareUpload("a/b.png", " ", Duration.ofMinutes(1)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InternalServerErrorException.class);
     }
 }

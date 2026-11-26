@@ -31,9 +31,11 @@ public class MdcTaskDecorator implements TaskDecorator {
     }
 
     private static void restore(java.util.Map<String, String> contextMap) {
-        if (contextMap == null)
+        if (contextMap == null) {
             MDC.clear();
-        else
-            MDC.setContextMap(contextMap);
+            return;
+        }
+
+        MDC.setContextMap(contextMap);
     }
 }

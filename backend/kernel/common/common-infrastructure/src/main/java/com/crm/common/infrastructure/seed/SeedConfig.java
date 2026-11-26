@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
@@ -15,8 +16,14 @@ public class SeedConfig {
     public DatabaseSeeder databaseSeeder(
             List<Seeder<?>> seeders,
             ObjectMapper objectMapper,
-            Environment environment
+            Environment environment,
+            TransactionTemplate useCaseTransactionTemplate
     ) {
-        return new DatabaseSeeder(seeders, objectMapper, environment);
+        return new DatabaseSeeder(
+                seeders,
+                objectMapper,
+                environment,
+                useCaseTransactionTemplate
+        );
     }
 }

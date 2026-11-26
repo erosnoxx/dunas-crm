@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -77,6 +78,16 @@ class BoundedContextRulesTest {
         "com.rabbitmq..",
         "redis.clients.."
     };
+
+    /**
+     * Subdomínios de um mesmo BC (architecture.md §4.4) e, para cada um, os subdomínios dos quais
+     * ele pode depender. A chave é {@code <bc>.<subdomínio>}. Todo par do mesmo BC fora deste
+     * mapa é proibido.
+     */
+    private static final Map<String, Set<String>> SUBDOMAIN_DEPENDENCIES = Map.of(
+        "registry.catalog", Set.of(),
+        "registry.customers", Set.of("registry.catalog")
+    );
 
     private static JavaClasses classes;
 
@@ -245,6 +256,46 @@ class BoundedContextRulesTest {
             .because("composição entre BCs mora no módulo orchestration, nunca montada de improviso dentro de web (architecture.md §5.4)"));
     }
 
+    /**
+     * A única exceção em que {@code boot} enxerga a application de um BC: a cadeia de segurança
+     * ({@code com.crm.boot.security..}) chama {@code AuthenticateSession}, do IAM. Qualquer outra
+     * classe de {@code boot}, e qualquer outro BC dentro da cadeia, continua proibida
+     * (architecture.md §4.1).
+     */
+    @Test
+    @DisplayName("boot só depende da application do iam, e só na cadeia de segurança")
+    void bootDependsOnApplicationOnlyInTheSecurityChain() {
+        for (var context : BOUNDED_CONTEXTS) {
+            var scope = context.equals("iam")
+                ? resideInAPackage(BASE + ".boot..").and(not(resideInAPackage(BASE + ".boot.security..")))
+                : resideInAPackage(BASE + ".boot..");
+
+            check(noClasses()
+                .that(scope)
+                .should().dependOnClassesThat().resideInAPackage(layer(context, "application"))
+                .because("boot só configura; a única exceção é a cadeia de segurança, que autentica pelo iam (architecture.md 4.1)"));
+        }
+    }
+
+    @Test
+    @DisplayName("subdomínios do mesmo BC só dependem na direção declarada")
+    void subdomainsDependOnlyInDeclaredDirection() {
+        for (var from : SUBDOMAIN_DEPENDENCIES.keySet()) {
+            for (var to : SUBDOMAIN_DEPENDENCIES.keySet()) {
+                if (from.equals(to) || SUBDOMAIN_DEPENDENCIES.get(from).contains(to))
+                    continue;
+
+                if (!from.split("\\.")[0].equals(to.split("\\.")[0]))
+                    continue;
+
+                check(noClasses()
+                    .that().resideInAPackage(subdomain(from))
+                    .should().dependOnClassesThat().resideInAPackage(subdomain(to))
+                    .because("subdomínios do mesmo BC só dependem em mão única, na direção declarada (architecture.md 4.4)"));
+            }
+        }
+    }
+
     @Test
     @DisplayName("não existe ciclo de dependência entre bounded contexts")
     void noCyclesBetweenBoundedContexts() {
@@ -265,6 +316,13 @@ class BoundedContextRulesTest {
 
     private static String bc(String context) {
         return BASE + "." + context + "..";
+    }
+
+    /** {@code registry.catalog} vira {@code com.crm.registry.*.catalog..}: o subdomínio vem depois da camada. */
+    private static String subdomain(String qualified) {
+        var parts = qualified.split("\\.");
+
+        return BASE + "." + parts[0] + ".*." + parts[1] + "..";
     }
 
     private static String layer(String context, String layer) {

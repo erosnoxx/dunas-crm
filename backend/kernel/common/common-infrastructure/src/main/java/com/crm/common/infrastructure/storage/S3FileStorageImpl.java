@@ -1,6 +1,7 @@
 package com.crm.common.infrastructure.storage;
 
 import com.crm.common.application.exceptions.ExternalServiceException;
+import com.crm.common.application.exceptions.InternalServerErrorException;
 import com.crm.common.application.storage.FileStorage;
 import com.crm.common.application.storage.StoredObject;
 import com.crm.common.application.storage.UploadTicket;
@@ -44,7 +45,7 @@ class S3FileStorageImpl implements FileStorage {
         requireValidKey(key);
 
         if (contentType == null || contentType.isBlank())
-            throw new IllegalArgumentException("contentType é obrigatório");
+            throw new InternalServerErrorException("contentType é obrigatório");
 
         var put = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -107,7 +108,7 @@ class S3FileStorageImpl implements FileStorage {
 
     private static void requireValidKey(String key) {
         if (key == null || key.length() > MAX_KEY_LENGTH || !VALID_KEY.matcher(key).matches() || key.contains(".."))
-            throw new IllegalArgumentException("chave de arquivo inválida");
+            throw new InternalServerErrorException("chave de arquivo inválida");
     }
 
     private static ExternalServiceException unavailable(SdkException cause) {

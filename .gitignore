@@ -35,3 +35,6 @@ node_modules/
 # Ferramentas
 .claude/settings.local.json
 graphify-out/
+
+# Frontend
+.react-router/

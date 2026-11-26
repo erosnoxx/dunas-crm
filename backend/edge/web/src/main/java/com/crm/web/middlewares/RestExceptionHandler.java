@@ -23,8 +23,7 @@ import java.util.Optional;
  * <p>Exceptions do próprio Spring MVC (método não suportado, tipo de mídia) seguem o tratamento
  * padrão de {@link ResponseEntityExceptionHandler}.
  */
-@Slf4j
-@RestControllerAdvice
+@Slf4j @RestControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     static final String CODE = "code";

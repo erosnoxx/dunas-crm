@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Novo local, web</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1220;color:#E8EDF5;font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:24px}
+h1,h2,p{margin:0}
+.shell{display:flex;width:1280px;height:820px}
+.nav{width:232px;box-sizing:border-box;background:#0F1729;padding:24px 16px;display:flex;flex-direction:column;gap:32px;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px;font-family:"Chakra Petch",system-ui,sans-serif;font-size:20px;font-weight:600;letter-spacing:.04em}
+.brand img{width:40px;height:40px;border-radius:8px;display:block}
+.item{display:flex;align-items:center;gap:12px;height:44px;padding:0 14px;font-size:14px;font-weight:600;color:#9AA7BD;text-decoration:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.item.on{background:#1B2A44;color:#E8EDF5}
+.who{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.av{width:40px;height:40px;border-radius:50%;background:#1B2A44;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px}
+.acc{font-size:14px;color:#9AA7BD;padding:10px 8px;display:block}
+.main{flex:1;min-width:0;padding:32px;display:flex;flex-direction:column;gap:20px;overflow:hidden}
+.title{font-family:"Chakra Petch",system-ui,sans-serif;font-size:36px;line-height:40px;font-weight:700}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#9AA7BD;text-decoration:none;min-height:44px}
+.panel{background:#131C2E;border:1px solid #26324A;padding:24px;max-width:640px;box-sizing:border-box;width:100%;display:flex;flex-direction:column;gap:18px}
+.fl{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fl label,.fl .lb{font-size:13px;line-height:18px;font-weight:600}
+.in{height:44px;box-sizing:border-box;width:100%;background:#0B1220;border:1px solid #34476B;color:#E8EDF5;padding:0 12px;font:inherit;font-size:16px}
+.ro{height:44px;box-sizing:border-box;display:flex;align-items:center;padding:0 12px;background:#0F1729;border:1px solid #26324A;color:#9AA7BD;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.help{font-size:12px;line-height:16px;color:#9AA7BD}
+.sec{border-top:1px solid #26324A;padding-top:18px;display:flex;flex-direction:column;gap:12px}
+.sec h2{font-size:13px;line-height:18px;font-weight:600;color:#9AA7BD}
+.g1{display:grid;grid-template-columns:160px minmax(0,1fr);gap:12px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 96px;gap:12px}
+.row{display:flex;gap:12px;justify-content:flex-end}
+.btn{height:44px;border:0;background:#FF7E00;color:#0B1220;font:600 14px "IBM Plex Sans",system-ui,sans-serif;padding:0 20px;display:inline-flex;align-items:center;text-decoration:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.btn2{height:44px;background:#1B2A44;color:#E8EDF5;font:600 14px "IBM Plex Sans",system-ui,sans-serif;padding:0 20px;display:inline-flex;align-items:center;text-decoration:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.cap{font-size:12px;line-height:16px;color:#9AA7BD;max-width:640px}
+</style>
+</helmet>
+<div class="shell">
+  <nav class="nav" aria-label="Principal">
+    <div class="brand"><img src="/_blob/92042a9ffee5d55ce807843f55fc291d" alt="">DUNAS</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <a class="item on" href="Main.dc.html" aria-current="page">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 2v2M8 2v2"/><rect x="3" y="4" width="18" height="18" rx="2"/><circle cx="12" cy="11" r="3"/><path d="M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
+        Clientes
+      </a>
+      <a class="item" href="#">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+        Catálogo
+      </a>
+      <a class="item" href="#">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+        Usuários
+      </a>
+    </div>
+    <div class="who">
+      <div style="display:flex;align-items:center;gap:12px;padding:0 8px">
+        <div class="av" aria-hidden="true">M</div>
+        <div style="display:flex;flex-direction:column;line-height:1.25"><span style="font-size:14px;font-weight:600">Marina Costa</span><span style="font-size:13px;color:#9AA7BD">Administrador</span></div>
+      </div>
+      <a class="acc" href="#">Minhas sessões</a>
+      <a class="acc" href="#" style="padding-top:0">Trocar senha</a>
+      <a class="acc" href="#" style="padding-top:0">Sair</a>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div>
+      <a class="back" href="Ficha-web.dc.html">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        J. Silva Comércio de Alimentos Ltda
+      </a>
+      <h1 class="title">Novo local</h1>
+    </div>
+
+    <form class="panel" action="#">
+      <div class="fl"><span class="lb">Cliente</span><div class="ro">J. Silva Comércio de Alimentos Ltda (Padaria Boa Vista)</div></div>
+      <div class="fl">
+        <label for="nome">Nome do local *</label>
+        <input id="nome" class="in" type="text" maxlength="60" value="Fábrica" aria-describedby="nome-dica">
+        <p id="nome-dica" class="help">Um nome curto para achar o local na ficha, como "Casa" ou "Fazenda Boa Vista".</p>
+      </div>
+
+      <div class="sec">
+        <h2>Endereço</h2>
+        <div class="g1">
+          <div class="fl">
+            <label for="cep">CEP *</label>
+            <input id="cep" class="in" type="text" inputmode="numeric" placeholder="00000-000" value="38446-102" aria-describedby="cep-dica">
+          </div>
+          <div class="fl">
+            <label for="rua">Logradouro *</label>
+            <input id="rua" class="in" type="text" maxlength="150" value="Rua Tiradentes">
+          </div>
+        </div>
+        <p id="cep-dica" class="help" style="margin-top:-6px">O CEP não preenche o endereço: digite todos os campos.</p>
+        <div class="g1">
+          <div class="fl">
+            <label for="num">Número *</label>
+            <input id="num" class="in" type="text" maxlength="15" value="220" aria-describedby="num-dica">
+          </div>
+          <div class="fl">
+            <label for="comp">Complemento (opcional)</label>
+            <input id="comp" class="in" type="text" maxlength="50" value="Galpão 2">
+          </div>
+        </div>
+        <p id="num-dica" class="help" style="margin-top:-6px">Sem número, use "S/N".</p>
+        <div class="g2">
+          <div class="fl">
+            <label for="bairro">Bairro *</label>
+            <input id="bairro" class="in" type="text" maxlength="100" value="Distrito Industrial">
+          </div>
+          <div class="fl">
+            <label for="cid">Cidade *</label>
+            <input id="cid" class="in" type="text" maxlength="100" value="Araguari">
+          </div>
+          <div class="fl">
+            <label for="uf">UF *</label>
+            <select id="uf" class="in"><option>AC</option><option>AL</option><option>AM</option><option>AP</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option selected>MG</option><option>MS</option><option>MT</option><option>PA</option><option>PB</option><option>PE</option><option>PI</option><option>PR</option><option>RJ</option><option>RN</option><option>RO</option><option>RR</option><option>RS</option><option>SC</option><option>SE</option><option>SP</option><option>TO</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <a class="btn2" href="Ficha-web.dc.html">Cancelar</a>
+        <a class="btn" href="Ficha-web.dc.html">Salvar local</a>
+      </div>
+    </form>
+    <p class="cap">Página própria, como "Novo modelo", e não painel lateral. Editar local abre esta página preenchida, com "Salvar alterações" e, ao lado, o painel "Situação" com "Desativar local", sem confirmação (como na página do modelo). O cliente do local não muda.</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
