@@ -1,4 +1,4 @@
-package com.crm.web.iam;
+package com.crm.web.iam.controllers;
 
 import com.crm.common.application.pages.Page;
 import com.crm.common.application.pages.Pageable;

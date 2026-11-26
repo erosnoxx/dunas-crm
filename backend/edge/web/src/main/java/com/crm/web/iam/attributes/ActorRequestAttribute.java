@@ -1,10 +1,10 @@
-package com.crm.web.iam;
+package com.crm.web.iam.attributes;
 
 /**
  * Nome do atributo de requisição onde a cadeia de segurança do {@code boot} deixa o
  * {@link com.crm.shared.application.Actor} da sessão autenticada.
  *
- * <p>É o único elo entre a autenticação e os controllers: o {@link ActorArgumentResolver} lê
+ * <p>É o único elo entre a autenticação e os controllers: o {@link com.crm.web.iam.resolvers.ActorArgumentResolver} lê
  * daqui e nenhum controller toca em cookie, token ou cabeçalho de credencial.
  */
 public final class ActorRequestAttribute {

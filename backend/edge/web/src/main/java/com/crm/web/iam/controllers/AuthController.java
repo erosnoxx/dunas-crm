@@ -1,5 +1,7 @@
-package com.crm.web.iam;
+package com.crm.web.iam.controllers;
 
+import com.crm.web.iam.views.SessionView;
+import com.crm.web.iam.cookies.SessionCookie;
 import com.crm.shared.application.Actor;
 import com.crm.iam.application.schemas.CurrentUser;
 import com.crm.iam.application.schemas.SessionResponse;

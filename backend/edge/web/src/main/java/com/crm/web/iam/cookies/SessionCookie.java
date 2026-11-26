@@ -1,4 +1,4 @@
-package com.crm.web.iam;
+package com.crm.web.iam.cookies;
 
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;

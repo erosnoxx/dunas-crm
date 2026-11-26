@@ -2,7 +2,7 @@ package com.crm.boot.security;
 
 import com.crm.common.application.exceptions.UnauthorizedException;
 import com.crm.iam.application.usecases.commands.AuthenticateSession;
-import com.crm.web.iam.ActorRequestAttribute;
+import com.crm.web.iam.attributes.ActorRequestAttribute;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

@@ -1,4 +1,4 @@
-package com.crm.web.registry;
+package com.crm.web.registry.controllers;
 
 import com.crm.common.application.pages.Page;
 import com.crm.common.application.pages.Pageable;

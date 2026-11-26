@@ -1,5 +1,6 @@
-package com.crm.web.iam;
+package com.crm.web.iam.config;
 
+import com.crm.web.iam.resolvers.ActorArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

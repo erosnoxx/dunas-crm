@@ -1,5 +1,7 @@
-package com.crm.web.iam;
+package com.crm.web.iam.controllers;
 
+import com.crm.web.iam.attributes.ActorRequestAttribute;
+import com.crm.web.iam.IamMvc;
 import com.crm.iam.application.usecases.commands.RevokeSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

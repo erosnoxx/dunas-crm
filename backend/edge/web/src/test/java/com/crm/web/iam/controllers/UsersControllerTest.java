@@ -1,5 +1,7 @@
-package com.crm.web.iam;
+package com.crm.web.iam.controllers;
 
+import com.crm.web.iam.attributes.ActorRequestAttribute;
+import com.crm.web.iam.IamMvc;
 import com.crm.common.application.pages.Page;
 import com.crm.common.application.pages.Pageable;
 import com.crm.iam.application.schemas.SessionSummary;
