@@ -1,5 +1,6 @@
 package com.crm.web.iam;
 
+import com.crm.web.iam.resolvers.ActorArgumentResolver;
 import com.crm.shared.application.Actor;
 import com.crm.shared.domain.enums.Role;
 import com.crm.web.middlewares.RestExceptionHandler;

@@ -1,8 +1,8 @@
-package com.crm.web.registry;
+package com.crm.web.registry.controllers;
 
 import com.crm.registry.application.customers.schemas.ZipCodeAddress;
 import com.crm.registry.application.customers.usecases.queries.FindAddressByZipCode;
-import com.crm.web.iam.ActorRequestAttribute;
+import com.crm.web.iam.attributes.ActorRequestAttribute;
 import com.crm.web.iam.IamMvc;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

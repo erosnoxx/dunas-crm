@@ -1,4 +1,4 @@
-package com.crm.web.iam;
+package com.crm.web.iam.views;
 
 import com.crm.iam.application.schemas.SessionResponse;
 
@@ -12,7 +12,7 @@ public record SessionView(
         Instant expiresAt,
         boolean mustChangePassword
 ) {
-    static SessionView of(SessionResponse response) {
+    public static SessionView of(SessionResponse response) {
         return new SessionView(response.expiresAt(), response.mustChangePassword());
     }
 }

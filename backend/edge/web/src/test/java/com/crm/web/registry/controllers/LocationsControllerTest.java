@@ -1,4 +1,4 @@
-package com.crm.web.registry;
+package com.crm.web.registry.controllers;
 
 import com.crm.common.application.exceptions.ConcurrentUpdateException;
 import com.crm.common.application.exceptions.UnprocessableEntityException;
@@ -8,7 +8,7 @@ import com.crm.registry.application.customers.usecases.commands.ReactivateLocati
 import com.crm.registry.application.customers.usecases.commands.RegisterLocation;
 import com.crm.registry.application.customers.usecases.commands.UpdateLocation;
 import com.crm.shared.application.schemas.response.UUIDResponse;
-import com.crm.web.iam.ActorRequestAttribute;
+import com.crm.web.iam.attributes.ActorRequestAttribute;
 import com.crm.web.iam.IamMvc;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

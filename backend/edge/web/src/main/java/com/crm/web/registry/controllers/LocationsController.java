@@ -1,4 +1,4 @@
-package com.crm.web.registry;
+package com.crm.web.registry.controllers;
 
 import com.crm.registry.application.customers.usecases.commands.DeactivateLocation;
 import com.crm.registry.application.customers.usecases.commands.ReactivateLocation;

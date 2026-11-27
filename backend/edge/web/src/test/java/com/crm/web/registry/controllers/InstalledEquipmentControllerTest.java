@@ -1,4 +1,4 @@
-package com.crm.web.registry;
+package com.crm.web.registry.controllers;
 
 import com.crm.common.application.exceptions.ConflictException;
 import com.crm.common.application.exceptions.UnprocessableEntityException;
@@ -7,7 +7,7 @@ import com.crm.registry.application.customers.usecases.commands.InstallEquipment
 import com.crm.registry.application.customers.usecases.commands.ReactivateInstalledEquipment;
 import com.crm.registry.application.customers.usecases.commands.UpdateInstalledEquipment;
 import com.crm.shared.application.schemas.response.UUIDResponse;
-import com.crm.web.iam.ActorRequestAttribute;
+import com.crm.web.iam.attributes.ActorRequestAttribute;
 import com.crm.web.iam.IamMvc;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

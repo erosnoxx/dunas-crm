@@ -1,5 +1,6 @@
-package com.crm.web.iam;
+package com.crm.web.iam.resolvers;
 
+import com.crm.web.iam.attributes.ActorRequestAttribute;
 import com.crm.common.application.exceptions.UnauthorizedException;
 import com.crm.shared.application.Actor;
 import org.springframework.core.MethodParameter;
